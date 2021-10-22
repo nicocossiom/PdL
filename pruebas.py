@@ -1,22 +1,26 @@
-i=1
-class prueba:
-    def __init__(self):
-        self.a="/"
-        self.f = open("input", "r")
-        self.a = self.f.read(1) 
+from lexer import Lexer
 
-    def cambiar(self):
-        self.a = "*"
-        print("cambiado")
+l = Lexer("input")
+l.correrLines()
 
-    def next(self):
-        self.a = self.f.read(1) 
-p = prueba()
+# class prueba:
+#     def __init__(self):
+#         self.a="/"
+#         self.f = open("input", "r")
+#         self.a = self.f.read(1) 
 
-if p.a == "/" and p.cambiar() is None and p.a == "*":
-    print(p.a)
+#     def cambiar(self):
+#         self.a = "*"
+#         print("cambiado")
 
-while p.a != "":
-    p.next()
-    i=i+1
-    print(i)
+#     def next(self):
+#         self.a = self.f.read(1) 
+# p = prueba()
+
+# if p.a == "/" and p.cambiar() is None and p.a == "*":
+#     print(p.a)
+
+# while p.a != "":
+#     p.next()
+#     i=i+1
+#     print(i)

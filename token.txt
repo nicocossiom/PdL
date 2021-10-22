@@ -1,0 +1,10 @@
+< asig , - >
+< llaveCerrado , - >
+< llaveAbierto , - >
+< llaveCerrado , - >
+< id , function >
+< id , let >
+< cteEntera , 123 >
+< cadena , cadena >
+< and , - >
+< id , int >

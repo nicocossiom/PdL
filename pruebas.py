@@ -1,7 +1,7 @@
-from lexer import Lexer
+import sys
 
-l = Lexer("input")
-l.correrLines()
+# l = Lexer("input")
+# l.correrLines()
 
 # class prueba:
 #     def __init__(self):
@@ -24,3 +24,5 @@ l.correrLines()
 #     p.next()
 #     i=i+1
 #     print(i)
+
+print(len(sys.argv))

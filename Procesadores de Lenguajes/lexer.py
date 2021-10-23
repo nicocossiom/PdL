@@ -101,7 +101,7 @@ class Lexer:
                         else:self.error(1)
             
             #Block comment processing
-            elif self.car == "/": 
+            elif self.car == "/":
                 self.next()
                 if self.car == "*":
                     self.next()
@@ -117,7 +117,8 @@ class Lexer:
                 while self.car != "\"":
                     self.concatenate()
                     self.next()
-                self.genToken("cadena",self.lex)
+                if(len(self.lex)<65):self.genToken("cadena",self.lex)
+                else:self.error(1)
             
             #Operators, symbols
             elif self.car in SYMB_OPS:

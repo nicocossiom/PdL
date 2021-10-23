@@ -23,8 +23,9 @@ SYMB_OPS ={
     "}": "llaveCerrado"
 }
 ERROR_CODE = {
-    0:"Comentario ",
-    1:""
+    0:"Uso erróneo de comentarios",
+    1:"Lexema excede el tamaño máximo de caracteres permitido",
+    2:"Dígito con valor mayor al permitido (32768) en el sistema"
 }
 
 def peek_nextCar(f):
@@ -43,7 +44,7 @@ class Lexer:
         self.num = 0 #current integer number being constructed
         self.lex = "" #current string being constructed
         self.car = f.read(1) #current character being read
-        self.tokenList = [] 
+        self.tokenList = [] #current list of tokens being generated and saved
 
     def next(self):
         '''Advances current character to the next one from the file'''
@@ -51,7 +52,7 @@ class Lexer:
         if self.car != "": 
             while(ord(self.car) < 33):
                 self.car = f.read(1)
-        
+    
     def generateNumber(self):
         '''Adds current char to number in construction after multiplying the number by 10 '''
         self.num = self.num * 10 + int(self.car)        
@@ -67,29 +68,38 @@ class Lexer:
 
 
 # < codigo , atributo > 
-    def genToken(self, code:str, attribute) -> Token: 
+    def genToken(self, code:str, attribute=None) -> Token: 
         token = Token(code, attribute)
         self.tokenList.append(token)
         self.lex = ""
-        self.num = 0 
+        self.num = 0
         return token
 
     def error(self, tipo: int):
-        sys.exit("ERROR:", ERROR_CODE[tipo])
+        sys.exit(f"[ERROR] {ERROR_CODE[tipo]}")
 
     def tokenize(self):
         while self.car != "":
-            #Integer being formed 
+            #Integer being formed
             if (self.car).isdigit() and self.lex=="":
                 self.generateNumber()
-                if(not peek_nextCar(f).isdigit()): self.genToken("cteEntera", self.num)
+                if(not peek_nextCar(f).isdigit()):
+                    if(self.num < 32768):
+                        self.genToken("cteEnt", self.num)
+                    else:
+                        self.error(2)
+            
             #Identifiers or Reserved Words
             elif self.car in LETTERS or self.lex != "":
                 self.concatenate()
                 nextCar = peek_nextCar(f)
                 if(nextCar not in LETTERS or nextCar == "_" or nextCar.isdigit() or nextCar ==""):
-                    if self.lex in RES_WORD: self.genToken("id",self.lex)
-                    else: self.genToken(self.lex, None)
+                    if self.lex in RES_WORD: 
+                        self.genToken(self.lex)
+                    else:
+                        if(len(self.lex)<65):self.genToken(self.lex)
+                        else:self.error(1)
+            
             #Block comment processing
             elif self.car == "/": 
                 self.next()
@@ -100,6 +110,7 @@ class Lexer:
                         self.next()
                 else: self.error(0)
                 self.next()
+            
             #String (cadena) processing
             elif self.car == "\"": 
                 self.next()
@@ -107,6 +118,7 @@ class Lexer:
                     self.concatenate()
                     self.next()
                 self.genToken("cadena",self.lex)
+            
             #Operators, symbols
             elif self.car in SYMB_OPS:
                 #+ or ++

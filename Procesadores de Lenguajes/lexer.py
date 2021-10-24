@@ -62,9 +62,16 @@ class Lexer:
         self.lex += self.car
 
     def printToken(self,):
-        with open("token.txt", "w") as f:
+        with open("tokens.txt", "w") as f:
             for token in self.tokenList:
-                f.write(f"< {token.code} , {token.att} >\n".replace("None", "-"))
+                f.write(f"< {token.code} , {token.att} >\n".replace("None", " ")) #del* < código del* , del* [atributo] del* > del* RE
+
+    def printTS(self):
+        with open("ts.txt", "w") as f:
+            #to do
+            for token in self.tokenList:
+                f.write(f"* TS de X#N:\n*'{token}'\n+tipo: {token.code}\n+despl: {token}num_x \n") #pal* # del* núm del* : del* RC
+
 
 
 # < codigo , atributo > 
@@ -80,6 +87,7 @@ class Lexer:
 
     def tokenize(self):
         while self.car != "":
+            # ------------------ TO FIX ------------------
             #Integer being formed
             if (self.car).isdigit() and self.lex=="":
                 self.generateNumber()

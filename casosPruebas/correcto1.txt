@@ -1,5 +1,5 @@
 function salto string (){
-	return "\n";
+	return "hola";
 }
 
 function imprime (string s, string msg, int f){	/* función que recibe 3 argumentos */

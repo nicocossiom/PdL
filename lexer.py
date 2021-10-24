@@ -6,7 +6,7 @@ import os
 
 if len(sys.argv) > 2: sys.exit("Input file path to analyze as program argument")
 #file that the lexer will generate tokens for 
-if len(sys.argv) == 1: f = open(os.getcwd+"/casosPruebas/correcto1" ,"r")
+if len(sys.argv) == 1: f = open("./casosPruebas/correcto1.txt" ,"r")
 elif os.path.exists(os.getcwd() + "/"+ sys.argv[1]): f = open(sys.argv[1], "r")
 else: sys.exit(f"File \'{sys.argv[1]}\' does not exist")
 #Lenguage definitions by class
@@ -51,12 +51,13 @@ class Lexer:
 
     def next(self):
         '''Advances current character to the next one from the file'''
-        self.car = f.read(1)
+        if self.peek_nextCar(f)!="": self.car = f.read(1)
         if self.car == "\n": self.line+=1
         if self.car != "": 
             while(ord(self.car) < 33):
                 self.car = f.read(1)
                 if self.car == "\n": self.line+=1
+                if self.car == "": break
     
     def generateNumber(self):
         '''Adds current char to number in construction after multiplying the number by 10 '''

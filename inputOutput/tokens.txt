@@ -1,0 +1,13 @@
+< asig ,   >
+< llaveCerrado ,   >
+< llaveAbierto ,   >
+< llaveCerrado ,   >
+< function ,   >
+< let ,   >
+< cteEnt , 123 >
+< cadena , cadena >
+< and ,   >
+< int ,   >
+< id , se >
+< id , vienen >
+< id , cositas >

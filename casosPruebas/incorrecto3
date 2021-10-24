@@ -1,0 +1,10 @@
+/*
+Imprimir en salida estándar con formateo de variables entre la cadena de caracteres
+*/
+let int five = 5;
+let int ten = 10;
+let int number = 32768;
+print(`Fifteen is ` + five `+` ten `and not ` + 2 * five `+` ten`.`);
+print("An int variable is lower than " + number);
+let string test = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
+print(test);

@@ -1,0 +1,20 @@
+< id , ive >
+< id , en >
+< puntoComa ,   >
+< print ,   >
+< parAbierto ,   >
+< cadena , An int variable is lower than  >
+< mas ,   >
+< id , number >
+< parCerrado ,   >
+< puntoComa ,   >
+< let ,   >
+< string ,   >
+< id , test >
+< asig ,   >
+< puntoComa ,   >
+< print ,   >
+< parAbierto ,   >
+< id , test >
+< parCerrado ,   >
+< puntoComa ,   >

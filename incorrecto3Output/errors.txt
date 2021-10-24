@@ -1,0 +1,8 @@
+-------------------------------------
+Errors output for file 'incorrecto3':
+-------------------------------------
+Error code'6'': Cadena se debe especificar entre " ", no con ' '--> linea 7
+Error code'6'': Cadena se debe especificar entre " ", no con ' '--> linea 7
+Error code'6'': Cadena se debe especificar entre " ", no con ' '--> linea 7
+Error code'6'': Cadena se debe especificar entre " ", no con ' '--> linea 7
+Error code'1'': Lexema excede el tamaño maximo de caracteres permitido--> linea 9

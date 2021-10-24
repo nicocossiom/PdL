@@ -1,0 +1,26 @@
+< function ,   >
+< id , bisiesto >
+< boolean ,   >
+< parAbierto ,   >
+< int ,   >
+< id , a >
+< parCerrado ,   >
+< llaveAbierto ,   >
+< id , return >
+< parAbierto ,   >
+< id , a >
+< cteEnt , 4 >
+< equals ,   >
+< cteEnt , 0 >
+< and ,   >
+< id , a >
+< cteEnt , 100 >
+< asig ,   >
+< cteEnt , 0 >
+< id , a >
+< cteEnt , 400 >
+< equals ,   >
+< cteEnt , 0 >
+< parCerrado ,   >
+< puntoComa ,   >
+< llaveCerrado ,   >

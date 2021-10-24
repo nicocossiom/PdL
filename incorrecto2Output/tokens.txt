@@ -1,0 +1,102 @@
+< let ,   >
+< int ,   >
+< id , num >
+< asig ,   >
+< cteEnt , 1 >
+< puntoComa ,   >
+< function ,   >
+< id , factorial >
+< int ,   >
+< parAbierto ,   >
+< int ,   >
+< id , x >
+< parCerrado ,   >
+< llaveAbierto ,   >
+< id , if >
+< parAbierto ,   >
+< id , x >
+< mayor ,   >
+< cteEnt , 1 >
+< parCerrado ,   >
+< id , return >
+< id , x >
+< por ,   >
+< id , factorial >
+< parAbierto ,   >
+< id , x >
+< cteEnt , 1 >
+< parCerrado ,   >
+< puntoComa ,   >
+< id , return >
+< cteEnt , 1 >
+< puntoComa ,   >
+< llaveCerrado ,   >
+< function ,   >
+< id , Suma >
+< boolean ,   >
+< parAbierto ,   >
+< int ,   >
+< id , aux >
+< coma ,   >
+< int ,   >
+< id , fin >
+< parCerrado ,   >
+< llaveAbierto ,   >
+< id , for >
+< parAbierto ,   >
+< id , x >
+< asig ,   >
+< cteEnt , 1 >
+< puntoComa ,   >
+< id , x >
+< id , fin >
+< puntoComa ,   >
+< id , x >
+< asig ,   >
+< id , x >
+< mas ,   >
+< cteEnt , 2 >
+< parCerrado ,   >
+< llaveAbierto ,   >
+< id , aux >
+< mas ,   >
+< asig ,   >
+< id , factorial >
+< parAbierto ,   >
+< id , aux >
+< cteEnt , 1 >
+< parCerrado ,   >
+< puntoComa ,   >
+< llaveCerrado ,   >
+< id , return >
+< id , aux >
+< mayor ,   >
+< cteEnt , 10000 >
+< puntoComa ,   >
+< llaveCerrado ,   >
+< function ,   >
+< id , Imprime >
+< parAbierto ,   >
+< int ,   >
+< id , a >
+< parCerrado ,   >
+< llaveAbierto ,   >
+< print ,   >
+< parAbierto ,   >
+< id , a >
+< parCerrado ,   >
+< puntoComa ,   >
+< llaveCerrado ,   >
+< id , Imprime >
+< parAbierto ,   >
+< id , factorial >
+< parAbierto ,   >
+< id , Suma >
+< parAbierto ,   >
+< cteEnt , 5 >
+< coma ,   >
+< cteEnt , 6 >
+< parCerrado ,   >
+< parCerrado ,   >
+< parCerrado ,   >
+< puntoComa ,   >

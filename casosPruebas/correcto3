@@ -1,0 +1,37 @@
+function demo ()	{ /* definición de la función demo, sin argumentos y que no devuelve nada */
+	let int v1; let int v2; let int v3;
+	let int zv;
+
+	print ("Escriba tres números: ");
+	input (v1); input (v2); input (v3);
+	
+	if (v3 == 0) return;
+	
+	if (v1 == v2){
+		print ("Escriba su nombre: ");
+		let string s;
+		input (s);
+		if (v2 > v3){
+			let int v0 = v2;
+		}
+		else{
+			v0 = v3;
+		}
+		print (s);
+	}
+	s = "El primer valor era ";
+	if (v1 == 0){
+		print (s); 
+		print (v1); 
+		print (".\n");
+	}
+	else{
+		print (s); 
+		print (".\n");
+	}
+
+	potencia (v0, 4);
+	potencia (zv, 5);
+}
+
+demo(); /*El funcionamiento de la función demo no es correcta y el algoritmo es solo representativo*/

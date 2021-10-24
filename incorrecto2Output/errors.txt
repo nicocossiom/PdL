@@ -1,0 +1,10 @@
+-------------------------------------
+Errors output for file 'incorrecto2':
+-------------------------------------
+Error code'4'': Simbolo '-' no pertenece al lenguaje--> linea 4
+Error code'5'': Comentarios de tipo: '//comentario', no estan permitidos--> linea 4
+Error code'5'': Comentarios de tipo: '//comentario', no estan permitidos--> linea 6
+Error code'4'': Simbolo '<' no pertenece al lenguaje--> linea 10
+Error code'4'': Simbolo '-' no pertenece al lenguaje--> linea 11
+Error code'5'': Comentarios de tipo: '//comentario', no estan permitidos--> linea 14
+Error code'5'': Comentarios de tipo: '//comentario', no estan permitidos--> linea 18

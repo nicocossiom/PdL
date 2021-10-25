@@ -43,22 +43,48 @@ class Lexer:
         self.num = 0 #current integer number being constructed
         self.lex = "" #current string being constructed
         self.filename = os.path.basename(f.name)
-        self.car = f.read(1) #current character being read
+        self.car = "" #current character being read
         self.outputdir = os.getcwd()+"/" +self.filename+"Output"
         self.line = 1
         self.tokenList = [] #current list of tokens being generated and saved
         self.errorList = []
 
+    def skipBlockComments(self):
+        self.car = f.read(1)
+        if self.car == "*":
+            self.car = f.read(1)
+            while (self.peek_nextCar(f) != "/" and self.car != "*" and self.car != ""):
+                self.car = f.read(1)
+                if(self.car == ""): self.error(3)
+            self.car = f.read(1)
+            self.car = f.read(1)
+        elif self.car == "/": 
+            f.readline()
+            self.line+=1
+            self.error(5)
+        else: self.error(4, self.car)
+    
+    def skipDelimeters(self):
+        if self.car!= "":
+            while(self.car != "" and ord(self.car) < 33):    
+                if self.car == "\n": self.line+=1
+                if self.car == "": break#Block comment processing
+                self.car = f.read(1)
+            if self.car == "/": self.skipBlockComments()
+
     def next(self):
         '''Advances current character to the next one from the file'''
-        if self.peek_nextCar(f)!="": self.car = f.read(1)
-        if self.car == "\n": self.line+=1
-        if self.car != "": 
-            while(ord(self.car) < 33):
-                self.car = f.read(1)
-                if self.car == "\n": self.line+=1
-                if self.car == "": break
-    
+        # if self.peek_nextCar(f)!="": self.car = f.read(1)
+        self.car = f.read(1)
+        if self.car !="":
+            if self.car != "/":
+               self.skipDelimeters() 
+            else: 
+                self.skipBlockComments()
+                self.skipDelimeters()
+
+            
+
     def generateNumber(self):
         '''Adds current char to number in construction after multiplying the number by 10 '''
         self.num = self.num * 10 + int(self.car)        
@@ -97,6 +123,7 @@ class Lexer:
         if tipo == 1: self.lex = ""
    
     def tokenize(self):
+        self.next()
         while self.car != "":
             #Integer being formed
             if (self.car).isdigit() and self.lex=="":
@@ -117,21 +144,6 @@ class Lexer:
                     else:
                         if(len(self.lex)<65):self.genToken("id", self.lex)
                         else: self.error(1)
-            
-            #Block comment processing
-            elif self.car == "/":
-                self.next()
-                if self.car == "*":
-                    self.next()
-                    while (self.peek_nextCar(f) != "/" and self.car != "*"):
-                        self.next()
-                        self.next()
-                        if(self.car == ""): self.error(3)
-                    self.next()
-                elif self.car == "/": 
-                    f.readline()
-                    self.error(5)
-                else: self.error(4, self.car)
             
             #String (cadena) processing
             elif self.car == "\"" or "": 
@@ -169,8 +181,7 @@ class Lexer:
                     while self.car not in "\'`":
                         self.next()
                     if self.car != "": 
-                        self.next()
                         self.error(6) 
                     else: self.error(7)
                 else: self.error(4, self.car)
-            self.next()
+            if self.car != "": self.next()

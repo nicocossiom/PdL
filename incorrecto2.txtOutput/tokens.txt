@@ -18,7 +18,7 @@
 < mayor ,   >
 < cteEnt , 1 >
 < parCerrado ,   >
-< id , return >
+< return ,   >
 < id , x >
 < por ,   >
 < id , factorial >
@@ -27,7 +27,7 @@
 < cteEnt , 1 >
 < parCerrado ,   >
 < puntoComa ,   >
-< id , return >
+< return ,   >
 < cteEnt , 1 >
 < puntoComa ,   >
 < llaveCerrado ,   >
@@ -68,7 +68,7 @@
 < parCerrado ,   >
 < puntoComa ,   >
 < llaveCerrado ,   >
-< id , return >
+< return ,   >
 < id , aux >
 < mayor ,   >
 < cteEnt , 10000 >

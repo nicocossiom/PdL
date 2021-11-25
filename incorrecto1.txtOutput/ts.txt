@@ -1,0 +1,3 @@
+TS GLOBAL #1
+*Lexema: 'bisiesto'
+*Lexema: 'a'

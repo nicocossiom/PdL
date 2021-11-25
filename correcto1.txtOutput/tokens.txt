@@ -1,0 +1,48 @@
+< function ,   >
+< id , salto >
+< string ,   >
+< parAbierto ,   >
+< parCerrado ,   >
+< llaveAbierto ,   >
+< return ,   >
+< cadena , \n >
+< puntoComa ,   >
+< llaveCerrado ,   >
+< function ,   >
+< id , imprime >
+< parAbierto ,   >
+< string ,   >
+< id , s >
+< coma ,   >
+< string ,   >
+< id , msg >
+< coma ,   >
+< int ,   >
+< id , f >
+< parCerrado ,   >
+< llaveAbierto ,   >
+< print ,   >
+< parAbierto ,   >
+< id , s >
+< parCerrado ,   >
+< puntoComa ,   >
+< print ,   >
+< parAbierto ,   >
+< id , msg >
+< parCerrado ,   >
+< puntoComa ,   >
+< print ,   >
+< parAbierto ,   >
+< id , f >
+< parCerrado ,   >
+< puntoComa ,   >
+< print ,   >
+< parAbierto ,   >
+< id , salto >
+< parAbierto ,   >
+< parCerrado ,   >
+< parCerrado ,   >
+< puntoComa ,   >
+< return ,   >
+< puntoComa ,   >
+< llaveCerrado ,   >

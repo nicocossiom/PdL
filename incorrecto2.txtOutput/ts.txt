@@ -1,0 +1,11 @@
+TS GLOBAL #1
+*Lexema: 'num'
+*Lexema: 'factorial'
+*Lexema: 'x'
+*Lexema: 'if'
+*Lexema: 'Suma'
+*Lexema: 'aux'
+*Lexema: 'fin'
+*Lexema: 'for'
+*Lexema: 'Imprime'
+*Lexema: 'a'

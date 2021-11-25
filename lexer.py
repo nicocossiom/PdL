@@ -1,16 +1,14 @@
-#!/usr/bin/python
-#!/usr/bin/python3
-#!/usr/bin/pyton3.10
 import sys
 import os 
 
 if len(sys.argv) > 2: sys.exit("Input file path to analyze as program argument")
+#manual path specification for debugging puropses
+if len(sys.argv) == 1: f = open("./casosPruebas/incorrecto3.txt" ,"r")
 #file that the lexer will generate tokens for 
-if len(sys.argv) == 1: f = open("./casosPruebas/correcto1.txt" ,"r")
 elif os.path.exists(os.getcwd() + "/"+ sys.argv[1]): f = open(sys.argv[1], "r")
 else: sys.exit(f"File \'{sys.argv[1]}\' does not exist")
 #Lenguage definitions by class
-RES_WORD = [ "let","function","rn","else","input","print","while","do","true","false","int","boolean","string"]
+RES_WORD = [ "let","function","rn","else","input","print","while","do","true","false","int","boolean","string","return"]
 LETTERS = "abcdefghijlmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
 SYMB_OPS ={
     "+": "mas",
@@ -50,12 +48,14 @@ class Lexer:
         self.errorList = []
 
     def skipBlockComments(self):
+        '''Skips block comments and detects error in its specification'''
         self.car = f.read(1)
         if self.car == "*":
             self.car = f.read(1)
-            while (self.peek_nextCar(f) != "/" and self.car != "*" and self.car != ""):
+            while (self.peekNextCar() != "/" and self.car != "*" and self.car != ""):
                 self.car = f.read(1)
-                if(self.car == ""): self.error(3)
+                if self.car == "" : self.error(3)
+                if self.car == "/n": self.car+=1
             self.car = f.read(1)
             self.car = f.read(1)
         elif self.car == "/": 
@@ -65,6 +65,7 @@ class Lexer:
         else: self.error(4, self.car)
     
     def skipDelimeters(self):
+        '''Skips delimeters such as \\t and \\n '''
         if self.car!= "":
             while(self.car != "" and ord(self.car) < 33):    
                 if self.car == "\n": self.line+=1
@@ -73,8 +74,8 @@ class Lexer:
             if self.car == "/": self.skipBlockComments()
 
     def next(self):
-        '''Advances current character to the next one from the file'''
-        # if self.peek_nextCar(f)!="": self.car = f.read(1)
+        '''Retrieves next character recognized in the leanguage for processing'''
+        # if self.peekNextCar()!="": self.car = f.read(1)
         self.car = f.read(1)
         if self.car !="":
             if self.car != "/":
@@ -82,8 +83,6 @@ class Lexer:
             else: 
                 self.skipBlockComments()
                 self.skipDelimeters()
-
-            
 
     def generateNumber(self):
         '''Adds current char to number in construction after multiplying the number by 10 '''
@@ -93,7 +92,9 @@ class Lexer:
         '''Concatenates current char to lexeme in contruction'''
         self.lex += self.car
 
-    def printToken(self,):
+    def printToken(self):
+        '''Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
+        Writes all tokens with the appropiate format to the file "tokens.txt" after tokenize() has been used'''
         try: os.mkdir(self.outputdir)    
         except OSError: f"Error al crear carpeta de volcado en: {self.outputdir}"
         except: FileExistsError
@@ -102,7 +103,8 @@ class Lexer:
             for token in self.tokenList:
                 f.write(f"< {token.code} , {token.att} >\n".replace("None", " ")) #del* < código del* , del* [atributo] del* > del* RE
 
-    def peek_nextCar(self, f) -> str:
+    def peekNextCar(self) -> str:
+        '''Returns the character next to that which the file pointer is at, without advancing said file pointer'''
         pos = f.tell()
         car = f.read(1)
         f.seek(pos)
@@ -110,25 +112,36 @@ class Lexer:
         
     # < codigo , atributo > 
     def genToken(self, code:str, attribute=None) -> Token: 
+        '''Generates a token and appends it to the list of tokens:\n
+        -code: specifies token code (id,string,cteEnt,etc)
+        -attribute: (OPTIONAL) specifies an attribute if the token needs it i.e < cteEnt , valor > 
+        '''
         token = Token(code, attribute)
         self.tokenList.append(token)
         self.lex = ""
         self.num = 0
         return token
     
-    def error(self, tipo: int, attributes=None):
-        err = Error(tipo, self.line, attributes)
+    def error(self, tipo: int, attribute=None):
+        '''Generates an error and appends it to the list of error:\n
+        -tipo: specifies error type. -All error types are specified in the errorHandler class
+        -attribute: (OPTIONAL) specifies an attribute if the error needs it i.e symbol which was not recognized in error4
+        '''
+        err = Error(tipo, self.line, attribute)
         self.errorList.append(err)
         if tipo == 5: self.line+=1
         if tipo == 1: self.lex = ""
    
     def tokenize(self):
+        ''''
+        Analyzes characters, generates tokens and errors if found
+        '''
         self.next()
         while self.car != "":
             #Integer being formed
             if (self.car).isdigit() and self.lex=="":
                 self.generateNumber()
-                if(not self.peek_nextCar(f).isdigit()):
+                if(not self.peekNextCar().isdigit()):
                     if(self.num < 32768):
                         self.genToken("cteEnt", self.num)
                     else:
@@ -137,7 +150,7 @@ class Lexer:
             #Identifiers or Reserved Words
             elif self.car in LETTERS or self.lex != "":
                 self.concatenate()
-                nextCar = self.peek_nextCar(f)
+                nextCar = self.peekNextCar()
                 if(nextCar not in LETTERS or nextCar == "_" or nextCar.isdigit() or nextCar ==""):
                     if self.lex in RES_WORD: 
                         self.genToken(self.lex)
@@ -146,7 +159,7 @@ class Lexer:
                         else: self.error(1)
             
             #String (cadena) processing
-            elif self.car == "\"" or "": 
+            elif self.car == "\"": 
                 self.next()
                 while self.car != "\"":
                     self.concatenate()
@@ -158,18 +171,18 @@ class Lexer:
             elif self.car in SYMB_OPS:
                 #+ or ++
                 if(self.car == "+"):
-                    if (self.peek_nextCar(f) == "+") :
+                    if (self.peekNextCar() == "+") :
                         self.genToken("postIncrem")
                         self.next()
                     else: self.genToken("mas")
                 #&&
                 elif (self.car == "&"):
-                    if (self.peek_nextCar(f) == "&") : 
+                    if (self.peekNextCar() == "&") : 
                         self.genToken("and")
                         self.next()
                 #= or ==
                 elif(self.car == "="):
-                    if (self.peek_nextCar(f) == "="):
+                    if (self.peekNextCar() == "="):
                         self.genToken("equals")
                         self.next()
                     else:
@@ -177,9 +190,10 @@ class Lexer:
                 else:
                     self.genToken(SYMB_OPS[self.car])
             else:
-                if self.car in "\'`":
-                    while self.car not in "\'`":
-                        self.next()
+                if self.car in "\'":
+                    self.car = f.read(1)
+                    while self.car !="\'":
+                        self.car = f.read(1)
                     if self.car != "": 
                         self.error(6) 
                     else: self.error(7)

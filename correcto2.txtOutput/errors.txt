@@ -1,0 +1,8 @@
+---------------------------------------
+Errors output for file 'correcto2.txt':
+---------------------------------------
+Error code'4'': Simbolo '
+' no pertenece al lenguaje--> linea 2
+Error code'4'': Simbolo '<' no pertenece al lenguaje--> linea 8
+Error code'4'': Simbolo '
+' no pertenece al lenguaje--> linea 9

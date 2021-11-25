@@ -1,0 +1,6 @@
+TS GLOBAL #1
+*Lexema: 'salto'
+*Lexema: 'imprime'
+*Lexema: 's'
+*Lexema: 'msg'
+*Lexema: 'f'

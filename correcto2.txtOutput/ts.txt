@@ -1,5 +1,0 @@
-TS GLOBAL #1
-*Lexema: 'potencia'
-*Lexema: 'z'
-*Lexema: 'dim'
-*Lexema: 's'

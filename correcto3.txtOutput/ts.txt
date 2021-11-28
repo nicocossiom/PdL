@@ -1,7 +1,0 @@
-TS GLOBAL #1
-*Lexema: 'demo'
-*Lexema: 'v'
-*Lexema: 'zv'
-*Lexema: 'if'
-*Lexema: 's'
-*Lexema: 'potencia'

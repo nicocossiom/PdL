@@ -6,10 +6,14 @@ from errorHandler import ErrorHandler
 from lexer import Lexer
 from tablaSimbolos import TS
 from errorHandler import ErrorHandler
+from syntactic import Syntactic
 lexer = Lexer()
 lexer.tokenize()
-lexer.printToken()
+lexer.printTokens()
 ts = TS(lexer)
 ts.printTS()
-errorHandler = ErrorHandler(lexer)
+syntactic = Syntactic(lexer)
+syntactic.P()
+syntactic.exportParse()
+errorHandler = ErrorHandler(lexer, syntactic)
 errorHandler.errorPrinter()

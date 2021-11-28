@@ -1,5 +1,0 @@
-TS GLOBAL #1
-*Lexema: 'five'
-*Lexema: 'ten'
-*Lexema: 'number'
-*Lexema: 'test'

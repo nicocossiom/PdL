@@ -24,29 +24,34 @@ SYMB_OPS ={
     "}": "llaveCerrado"
 }
 
-
-class Error():
-    def __init__(self, num:int, linea:int, attr=None):
-        self.code = num
-        self.line = linea
-        self.att = attr
-
 class Token:
-    def __init__(self, type:str, attribute=None):
+    def __init__(self, type:str, attribute=None, linea = None):
         self.code = type
-        self.att = attribute 
-
+        self.att = attribute
+        self.linea = linea
 class Lexer:
     def __init__(self):
         self.num = 0 #current integer number being constructed
         self.lex = "" #current string being constructed
         self.filename = os.path.basename(f.name)
         self.car = "" #current character being read
-        self.outputdir = os.getcwd()+"/" +self.filename+"Output"
+        self.outputdir = os.getcwd()+"/output" +self.filename+"Output"
         self.line = 1
         self.tokenList = [] #current list of tokens being generated and saved
         self.errorList = []
-
+    
+    class error(Error):
+        def __init__(self, tipo: int, attribute=None):
+            '''Generates an error and appends it to the list of error:\n
+            -tipo: specifies error type. 
+            -All error types are specified in the errorHandler class
+            -attribute: (OPTIONAL) specifies an attribute if the error needs it i.e symbol which was not recognized in error4
+            '''
+            err = Error(tipo, self.line, attribute)
+            self.errorList.append(err)
+            if tipo == 5: self.line+=1
+            if tipo == 1: self.lex = ""
+    
     def skipBlockComments(self):
         '''Skips block comments and detects error in its specification'''
         self.car = f.read(1)
@@ -92,7 +97,7 @@ class Lexer:
         '''Concatenates current char to lexeme in contruction'''
         self.lex += self.car
 
-    def printToken(self):
+    def printTokens(self):
         '''Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
         Writes all tokens with the appropiate format to the file "tokens.txt" after tokenize() has been used'''
         try: os.mkdir(self.outputdir)    
@@ -116,21 +121,11 @@ class Lexer:
         -code: specifies token code (id,string,cteEnt,etc)
         -attribute: (OPTIONAL) specifies an attribute if the token needs it i.e < cteEnt , valor > 
         '''
-        token = Token(code, attribute)
+        token = Token(code, attribute, self.line)
         self.tokenList.append(token)
         self.lex = ""
         self.num = 0
         return token
-    
-    def error(self, tipo: int, attribute=None):
-        '''Generates an error and appends it to the list of error:\n
-        -tipo: specifies error type. -All error types are specified in the errorHandler class
-        -attribute: (OPTIONAL) specifies an attribute if the error needs it i.e symbol which was not recognized in error4
-        '''
-        err = Error(tipo, self.line, attribute)
-        self.errorList.append(err)
-        if tipo == 5: self.line+=1
-        if tipo == 1: self.lex = ""
    
     def tokenize(self):
         ''''
@@ -159,7 +154,7 @@ class Lexer:
                         else: self.error(1)
             
             #String (cadena) processing
-            elif self.car == "\"": 
+            elif self.car == "\"":
                 self.next()
                 while self.car != "\"":
                     self.concatenate()
@@ -199,3 +194,4 @@ class Lexer:
                     else: self.error(7)
                 else: self.error(4, self.car)
             if self.car != "": self.next()
+        self.genToken("eof") #llega al final de archivo -> eof

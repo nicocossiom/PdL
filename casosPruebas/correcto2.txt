@@ -1,4 +1,4 @@
-function potencia (int z, int dim)	{
+function potencia int (int z, int dim)	{
 	let int s;	/* Oculta a la global */
 	int s = 0;
 	do{

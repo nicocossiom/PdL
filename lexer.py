@@ -1,5 +1,6 @@
 import sys
 import os 
+import errorHandler
 
 if len(sys.argv) > 2: sys.exit("Input file path to analyze as program argument")
 #manual path specification for debugging puropses
@@ -40,7 +41,7 @@ class Lexer:
         self.tokenList = [] #current list of tokens being generated and saved
         self.errorList = []
     
-    class error(Error):
+    class error(errorHandler):
         def __init__(self, tipo: int, attribute=None):
             '''Generates an error and appends it to the list of error:\n
             -tipo: specifies error type. 
@@ -100,13 +101,14 @@ class Lexer:
     def printTokens(self):
         '''Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
         Writes all tokens with the appropiate format to the file "tokens.txt" after tokenize() has been used'''
-        try: os.mkdir(self.outputdir)    
-        except OSError: f"Error al crear carpeta de volcado en: {self.outputdir}"
-        except: FileExistsError
-        print(f"Directorio de volcado del programa creado en: {self.outputdir}") 
-        with open(self.outputdir+"/tokens.txt", "w") as f:
-            for token in self.tokenList:
-                f.write(f"< {token.code} , {token.att} >\n".replace("None", " ")) #del* < código del* , del* [atributo] del* > del* RE
+        os.mkdir(self.outputdir)   
+        # try: os.mkdir(self.outputdir)    
+        # except OSError: f"Error al crear carpeta de volcado en: {self.outputdir}"
+        # except: FileExistsError
+        # print(f"Directorio de volcado del programa creado en: {self.outputdir}") 
+        # with open(self.outputdir+"/tokens.txt", "w") as f:
+        #     for token in self.tokenList:
+        #         f.write(f"< {token.code} , {token.att} >\n".replace("None", " ")) #del* < código del* , del* [atributo] del* > del* RE
 
     def peekNextCar(self) -> str:
         '''Returns the character next to that which the file pointer is at, without advancing said file pointer'''

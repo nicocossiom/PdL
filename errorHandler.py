@@ -1,7 +1,3 @@
-from string import Template
-from lexer import *
-from syntactic import *
-
 ERROR_MSG = {
     0:"Uso erroneo de comentario de bloque\n\tFormato:\'/* Comentario de bloque */ \'",
     1:"Lexema excede el tamaño maximo de caracteres permitido",
@@ -13,15 +9,14 @@ ERROR_MSG = {
     7:"cadena no cerrada",
     8:"Error sintáctico"
 }
-
-class Error():
-    def __init__(self, num:int, linea:int, attr=None):
-        self.code = num
-        self.line = linea
-        self.att = attr
-
+import errorHandler, lexer, syntactic, tablaSimbolos
+class Error:
+        def __init__(self, num:int, linea:int, attr=None):
+            self.code = num
+            self.line = linea
+            self.att = attr
 class errorHandler:
-    def __init__(self, lexer : lexer , syntactic : Syntactic ) -> None:
+    def __init__(self, lexer : Lexer , syntactic : Syntactic ) -> None:
         self.lexer = lexer
         self.syntactic = syntactic
     

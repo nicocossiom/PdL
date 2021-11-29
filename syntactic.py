@@ -1,6 +1,3 @@
-from lexer import lexer, Token
-from errorHandler import Error
-
 First = {
     'P': ["let", "if", "while", "do", "function", "eof"], 
     'B': ["let", "if", "while", "do"],
@@ -26,14 +23,15 @@ First = {
     "V" : ["id", "parAbierto", "entero", "cadena", "true", "false"],
     "Vp": "parAbierto"
 }
+import errorHandler, lexer, syntactic, tablaSimbolos
 
 class Syntactic: 
+    
     class error(Error):
         def __init__(self, num, linea):
             super().__init__(num, linea)
             
-
-    def __init__(self, lexer: lexer) -> None:
+    def __init__(self, lexer: Lexer) -> None:
         self.lexer = lexer
         self.tokenList = lexer.tokenList 
         self.index = 0 # indice que apunta al elemento actual de la lista de tokens
@@ -55,10 +53,12 @@ class Syntactic:
         self.errorList.append(error(8, self.token.line))                     
 
     def exportParse(self) -> None:
-          '''Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
+        '''Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
         Writes all tokens with the appropiate format to the file "tokens.txt" after tokenize() has been used'''
-        try: os.mkdir(self.outputdir)
-        except OSError: f"Error al crear carpeta de volcado en: {self.outputdir}"
+        try: 
+            os.mkdir(self.outputdir)
+        except OSError: 
+            print(f"Error al crear carpeta de volcado en: {self.outputdir}")
         except FileExistsError:
             print(f"Directorio de volcado del programa creado en: {self.outputdir}") 
         with open(self.outputdir+"/tokens.txt", "w") as f:
@@ -99,7 +99,7 @@ class Syntactic:
         elif equipara("while", 7):
             if equipara("parAbierto"):
                 E()
-                if (equipara("parCerrado"):
+                if (equipara("parCerrado")):
                     if equipara("llaveAbierto"):
                         C()
                         if equipara("llaveCerrado"): return

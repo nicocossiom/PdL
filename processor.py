@@ -3,18 +3,9 @@ import os
 from string import Template
 from typing import List
 
-if len(sys.argv) > 2: sys.exit("Input file path to analyze as program argument")
-# manual path specification for debugging puropses
-if len(sys.argv) == 1:
-    f = open("./casosPruebas/correcto2.txt", "r")
-# file that the lexer will generate tokens for
-elif os.path.exists(os.getcwd() + "/" + sys.argv[1]):
-    f = open(sys.argv[1], "r")
-else:
-    sys.exit(f"File \'{sys.argv[1]}\' does not exist")
 # Lenguage definitions by class
 RES_WORD = ["let", "function", "rn", "else", "input", "print", "while", "do", "true", "false", "int", "boolean",
-            "string", "return"]
+            "string", "return", "if"]
 LETTERS = "abcdefghijlmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
 SYMB_OPS = {
     "+": "mas",
@@ -29,7 +20,19 @@ SYMB_OPS = {
     "{": "llaveAbierto",
     "}": "llaveCerrado"
 }
-
+class Error:
+    """
+    Global error class used for all parts of the procesor. Each part must define its own error() method
+    that creates an Error and adds it to the list of errors of said class
+    """
+    def __init__(self, num: int, linea: int = None, attr=None):
+        """
+        num = code
+        
+        """
+        self.code = num
+        self.line = linea
+        self.att = attr
 
 class Token:
     def __init__(self, type: str, attribute=None, line=None):
@@ -37,9 +40,8 @@ class Token:
         self.att = attribute
         self.line = line
 
-
 class Lexer:
-    def __init__(self):
+    def __init__(self, f):
         self.num = 0  # current integer number being constructed
         self.lex = ""  # current string being constructed
         self.filename = os.path.basename(f.name)
@@ -48,6 +50,7 @@ class Lexer:
         self.line = 1
         self.tokenList = []  # current list of tokens being generated and saved
         self.errorList = []
+
 
     def skipBlockComments(self):
         '''Skips block comments and detects error in its specification'''
@@ -116,6 +119,9 @@ class Lexer:
         f.seek(pos)
         return car
 
+    def error(self, num: int, linea: int = None, attr=None):
+        self.errorList.append(Error(num, linea, attr))
+
     # < codigo , atributo > 
     def genToken(self, code: str, attribute=None) -> Token:
         '''Generates a token and appends it to the list of tokens:\n
@@ -141,21 +147,20 @@ class Lexer:
                     if (self.num < 32768):
                         self.genToken("cteEnt", self.num)
                     else:
-                        self.error(2)
+                        error(2)
 
             # Identifiers or Reserved Words
             elif self.car in LETTERS or self.lex != "":
                 self.concatenate()
                 nextCar = self.peekNextCar()
-                if (nextCar not in LETTERS or nextCar == "_" or nextCar.isdigit() or nextCar == ""):
+                if ( not nextCar.isdigit() and nextCar not in LETTERS and nextCar == "_"  or nextCar == ""):
                     if self.lex in RES_WORD:
-                        print(self.lex)
                         self.genToken(self.lex)
                     else:
                         if (len(self.lex) < 65):
                             self.genToken("id", self.lex)
                         else:
-                            self.error(1)
+                            error(1)
 
             # String (cadena) processing
             elif self.car == "\"":
@@ -166,7 +171,7 @@ class Lexer:
                 if (len(self.lex) < 65):
                     self.genToken("cadena", self.lex)
                 else:
-                    self.error(1)
+                    error(1)
 
             # Operators, symbols
             elif self.car in SYMB_OPS:
@@ -197,14 +202,15 @@ class Lexer:
                     while self.car != "\'":
                         self.car = f.read(1)
                     if self.car != "":
-                        self.error(6)
+                        error(6)
                     else:
-                        self.error(7)
+                        error(7)
                 else:
                     error(4, self.car)
             if self.car != "": self.next()
         self.genToken("eof")  # llega al final de archivo -> eof
 
+#-------------------------Sintactico-------------------------------
 
 First = {
     'P': ["let", "if", "while", "do", "function", "eof"],
@@ -233,19 +239,6 @@ First = {
 }
 
 
-# class error:
-#     def __init__(self, tipo: int, attribute=None, line = None):
-#         '''Generates an error and appends it to the list of error:\n
-#         -tipo: specifies error type. 
-#         -All error types are specified in the errorHandler class
-#         -attribute: (OPTIONAL) specifies an attribute if the error needs it i.e symbol which was not recognized in error4
-#         '''
-#         Lexer.errorList.append(err)
-#         if tipo == 5: self.line+=1
-#         if tipo == 1: self.lex = ""
-#         self.line = line
-
-
 class Syntactic:
     def __init__(self, lexer: Lexer) -> None:
         self.lexer = lexer
@@ -269,7 +262,7 @@ class Syntactic:
         if (self.token == code):
             self.next()
             return True
-        self.errorList.append(error(8, self.tokenList[self.index].line))
+        self.errorList.append(Error(8, self.tokenList[self.index].line))
 
     def exportParse(self) -> None:
         '''Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
@@ -554,20 +547,12 @@ ERROR_MSG = {
     8: "Error sintáctico"
 }
 
-
-class error:
-    def __init__(self, num: int, linea: int, attr=None):
-        self.code = num
-        self.line = linea
-        self.att = attr
-
-
 class errorHandler:
-    def __init__(self, lexer: Lexer, syntactic: Syntactic) -> None:
+    def __init__(self, lexer: Lexer, syntactic: Syntactic = None) -> None:
         self.lexer = lexer
         self.syntactic = syntactic
 
-    def errorStringBuilder(self, tipo: str, f) -> None:
+    def errorCreate(self, tipo: str, f) -> None:
         if tipo == "lex": errList = self.lexer.errorList
         if tipo == "syn": errList = self.syntactic.errorList
         for error in errList:
@@ -584,13 +569,13 @@ class errorHandler:
             header += "-" * times
             header = "-" * times + "\n" + header + "\nLexical errors: "
             f.write(header)
-            self.errorStringBuilder("lex", f)
-            header = f"\nSyntactic errors':\n"
-            times = len(header) - 1
-            header += "-" * times
-            header = "-" * times + "\n" + header
-            f.write(header)
-            self.errorStringBuilder("syn", f)
+            self.errorCreate("lex", f)
+            # header = f"\nSyntactic errors':\n"
+            # times = len(header) - 1
+            # header += "-" * times
+            # header = "-" * times + "\n" + header
+            # f.write(header)
+            # errorStringBuilder("syn", f)
 
 
 def pipInstall(package):
@@ -599,19 +584,52 @@ def pipInstall(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 
-def checkDependencies(deps):
+def checkDependencies(dependencies):
+    """
+       Checks and installs all dependencies needed for a projects
+
+       Parameters
+       ----------
+       dependencies : Dict{key : str -> value : str}
+           List of strings of dependencies that are wanted to be checked
+           Must be named after pip given list
+           Example:
+       """
     import pkg_resources
     installed = [d for d in pkg_resources.working_set]
-    for dep, realname in deps.items():
+    for dep, realname in dependencies.items():
         if dep not in str(installed):
             print(f'Module {realname} is not installed and is necessary to run')
             answer = input('Do you want to install it (Y/N): ')
             if answer == "N" or answer == "n" or answer == "No":
                 print(f"Exiting ... You must install the {realname} module for the processor to work")
-                exit()
+                sys.exit()
             elif answer == "Y" or answer == "y" or answer == "Yes":
                 print(f"Installing {realname}...")
                 pipInstall(realname)
+
+
+def getInput():
+    """
+    Gets the input from stdin or executes a certain file if none is given
+
+    Parameters
+    ----------
+    file : str
+        path to file to be executed, ignores stdin file
+    """
+    if len(sys.argv) > 2: sys.exit("Input file path to analyze as program argument")
+    # manual path specification for debugging puropses
+    if len(sys.argv) == 1:
+        sys.exit(f"No file specified, see -h or -help for program usage")
+    # file that the lexer will generate tokens for
+    else:
+        if sys.argv[1] in "-help":
+            sys.exit("See help at https://github.com/nicocossiom/PdL")
+        elif os.path.exists(os.getcwd() + "/" + sys.argv[1]):
+            return open(sys.argv[1], "r")
+        else:
+            sys.exit(f"File \'{sys.argv[1]}\' does not exist")
 
 
 if __name__ == "__main__":
@@ -620,16 +638,18 @@ if __name__ == "__main__":
     deps = {"ordered-set": "ordered_set"}
     checkDependencies(deps)
 
-    lexer = Lexer()
+    f = getInput()
+
+    lexer = Lexer(f)
     lexer.tokenize()
     lexer.printTokens()
 
     ts = TS(lexer)
     ts.printTS()
 
-    syntactic = Syntactic(lexer)
-    syntactic.P()
-    syntactic.exportParse()
+    # syntactic = Syntactic(lexer)
+    # syntactic.P()
+    # syntactic.exportParse()
 
-    errorHandler = errorHandler(lexer, syntactic)
+    errorHandler = errorHandler(lexer)
     errorHandler.errorPrinter()

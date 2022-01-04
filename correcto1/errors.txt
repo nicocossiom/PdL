@@ -1,11 +1,4 @@
 ----------------------------------------
 Errors output for file 'correcto1.txt':
  ----------------------------------------
-Lexical errors: ------------------
-
-Synactic errors':
-------------------
-Error code'8': Error sintáctico--> linea 1
-Error code'8': Error sintáctico--> linea 1
-Error code'8': Error sintáctico--> linea 2
-Error code'8': Error sintáctico--> linea 2
+Lexical errors: 

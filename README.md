@@ -97,7 +97,7 @@ Ejemplo en MacOS / Linux:
 ### Output del programa
 Se crea una carepta con el nombre de fichero sin su extensión que contiene los siguientes archivos:  
 
-//TODO
+//TODOs
 ```
 output
 |--- tokens.txt -> contiene los 

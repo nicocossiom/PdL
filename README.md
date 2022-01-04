@@ -1,5 +1,4 @@
 # PDL Javascript
---- 
 
 ## Tabla de contenidos
 1. [Descripción del proyecto](#Descripción-del-proyecto)
@@ -8,7 +7,7 @@
    - [Instalación local](#Instalación-local)  
         - [Desinstalación](#Desinstalación)
 3. [Uso](#Uso)
-4. [Estructura del código fuente](Estructura-del-código-fuente)
+4. [Estructura del código fuente](#Estructura-del-código-fuente)
 
 
 
@@ -99,7 +98,7 @@ Se crea una carepta con el nombre de fichero sin su extensión que contiene los 
 
 //TODOs
 ```
-output
+carpetaOutput
 |--- tokens.txt -> contiene los 
 |--- errors.txt -> contiene 
 |--- ts.txt     -> contiene

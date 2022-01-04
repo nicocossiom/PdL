@@ -105,5 +105,5 @@ output
 |--- ts.txt     -> contiene
 |--- parse.txt  -> contiene 
 ```
-# Estructura del código fuente
+## Estructura del código fuente
 //TODO

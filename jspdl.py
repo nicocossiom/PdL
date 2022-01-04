@@ -1,7 +1,7 @@
-import sys
 import os
+import sys
+from os import error
 from string import Template
-from typing import List
 
 # Lenguage definitions by class
 RES_WORD = ["let", "function", "rn", "else", "input", "print", "while", "do", "true", "false", "int", "boolean",
@@ -20,11 +20,14 @@ SYMB_OPS = {
     "{": "llaveAbierto",
     "}": "llaveCerrado"
 }
+
+
 class Error:
     """
     Global error class used for all parts of the procesor. Each part must define its own error() method
     that creates an Error and adds it to the list of errors of said class
     """
+
     def __init__(self, num: int, linea: int = None, attr=None):
         """
         num = code
@@ -34,55 +37,57 @@ class Error:
         self.line = linea
         self.att = attr
 
+
 class Token:
     def __init__(self, type: str, attribute=None, line=None):
         self.code = type
         self.att = attribute
         self.line = line
 
+
 class Lexer:
     def __init__(self, f):
+        self.f = f
         self.num = 0  # current integer number being constructed
         self.lex = ""  # current string being constructed
-        self.filename = os.path.basename(f.name)
+        self.filename = os.path.basename(self.f.name)
         self.car = ""  # current character being read
-        self.outputdir = os.getcwd() + "/" + self.filename.replace(".txt", "")
+        self.outputdir = os.getcwd() + "/" + self.filename.replace(".jspdl", "")
         self.line = 1
         self.tokenList = []  # current list of tokens being generated and saved
         self.errorList = []
 
-
     def skipBlockComments(self):
-        '''Skips block comments and detects error in its specification'''
-        self.car = f.read(1)
+        """Skips block comments and detects error in its specification"""
+        self.car = self.f.read(1)
         if self.car == "*":
-            self.car = f.read(1)
-            while (self.peekNextCar() != "/" and self.car != "*" and self.car != ""):
-                self.car = f.read(1)
+            self.car = self.f.read(1)
+            while self.peekNextCar() != "/" and self.car != "*" and self.car != "":
+                self.car = self.f.read(1)
                 if self.car == "": self.error(3)
                 if self.car == "/n": self.car += 1
-            self.car = f.read(1)
-            self.car = f.read(1)
+            self.car = self.f.read(1)
+            self.car = self.f.read(1)
         elif self.car == "/":
-            f.readline()
+            self.f.readline()
             self.line += 1
             self.error(5)
         else:
             self.error(4, self.car)
 
     def skipDelimeters(self):
-        '''Skips delimeters such as \\t and \\n '''
+        """Skips delimiters such as \\t and \\n """
         if self.car != "":
-            while (self.car != "" and ord(self.car) < 33):
+            while self.car != "" and ord(self.car) < 33:
                 if self.car == "\n": self.line += 1
                 if self.car == "": break  # Block comment processing
-                self.car = f.read(1)
+                self.car = self.f.read(1)
             if self.car == "/": self.skipBlockComments()
 
     def next(self):
-        '''Retrieves next character recognized in the leanguage for processing'''
-        # if self.peekNextCar()!="": self.car = f.read(1)
-        self.car = f.read(1)
+        """Retrieves next character recognized in the language for processing"""
+        # if self.peekNextCar()!="": self.car = self.f.read(1)
+        self.car = self.f.read(1)
         if self.car != "":
             if self.car != "/":
                 self.skipDelimeters()
@@ -91,32 +96,32 @@ class Lexer:
                 self.skipDelimeters()
 
     def generateNumber(self):
-        '''Adds current char to number in construction after multiplying the number by 10 '''
+        """Adds current char to number in construction after multiplying the number by 10 """
         self.num = self.num * 10 + int(self.car)
 
     def concatenate(self):
-        '''Concatenates current char to lexeme in contruction'''
+        """Concatenates current char to lexeme in contruction"""
         self.lex += self.car
 
     def printTokens(self):
-        '''Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
-        Writes all tokens with the appropiate format to the file "tokens.txt" after tokenize() has been used'''
+        """Creates a directory (specified in self.output dir which will contain all the output of the processor.\n
+        Writes all tokens with the appropriate format to the file "tokens.txt" after tokenize() has been used"""
         try:
             os.mkdir(self.outputdir)
         except OSError:
             f"Error al crear carpeta de volcado en: {self.outputdir}"
-        except:
-            FileExistsError
+        except FileExistsError:
+            pass
         print(f"Directorio de volcado del programa creado en: {self.outputdir}")
         with open(self.outputdir + "/tokens.txt", "w") as f:
             for token in self.tokenList:
                 f.write(f"< {token.code} , {token.att} >\n")  # del* < código del* , del* [atributo] del* > del* RE
 
     def peekNextCar(self) -> str:
-        '''Returns the character next to that which the file pointer is at, without advancing said file pointer'''
-        pos = f.tell()
-        car = f.read(1)
-        f.seek(pos)
+        """Returns the character next to that which the file pointer is at, without advancing said file pointer"""
+        pos = self.f.tell()
+        car = self.f.read(1)
+        self.f.seek(pos)
         return car
 
     def error(self, num: int, linea: int = None, attr=None):
@@ -135,16 +140,16 @@ class Lexer:
         return token
 
     def tokenize(self):
-        ''''
+        """'
         Analyzes characters, generates tokens and errors if found
-        '''
+        """
         self.next()
         while self.car != "":
             # Integer being formed
             if (self.car).isdigit() and self.lex == "":
                 self.generateNumber()
-                if (not self.peekNextCar().isdigit()):
-                    if (self.num < 32768):
+                if not self.peekNextCar().isdigit():
+                    if self.num < 32768:
                         self.genToken("cteEnt", self.num)
                     else:
                         error(2)
@@ -153,11 +158,11 @@ class Lexer:
             elif self.car in LETTERS or self.lex != "":
                 self.concatenate()
                 nextCar = self.peekNextCar()
-                if ( not nextCar.isdigit() and nextCar not in LETTERS and nextCar == "_"  or nextCar == ""):
+                if not nextCar.isdigit() and nextCar not in LETTERS and nextCar != "_" or nextCar == "":
                     if self.lex in RES_WORD:
                         self.genToken(self.lex)
                     else:
-                        if (len(self.lex) < 65):
+                        if len(self.lex) < 65:
                             self.genToken("id", self.lex)
                         else:
                             error(1)
@@ -167,8 +172,8 @@ class Lexer:
                 self.next()
                 while self.car != "\"":
                     self.concatenate()
-                    self.car = f.read(1)
-                if (len(self.lex) < 65):
+                    self.car = self.f.read(1)
+                if len(self.lex) < 65:
                     self.genToken("cadena", self.lex)
                 else:
                     error(1)
@@ -176,20 +181,20 @@ class Lexer:
             # Operators, symbols
             elif self.car in SYMB_OPS:
                 # + or ++
-                if (self.car == "+"):
-                    if (self.peekNextCar() == "+"):
+                if self.car == "+":
+                    if self.peekNextCar() == "+":
                         self.genToken("postIncrem")
                         self.next()
                     else:
                         self.genToken("mas")
                 # &&
-                elif (self.car == "&"):
-                    if (self.peekNextCar() == "&"):
+                elif self.car == "&":
+                    if self.peekNextCar() == "&":
                         self.genToken("and")
                         self.next()
                 # = or ==
-                elif (self.car == "="):
-                    if (self.peekNextCar() == "="):
+                elif self.car == "=":
+                    if self.peekNextCar() == "=":
                         self.genToken("equals")
                         self.next()
                     else:
@@ -198,9 +203,9 @@ class Lexer:
                     self.genToken(SYMB_OPS[self.car])
             else:
                 if self.car in "\'":
-                    self.car = f.read(1)
+                    self.car = self.f.read(1)
                     while self.car != "\'":
-                        self.car = f.read(1)
+                        self.car = self.f.read(1)
                     if self.car != "":
                         error(6)
                     else:
@@ -210,7 +215,8 @@ class Lexer:
             if self.car != "": self.next()
         self.genToken("eof")  # llega al final de archivo -> eof
 
-#-------------------------Sintactico-------------------------------
+
+# -------------------------Syntactic-------------------------------
 
 First = {
     'P': ["let", "if", "while", "do", "function", "eof"],
@@ -259,7 +265,7 @@ class Syntactic:
     def equipara(self, code: str, regla=None) -> bool:
         print("actual= " + self.token + " " + "a comparar= " + code)
         if regla is not None: self.reglas.append(regla)
-        if (self.token == code):
+        if self.token == code:
             self.next()
             return True
         self.errorList.append(Error(8, self.tokenList[self.index].line))
@@ -268,20 +274,20 @@ class Syntactic:
         '''Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
         Writes all tokens with the appropiate format to the file "tokens.txt" after tokenize() has been used'''
         with open(self.outputdir + "/parse.txt", "w") as f:
-            f.write("Descendente ")
-            for regla in self.reglas: f.write(f"{regla} ".replace("None", ""))
+            self.f.write("Descendente ")
+            for regla in self.reglas: self.f.write(f"{regla} ".replace("None", ""))
 
     def P(self) -> None:
         # First(B)
-        if (self.token) in First["B"]:
+        if self.token in First["B"]:
             self.reglas.append(1)
             self.B()
             self.P()
-        elif (self.token) in First['F']:
+        elif self.token in First['F']:
             self.reglas.append(2)
             self.F()
             self.P()
-        elif (self.equipara("eof")):
+        elif self.equipara("eof"):
             self.reglas.append(3)
             return
 
@@ -290,20 +296,20 @@ class Syntactic:
             self.T()
             if self.equipara("id"):
                 if self.equipara("puntoComa"): return
-        elif (self.equipara("if") and self.equipara("parAbierto")):
+        elif self.equipara("if") and self.equipara("parAbierto"):
             self.E()
             if self.equipara("parCerrado") and self.equipara("llaveAbierto"):
                 self.S()
-                if (self.equipara("llaveCerrado")):
-                    O()
+                if self.equipara("llaveCerrado"):
+                    self.O()
                     return
-        elif (self.token in First["S"]):
+        elif self.token in First["S"]:
             self.reglas.append(6)
             self.S()
         elif self.equipara("while", 7):
             if self.equipara("parAbierto"):
                 self.E()
-                if (self.equipara("parCerrado")):
+                if self.equipara("parCerrado"):
                     if self.equipara("llaveAbierto"):
                         self.C()
                         if self.equipara("llaveCerrado"): return
@@ -327,21 +333,21 @@ class Syntactic:
             return
 
     def T(self) -> None:
-        if (self.equipara("int", 11)):
+        if self.equipara("int", 11):
             return
-        elif (self.equipara("boolean", 12)):
+        elif self.equipara("boolean", 12):
             return
-        elif (self.equipara("string", 13)):
+        elif self.equipara("string", 13):
             return
 
     def S(self) -> None:
-        if (self.equipara("id", 14)):
+        if self.equipara("id", 14):
             self.Sp()
-        elif (self.equipara("return", 15)):
+        elif self.equipara("return", 15):
             self.X()
-            if (self.equipara("puntoComa")): return
+            if self.equipara("puntoComa"): return
         elif self.equipara("print", 16):
-            if (self.equipara('parAbierto')):
+            if self.equipara('parAbierto'):
                 self.E()
                 if self.equipara("parCerrado") and self.equipara("puntoComa"): return
         elif (self.equipara("input", 17) and self.equipara("parAbierto") and self.equipara("id") and self.equipara(
@@ -353,7 +359,7 @@ class Syntactic:
             self.E()
             if self.equipara("puntoComa"):
                 return
-        elif (self.equipara("parAbierto", 19)):
+        elif self.equipara("parAbierto", 19):
             self.L()
             if self.equipara("parCerrado"): return
         elif self.equipara("postIncrem", 20):
@@ -379,7 +385,7 @@ class Syntactic:
             if self.token in First['S']:
                 self.reglas.append(9999)
                 self.S()
-                if (self.equipara("puntoComa")):
+                if self.equipara("puntoComa"):
                     return
         else:
             self.reglas.append(25)
@@ -547,20 +553,26 @@ ERROR_MSG = {
     8: "Error sintáctico"
 }
 
+
 class errorHandler:
     def __init__(self, lexer: Lexer, syntactic: Syntactic = None) -> None:
         self.lexer = lexer
         self.syntactic = syntactic
 
-    def errorCreate(self, tipo: str, f) -> None:
-        if tipo == "lex": errList = self.lexer.errorList
-        if tipo == "syn": errList = self.syntactic.errorList
-        for error in errList:
-            errorString = f"\nError code'{error.code}': {ERROR_MSG[error.code]}"
-            if error.code == 4: errorString = Template(errorString).substitute(simbolo=error.att)
-            if error.code == 7: errorString += ERROR_MSG[7]
-            errorString += f"--> linea {error.line}"
-            f.write(errorString)
+    def createErrorString(self, tipo: str, f) -> None:
+        if tipo == "lex":
+            errList = self.lexer.errorList
+        elif tipo == "syn":
+            errList = self.syntactic.errorList
+        if errList is not None:
+            for errElem in errList:
+                errorString = f"\nError code'{errElem.code}': {ERROR_MSG[errElem.code]}"
+                if errElem.code == 4: errorString = Template(errorString).substitute(simbolo=errElem.att)
+                if errElem.code == 7: errorString += ERROR_MSG[7]
+                errorString += f"--> linea {errElem.line}"
+                f.write(errorString)
+        else:
+            sys.exit("se ha intentado crear un ErrorString especificando mal de donde viene")
 
     def errorPrinter(self):
         with open(self.lexer.outputdir + "/errors.txt", "w") as f:
@@ -569,12 +581,12 @@ class errorHandler:
             header += "-" * times
             header = "-" * times + "\n" + header + "\nLexical errors: "
             f.write(header)
-            self.errorCreate("lex", f)
+            self.createErrorString("lex", f)
             # header = f"\nSyntactic errors':\n"
             # times = len(header) - 1
             # header += "-" * times
             # header = "-" * times + "\n" + header
-            # f.write(header)
+            # self.f.write(header)
             # errorStringBuilder("syn", f)
 
 
@@ -632,7 +644,7 @@ def getInput():
             sys.exit(f"File \'{sys.argv[1]}\' does not exist")
 
 
-if __name__ == "__main__":
+def main():
     # dictionary of dependencies where key is the string used in the working set and value is the
     # actual name of the package that
     deps = {"ordered-set": "ordered_set"}
@@ -651,5 +663,9 @@ if __name__ == "__main__":
     # syntactic.P()
     # syntactic.exportParse()
 
-    errorHandler = errorHandler(lexer)
-    errorHandler.errorPrinter()
+    EH = errorHandler(lexer)
+    EH.errorPrinter()
+
+
+if __name__ == "__main__":
+    main()

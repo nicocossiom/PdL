@@ -42,11 +42,11 @@ git clone https://github.com/nicocossiom/PdL && python3 -m pip install -e PdL
 ### Desinstalación
 - MacOS / Linux  
 ``` 
-sudo python3 -m pip uninstall -e pdljs -y
+sudo python3 -m pip uninstall -e jspdl -y
 ```
 - Windows (no hace falta que la terminal sea lanzada como administrador) : 
 ```
-python3 -m pip uninstall -e pdljs -y
+python3 -m pip uninstall -e jspdl -y
 ```
 
 Para comprobar si se ha instalado correctamente use 
@@ -54,7 +54,7 @@ Para comprobar si se ha instalado correctamente use
 python3 -m pip show processor
 ```
 Devolverá lo siguiente si no está instalado: 
-> WARNING: Package(s) not found: pdljs
+> WARNING: Package(s) not found: jspdl
 
 Si está instalado devolverá: 
 > Name: jspdl

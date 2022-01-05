@@ -42,11 +42,11 @@ git clone https://github.com/nicocossiom/PdL && python3 -m pip install -e PdL
 ### Desinstalación
 - MacOS / Linux  
 ``` 
-sudo python3 -m pip uninstall -e jspdl -y
+sudo python3 -m pip uninstall jspdl -y
 ```
 - Windows (no hace falta que la terminal sea lanzada como administrador) : 
 ```
-python3 -m pip uninstall -e jspdl -y
+python3 -m pip uninstall jspdl -y
 ```
 
 Para comprobar si se ha instalado correctamente use 

@@ -106,6 +106,7 @@ class Lexer:
     def printTokens(self):
         """Creates a directory (specified in self.output dir which will contain all the output of the processor.\n
         Writes all tokens with the appropriate format to the file "tokens.txt" after tokenize() has been used"""
+
         try:
             os.mkdir(self.outputdir)
         except OSError:
@@ -219,91 +220,102 @@ class Lexer:
 # -------------------------Syntactic-------------------------------
 
 First = {
-    'P'  :   ["let", "if", "while", "do", "id", "return", "print", "input", "function", "eof"],
-    'B'  :   ["let", "if", "while", "do", "id", "return", "print", "input"],
-    "O"  :   "else",
-    "T"  :   ["int", "boolean", "string"],
-    "S"  :   ["id", "return", "print", "input"],
-    "Sp" :   ["asig", "parAbierto", "postIncrem", "equals"],
-    "X"  :   ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "C"  :   ["let", "if", "while", "id", "return", "print", "input"],
-    "L"  :   ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "Q"  :   "coma",
-    "F"  :   "function",
-    "H"  :   ["int", "boolean", "string"],
-    "A"  :   ["int", "boolean", "string"],
-    "K"  :   "coma",
-    "E"  :   ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "Ep" :   ["and", "mayor"],
-    "Epp":   ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "R"  :   ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "Rp" :   "por",
-    "U"  :   ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "Up" :   ["mas", ],
-    "V"  :   ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "Vp" :   "parAbierto"
+    'P': ["let", "if", "while", "do", "id", "return", "print", "input", "function", "eof"],
+    'B': ["let", "if", "while", "do", "id", "return", "print", "input"],
+    "O": "else",
+    "T": ["int", "boolean", "string"],
+    "S": ["id", "return", "print", "input"],
+    "Sp": ["asig", "parAbierto", "postIncrem", "equals"],
+    "X": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
+    "C": ["let", "if", "while", "id", "return", "print", "input"],
+    "L": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
+    "Q": "coma",
+    "F": "function",
+    "H": ["int", "boolean", "string"],
+    "A": ["int", "boolean", "string"],
+    "K": "coma",
+    "E": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
+    "Ep": ["and", "mayor"],
+    "Epp": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
+    "R": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
+    "Rp": "por",
+    "U": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
+    "Up": ["mas", ],
+    "V": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
+    "Vp": "parAbierto"
 }
 
+# usamos eof como $ para marcar fin de sentencia admisible
 Follow = {
-    "O"  :  ["let", "if","while", "do", "id", "return", "print", "input",  "function", "eof" ],
-    "X"  :  "puntoComa",
-    "C"  :  "llaveCerrado",
-    "L"  :  "parCerrado",
-    "Q"  :  "parCerrado",
-    "H"  :  "parAbierto",
-    "A"  :  "parCerrado",
-    "K"  :  "parCerrado",
-    "Ep" :  ["parCerrado", "coma", "puntoComa", "llaveCerrado", "$"],
-    "Rp" :  ["and", "mayor", "puntoComa", "llaveCerrado", "$"],
-    "Up" :  ["and","mayor"],
-    "Vp" :  ["mas","por"]
-
+    "O": ["let", "if", "while", "do", "id", "return", "print", "input", "function", "eof"],
+    "X": "puntoComa",
+    "C": "llaveCerrado",
+    "L": "parCerrado",
+    "Q": "parCerrado",
+    "H": "parAbierto",
+    "A": "parCerrado",
+    "K": "parCerrado",
+    "Ep": ["parCerrado", "coma", "puntoComa", "llaveCerrado", "eof"],
+    "Rp": ["and", "mayor", "puntoComa", "llaveCerrado", "eof"],
+    "Up": ["and", "mayor", "parCerrado"],
+    "Vp": ["mas", "por", "parCerrado"]
 }
+
 
 class Syntactic:
     def __init__(self, lexer: Lexer) -> None:
         self.lexer = lexer
         self.tokenList = lexer.tokenList
         self.index = 0  # indice que apunta al elemento actual de la lista de tokens
-        self.token = self.tokenList[self.index].code
+        self.actualToken = self.tokenList[self.index]
+        self.token = self.actualToken.code
         self.reglas = []
         self.outputdir = lexer.outputdir
         self.errorList = []
-       
+
     def next(self) -> Token:
-        print("next: actual= " + self.token)
-        self.index += 1
-        self.token = self.tokenList[self.index].code
-        print("siguiente " + self.token + '\n')
-        return self.token
+        if self.token != "eof":
+            compStr = "\nnext: " + self.token
+            self.index += 1
+            self.actualToken = self.tokenList[self.index]
+            self.token = self.actualToken.code
+            print(compStr + " -> " + self.token)
+            return self.token
 
     def equipara(self, code: str, regla=None) -> bool:
-        print("actual= " + self.token + " " + "a comparar= " + code)
-        if regla is not None: self.reglas.append(regla)
+        print(f"equipara({self.token} , {code} )", end="")
         if self.token == code:
+            print("CORRECTO")
+            if regla is not None:
+                # only add rule when it's first check in a function (has regla), and we're sure it's the correct token
+                self.reglas.append(regla)
             self.next()
             return True
-        self.error(8, self.tokenList[self.index].line)
+        # after first check, we expect a certain token but it was not it, now we can say it's an error
+        if regla is not None:
+            self.error(8, self.tokenList[self.index].line)
+        print("INCORRECTO -> siguiente")
+        return False
 
     def error(self, num: int, linea: int = None, attr=None):
         self.errorList.append(Error(num, linea, attr))
 
     def exportParse(self) -> None:
-        '''Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
-        Writes all tokens with the appropiate format to the file "tokens.txt" after tokenize() has been used'''
+        """Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
+        Writes all tokens with the appropiate format to the file "tokens.txt" after tokenize() has been used"""
         with open(self.outputdir + "/parse.txt", "w") as f:
             f.write("Descendente ")
-            for regla in self.reglas: f.write(f"{regla} ".replace("None", ""))
-
+            for regla in self.reglas:
+                f.write(f"{regla} ".replace("None", ""))
 
     def startSyntactic(self):
         self.P()
-        if self.next() != "$":
-            self.error(8)
-
+        # if self.next() != "eof":
+        #     self.error(8)
+        # else:
+        print("Terminado ")
 
     def P(self) -> None:
-        # First(B)
         if self.token in First["B"]:
             self.reglas.append(1)
             self.B()
@@ -320,226 +332,177 @@ class Syntactic:
         if self.equipara("let", 4):
             self.T()
             if self.equipara("id"):
-                if self.equipara("puntoComa"): return
-        elif self.equipara("if") and self.equipara("parAbierto"):
-            self.E()
-            if self.equipara("parCerrado") and self.equipara("llaveAbierto"):
-                self.S()
-                if self.equipara("llaveCerrado"):
-                    self.O()
+                if self.equipara("puntoComa"):
                     return
+        elif self.equipara("if", 5) and self.equipara("parAbierto"):
+            self.E()
+            if self.equipara("parCerrado"):
+                self.S()
         elif self.token in First["S"]:
             self.reglas.append(6)
             self.S()
-        elif self.equipara("while", 7):
-            if self.equipara("parAbierto"):
-                self.E()
-                if self.equipara("parCerrado"):
-                    if self.equipara("llaveAbierto"):
-                        self.C()
-                        if self.equipara("llaveCerrado"): return
-        elif self.equipara("do", 8):
+        elif self.equipara("do", 7):
             if self.equipara("llaveAbierto"):
                 self.S()
-                if self.equipara("llaveCerrado"):
-                    if self.equipara("while"):
-                        if self.equipara("parAbierto"):
-                            self.E()
-                            if self.equipara("parCerrado") and self.equipara("puntoComa"): return
-        return
-
-    def O(self) -> None:
-        if self.equipara("else", 9):
-            if self.equipara("parAbierto"):
-                self.T()
-                if self.equipara("parCerrado"): return
-        elif self.token in Follow["O"]:
-            self.reglas.append(10)
-        return
+                if self.equipara("llaveCerrado" and self.equipara("while") and self.equipara("parAbierto")):
+                    self.E()
+                    if self.equipara("parCerrado") and self.equipara("puntoComa"):
+                        return
 
     def T(self) -> None:
-        if self.equipara("int", 11):
+        if self.equipara("int", 8):
             return
-        elif self.equipara("boolean", 12):
+        elif self.equipara("boolean", 9):
             return
-        elif self.equipara("string", 13):
+        elif self.equipara("string", 10):
             return
 
     def S(self) -> None:
-        if self.equipara("id", 14):
+        if self.equipara("id", 11):
             self.Sp()
-        elif self.equipara("return", 15):
+        elif self.equipara("return", 12):
             self.X()
-            if self.equipara("puntoComa"): return
-        elif self.equipara("print", 16):
-            if self.equipara('parAbierto'):
-                self.E()
-                if self.equipara("parCerrado") and self.equipara("puntoComa"): return
-        elif (self.equipara("input", 17) and self.equipara("parAbierto") and self.equipara("id") and self.equipara(
+            if self.equipara("puntoComa"):
+                return
+        elif self.equipara("print", 13):
+            if self.token in First["V"]:
+                self.V()
+                self.equipara("puntoComa")
+        elif (self.equipara("input", 14) and self.equipara("parAbierto") and self.equipara("id") and self.equipara(
                 "parCerrado") and self.equipara("puntoComa")):
             return
 
     def Sp(self) -> None:
-        if self.equipara("asig", 18):
+        if self.equipara("asig", 15):
             self.E()
             if self.equipara("puntoComa"):
                 return
-        elif self.equipara("parAbierto", 19):
+        elif self.equipara("parAbierto", 16):
             self.L()
-            if self.equipara("parCerrado"): return
-        elif self.equipara("postIncrem", 20):
+            if self.equipara("parCerrado"):
+                return
+        elif self.equipara("postIncrem", 17):
             return
-        elif self.equipara("equals", 21):
-            self.E()
+
 
     def X(self) -> None:
         if self.token in First['E']:
-            self.reglas.append(22)
+            self.reglas.append(18)
             self.E()
         elif self.token in Follow['X']:
-            self.reglas.append(23)
-        return
+            self.reglas.append(19)
+        else:
+            self.error(8)
 
     def C(self) -> None:
         if self.token in First["B"]:
-            self.reglas.append(24)
+            self.reglas.append(20)
             self.B()
             self.C()
         elif self.token in Follow['C']:
-            self.reglas.append(25)
-        return
+            self.reglas.append(21)
 
     def L(self) -> None:
         if self.token in First["E"]:
-            self.reglas.append(26)
+            self.reglas.append(22)
             self.Q()
-        elif self.toke in Follow['L']:
-            self.reglas.append(27)
-        return
+        elif self.token in Follow['L']:
+            self.reglas.append(23)
+        else:
+            self.error(8)
 
     def Q(self) -> None:
-        if self.equipara("coma", 28):
+        if self.equipara("coma", 24):
             self.E()
             self.Q()
         elif self.token in Follow['Q']:
-            self.reglas.append(29)
-        return
+            self.reglas.append(25)
 
     def F(self) -> None:
-        if self.equipara("function", 30) and self.equipara("id"):
-            if self.token in First["H"]:
-                self.H()
-                if self.equipara("parAbierto"):
-                    self.A()
-                    if self.equipara("parCerrado") and self.equipara("llaveAbierto"):
-                        self.C()
-                        if self.equipara("llaveCerrado"): return
+        if self.equipara("function", 26) and self.equipara("id"):
+            # if self.token in First["H"]:
+            self.H()
+            if self.equipara("parAbierto"):
+                self.A()
+                if self.equipara("parCerrado") and self.equipara("llaveAbierto"):
+                    self.C()
+                    if self.equipara("llaveCerrado"):
+                        return
 
     def H(self) -> None:
         if self.token in First['T']:
-            self.reglas.append(31)
+            self.reglas.append(27)
             self.T()
         elif self.token in Follow['H']:
-            self.reglas.append(32)
-        return
+            self.reglas.append(28)
+        else:
+            self.error(8)
 
     def A(self) -> None:
         if self.token in First['T']:
-            self.reglas.append(33)
+            self.reglas.append(29)
             self.T()
             if self.equipara("id"):
                 self.K()
         elif self.token in Follow['A']:
-            self.reglas.append(34)
-        return
+            self.reglas.append(30)
+        else:
+            self.error(8)
 
     def K(self) -> None:
-        if self.equipara("coma", 35):
+        if self.equipara("coma", 31):
             self.T()
             if self.equipara("id"):
                 self.K()
         elif self.token in Follow['K']:
-            self.reglas.append(36)
-        return
+            self.reglas.append(32)
+        else:
+            self.error(8)
 
     def E(self) -> None:
         if self.token in First["R"]:
-            self.reglas.append(37)
+            self.reglas.append(33)
             self.R()
-            self.Ep()
+            self.O()
 
-    def Ep(self) -> None:
-        if self.equipara("and", 38):
-            self.Epp()
-        elif self.equipara("mayor", 39):
-            self.Epp()
-        elif self.token in Follow['Ep']:
-            self.reglas.append(40)
-        return
-
-    def Epp(self) -> None:
-        if self.token in First["R"]:
-            self.reglas.append(41)
+    def O(self) -> None:
+        if self.equipara("coma", 34):
             self.R()
-            self.Ep()
-        return
+            self.O()
+        elif self.equipara("mas", 35):
+            self.R()
+            self.O()
+        elif self.equipara("por", 36):
+            self.R()
+            self.O()
+        elif self.equipara("equals", 37):
+            self.R()
+            self.O()
+        elif self.equipara("mayor", 38):
+            self.R()
+            self.O()
+        elif self.token in Follow["O"]:
+            self.reglas.append(39)
+        else:
+            self.error(8)
 
     def R(self) -> None:
-        if self.token in First['U']:
-            self.reglas.append(42)
-            self.U()
+        if self.equipara("id", 40):
             self.Rp()
-        return
+        elif self.equipara("mas", 41): return
+        elif self.equipara("por", 42): return
+        elif self.equipara("equals", 43): return
+        elif self.equipara("mayor", 44): return
+        else:
+            self.error(8)
 
     def Rp(self) -> None:
-        if (self.next() == "mayor"):
-            self.reglas.append(43)
-            self.U()
-            self.Rp()
-        elif self.token in Follow['Rp']:
-            self.reglas.append(44)
-        return
-
-    def U(self) -> None:
-        if self.token in First["V"]:
-            self.reglas.append(45)
-            self.V()
-            self.Up()
-        return
-
-    def Up(self) -> None:
-        if self.equipara("mas", 46):
-            self.U()
-        elif self.equipara("por", 47):
-            self.U()
-        elif self.token in Follow['Up']:
-            self.reglas.append(48)
-        return
-
-    def V(self) -> None:
-        if self.equipara("id", 49):
-            self.Vp()
-        elif self.equipara("parAbierto", 50):
-            self.E()
-            if self.equipara("parCerrado"): 
-                return
-        elif (self.equipara("cteEnt", 51)):
-            return
-        elif (self.equipara("cadena", 52)):
-            return
-        elif (self.equipara("boolT", 53)):
-            return
-        elif (self.equipara("boolF", 54)):
-            return
-
-    def Vp(self) -> None:
-        if (self.equipara("parAbierto", 55)):
+        if self.equipara("parAbierto", 45):
             self.L()
-            if self.equipara("parCerrado"): return
-        elif self.token in Follow['Vp']:
-            self.reglas.append(56)
-        return
-
+            if self.equipara("parCerrado", 46): return
+        elif self.equipara("postIncrem", 47): return
+        elif self.token in Follow["R"]:
+            self.reglas.append("48")
 
 class TS():
     def __init__(self, lexer: Lexer):
@@ -555,7 +518,7 @@ class TS():
     def printTS(self):
         '''Outputs containing Symbol Table with correct format to 'ts.txt' in directory specified in $lexer.outputdir'''
         with open(self.lexer.outputdir + "/ts.txt", "w") as f:
-            f.write(("TS GLOBAL #1"))
+            f.write("TS GLOBAL #1")
             for lexId in self.setIds():
                 f.write(f"\n*Lexema: '{lexId}'")
 
@@ -579,6 +542,7 @@ class errorHandler:
         self.syntactic = syntactic
 
     def createErrorString(self, tipo: str, f) -> None:
+        errList = None  # empty initializd
         if tipo == "lex":
             errList = self.lexer.errorList
         elif tipo == "syn":
@@ -679,7 +643,7 @@ def main():
     ts.printTS()
 
     syntactic = Syntactic(lexer)
-    syntactic.P()
+    syntactic.startSyntactic()
     syntactic.exportParse()
 
     EH = errorHandler(lexer, syntactic)

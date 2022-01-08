@@ -373,19 +373,9 @@ class Syntactic:
                 return
         elif self.equipara("parAbierto", 16):
             self.L()
-            if self.equipara("parCerrado"):
-                self.Spp()
+            if self.equipara("parCerrado") and self.equipara("puntoComa"):
                 return
         elif self.equipara("postIncrem", 17) and self.equipara("puntoComa"):
-            return
-        else:
-            self.error(8)
-
-    def Spp(self) -> None:
-        if self.equipara("puntoComa", 51):
-            return
-        elif self.token in Follow["Spp"]:
-            self.reglas.append(51)
             return
         else:
             self.error(8)

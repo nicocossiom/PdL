@@ -220,45 +220,38 @@ class Lexer:
 # -------------------------Syntactic-------------------------------
 
 First = {
-    'P': ["let", "if", "while", "do", "id", "return", "print", "input", "function", "eof"],
-    'B': ["let", "if", "while", "do", "id", "return", "print", "input"],
-    "O": "else",
-    "T": ["int", "boolean", "string"],
-    "S": ["id", "return", "print", "input"],
-    "Sp": ["asig", "parAbierto", "postIncrem", "equals"],
-    "X": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "C": ["let", "if", "while", "id", "return", "print", "input"],
-    "L": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "Q": "coma",
-    "F": "function",
-    "H": ["int", "boolean", "string"],
-    "A": ["int", "boolean", "string"],
-    "K": "coma",
-    "E": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "Ep": ["and", "mayor"],
-    "Epp": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "R": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "Rp": "por",
-    "U": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "Up": ["mas", ],
-    "V": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
-    "Vp": "parAbierto"
+    'P':  ["function", "eof", "let", "if", "do","id", "return", "print", "input"],
+    'B':  ["let", "if", "do", "id", "return", "print", "input"],
+    "T":  ["int", "boolean", "string","id", "return", "print", "input"],
+    "S":  ["id", "return", "print", "input"],
+    "Sp": ["asig", "parAbierto", "postIncrem"],
+    "Spp":["puntoComa", "lambda"],
+    "X":  ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF", "lambda"],
+    "C":  ["let", "if", "id", "return", "print", "input", "do"],
+    "L":  ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF"],
+    "Q":  "coma",
+    "F":  "function",
+    "H":  ["int", "boolean", "string"],
+    "A":  ["int", "boolean", "string"],
+    "K":  "coma",
+    "E":  ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF"],
+    "O":  ["and", "mas", "equals", "por", "mayor", "lambda"],
+    "R":  ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF"],
+    "Rp": ["parAbierto", "postIncrem", "lambda"],
 }
 
 # usamos eof como $ para marcar fin de sentencia admisible
 Follow = {
-    "O": ["let", "if", "while", "do", "id", "return", "print", "input", "function", "eof"],
-    "X": "puntoComa",
-    "C": "llaveCerrado",
-    "L": "parCerrado",
-    "Q": "parCerrado",
-    "H": "parAbierto",
-    "A": "parCerrado",
-    "K": "parCerrado",
-    "Ep": ["parCerrado", "coma", "puntoComa", "llaveCerrado", "eof"],
-    "Rp": ["and", "mayor", "puntoComa", "llaveCerrado", "eof"],
-    "Up": ["and", "mayor", "parCerrado"],
-    "Vp": ["mas", "por", "parCerrado"]
+    "O":  ["puntoComa", "parCerrado", "coma"],
+    "X":  "puntoComa",
+    "C":  "llaveCerrado",
+    "L":  "parCerrado",
+    "Q":  "parCerrado",
+    "H":  "parAbierto",
+    "A":  "parCerrado",
+    "K":  "parCerrado",
+    "Rp": ["and",  "mas", "por", "equals", "mayor", "lambda", "coma", "puntoComa", "parCerrado"],
+    "Spp": [""]
 }
 
 
@@ -291,8 +284,8 @@ class Syntactic:
                 self.reglas.append(regla)
             self.next()
             return True
-        # after first check, we expect a certain token but it was not it, now we can say it's an error
-        if regla is not None:
+        if regla is None: # after first check (means we're in the middle of a state
+            # we expected a certain token but it was not it, now we can say it's an error
             self.error(8, self.tokenList[self.index].line)
         print("INCORRECTO -> siguiente")
         return False
@@ -343,8 +336,8 @@ class Syntactic:
             self.S()
         elif self.equipara("do", 7):
             if self.equipara("llaveAbierto"):
-                self.S()
-                if self.equipara("llaveCerrado" and self.equipara("while") and self.equipara("parAbierto")):
+                self.C()
+                if self.equipara("llaveCerrado") and self.equipara("while") and self.equipara("parAbierto"):
                     self.E()
                     if self.equipara("parCerrado") and self.equipara("puntoComa"):
                         return
@@ -365,9 +358,10 @@ class Syntactic:
             if self.equipara("puntoComa"):
                 return
         elif self.equipara("print", 13):
-            if self.token in First["V"]:
-                self.V()
-                self.equipara("puntoComa")
+            if self.equipara("parAbierto"):
+                self.E()
+                if self.equipara("parCerrado") and self.equipara("puntoComa"):
+                     return
         elif (self.equipara("input", 14) and self.equipara("parAbierto") and self.equipara("id") and self.equipara(
                 "parCerrado") and self.equipara("puntoComa")):
             return
@@ -380,10 +374,21 @@ class Syntactic:
         elif self.equipara("parAbierto", 16):
             self.L()
             if self.equipara("parCerrado"):
+                self.Spp()
                 return
-        elif self.equipara("postIncrem", 17):
+        elif self.equipara("postIncrem", 17) and self.equipara("puntoComa"):
             return
+        else:
+            self.error(8)
 
+    def Spp(self) -> None:
+        if self.equipara("puntoComa", 51):
+            return
+        elif self.token in Follow["Spp"]:
+            self.reglas.append(51)
+            return
+        else:
+            self.error(8)
 
     def X(self) -> None:
         if self.token in First['E']:
@@ -405,6 +410,7 @@ class Syntactic:
     def L(self) -> None:
         if self.token in First["E"]:
             self.reglas.append(22)
+            self.E()
             self.Q()
         elif self.token in Follow['L']:
             self.reglas.append(23)
@@ -420,7 +426,6 @@ class Syntactic:
 
     def F(self) -> None:
         if self.equipara("function", 26) and self.equipara("id"):
-            # if self.token in First["H"]:
             self.H()
             if self.equipara("parAbierto"):
                 self.A()
@@ -489,10 +494,11 @@ class Syntactic:
     def R(self) -> None:
         if self.equipara("id", 40):
             self.Rp()
-        elif self.equipara("mas", 41): return
-        elif self.equipara("por", 42): return
-        elif self.equipara("equals", 43): return
-        elif self.equipara("mayor", 44): return
+        elif self.equipara("parAbirto", 41): return
+        elif self.equipara("cteEnt", 42): return
+        elif self.equipara("cadena", 43): return
+        elif self.equipara("boolT", 44): return
+        elif self.equipara("boolF", 45): return
         else:
             self.error(8)
 
@@ -501,7 +507,7 @@ class Syntactic:
             self.L()
             if self.equipara("parCerrado", 46): return
         elif self.equipara("postIncrem", 47): return
-        elif self.token in Follow["R"]:
+        elif self.token in Follow["Rp"]:
             self.reglas.append("48")
 
 class TS():
@@ -516,7 +522,7 @@ class TS():
         return setTokenList
 
     def printTS(self):
-        '''Outputs containing Symbol Table with correct format to 'ts.txt' in directory specified in $lexer.outputdir'''
+        """Outputs containing Symbol Table with correct format to 'ts.txt' in directory specified in $lexer.outputdir"""
         with open(self.lexer.outputdir + "/ts.txt", "w") as f:
             f.write("TS GLOBAL #1")
             for lexId in self.setIds():

@@ -1,0 +1,28 @@
+COCO2MSG Borland C++ 3.1 IDE Message Filter
+===========================================
+
+Installation
+============
+
+   1-  Select Options->Transfer from the main menu
+   2-  Find a white space in the Transfer Dialog, press <Enter>
+   3-  Set
+       Title = "~Coco/R",
+       Path= "your cocor.exe full path",
+       Command Line = "$CAP MSG('your coco2msg.exe full path') $EDNAME /Options"
+             this means: filter output by coco2msg, parameters are
+                         editor name and /Options
+       Translator = X
+       Hot Key = unassigned
+   4-  Select New
+   5-  Select Ok
+
+   you are done!!!  :-)
+
+Use:
+====
+
+   You can call Coco/R from inside the Borland C++ 3.1 IDE from the tools
+   menu.  Try Coco/R's -D option to allow C errors to be reported directly
+   in the .ATG file
+

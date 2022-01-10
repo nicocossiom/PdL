@@ -1,0 +1,24 @@
+vc.mk is the makefile for recompiling cplus2.lib for the Visual C system
+Change to the directory with the sources of cplus2, then issue the make
+command
+
+   NMAKE /f "vc.mk" CFG="cplus2 - Win32 Debug"
+
+or
+
+   NMAKE /f "vc.mk" CFG="cplus2 - Win32 Release"
+
+The library appears in a subdirectory called Debug or Release.
+
+vc.mk is the makefile for recompiling cplus2.lib for the Visual C system
+Change to the directory with the sources of cplus2, then issue the make
+command
+
+   make -f borlandc.mk
+
+unix.mk is the makefile for recompiling cplus2.lib for unix systems
+Change to the directory with the sources of cplus2, then issue the make
+command
+
+   make -f unix.mk
+

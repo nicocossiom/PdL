@@ -1,0 +1,8 @@
+/correcto*
+/inc*
+/prueba*
+venv
+.vscode
+.idea
+__pycache__
+/jspdl.egg-info

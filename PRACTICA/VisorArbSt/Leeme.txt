@@ -1,0 +1,20 @@
+Instrucciones para el correcto funcionamiento de la aplicación de visualización de árboles sintácticos disponible para MSWindows:
+
+La aplicación requiere tener instalado .Net y la distribución de VC. Si el visualizador no funciona, será necesario seguir los siguientes pasos
+
+1) Instalar el Framework 4.0. Archivo "dotNetFx40_Full_x86_x64.exe".
+   (Este paso puede tardar varios minutos.)
+2) Instalar el Runtime. Archivo "vcredist_x86.exe".
+3) Ejecutar el visualizador.
+
+
+
+---------------
+
+Esta aplicación permite dibujar el árbol de análisis sintáctico dado un parse correspondiente a una gramática.
+
+Existen opciones para importar ficheros con la gramática y el parse, pero también se pueden editar en la propia aplicación.
+
+El formato de los ficheros se puede ver en la sección de ayuda y en la sección de documentación de la Web.
+
+El árbol generado se puede visualizar en la propia aplicación o convertir a HTML.

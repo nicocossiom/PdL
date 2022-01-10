@@ -1,0 +1,11 @@
+function salto string (){
+	return "\n";
+}
+
+function imprime (string s, string msg, int f){	/* función que recibe 3 argumentos */
+	print(s);
+	print(msg);
+	print(f);
+	print (salto());	/* imprime un salto de línea */
+	return;	/* finaliza la ejecución de la función (en este caso, se podría omitir) */
+}

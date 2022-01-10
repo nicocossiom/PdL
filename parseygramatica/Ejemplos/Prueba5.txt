@@ -1,0 +1,31 @@
+//// Prueba 0
+//// Prueba que muestra los conflictos de conjuntos FIRST y FOLLOW debidos 
+//// a la derivabilidad consecutiva de los distintos simbolos no terminales
+Terminales = { 0 1 2 3 4 5 6 }
+
+NoTerminales = { A B C D E F G }
+
+Axioma = A
+
+Producciones = {
+A -> B
+A -> C
+B -> D 1 3
+B -> 2
+B -> lambda
+C -> E 2 4
+C -> 1
+C -> lambda
+D -> F 5
+D -> 6
+D -> lambda
+E -> G 6
+E -> 5
+E -> lambda
+F -> 0
+F -> C
+F -> lambda
+G -> 0
+G -> lambda
+}
+

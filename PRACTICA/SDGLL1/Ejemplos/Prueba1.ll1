@@ -1,0 +1,20 @@
+//// Prueba 1
+//// Prueba clásica para la factorización
+//// Gramática no LL(1)
+Axioma = A
+
+NoTerminales = { A B C }
+
+Terminales = { a b c }
+
+//// El lenguaje que se genera el a+ b+ c+
+Producciones = {
+	A -> a A
+	A -> a B
+
+	B -> b B
+	B -> b C
+
+	C -> c
+	C -> c C
+}

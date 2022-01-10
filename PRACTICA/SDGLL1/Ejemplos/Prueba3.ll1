@@ -1,0 +1,28 @@
+//// Prueba 3
+//// Gramática recursiva por la izquierda
+
+//// Los símbolos terminales pueden contener en su nombre
+//// los caracteres que deseen
+Terminales = { 1! 2@ 3# }
+
+//// Sin embargo los terminales solo pueden tener
+//// letras, números y caracteres
+NoTerminales = { Simb_1	 Simb_2  Simb_3 }
+
+Axioma = Simb_3
+
+//// Las cadenas que genera la gramática son 1!* 2@* 3#*
+//// Las producciones causan recursividad por la izquierda
+//// Por tanto la gramática no puede ser LL(1)
+Producciones = {
+
+Simb_3 -> Simb_3 3#
+Simb_3 -> Simb_2
+
+Simb_2 -> Simb_2 2@
+Simb_2 -> Simb_1
+
+Simb_1 -> Simb_1 1!
+Simb_1 -> lambda 
+
+}

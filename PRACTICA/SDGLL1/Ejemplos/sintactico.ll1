@@ -1,0 +1,105 @@
+//// Conjunto de símbolos terminales
+Terminales = { pETerminales  pENoTerminales  pEAxioma  pEProducciones  =  {  }  ->
+		  idNormal  idSimbolo  comentario  finLinea  finFichero  SimbLambda  }
+
+//// Conjunto de símbolo no terminales
+NoTerminales = { Axioma  EntreConjuntos  Conjuntos  FinalFichero  Term  NTerm
+		     Axi  Prod  SigTerm  SigNTerm  SigAxi  SimbTerm  SigSimbTerm
+		     IdTerminal  SimbNTerm  SigSimbNTerm  IdNTerminal  Prods
+		     LinProd  Consecuente  FinConsecuente  SigConsecuente  IdConsecuente }
+
+//// Axioma
+Axioma = Axioma
+
+//// Lista de producciones
+Producciones = {
+
+Axioma -> EntreConjuntos  Conjuntos  FinalFichero
+
+EntreConjuntos -> comentario  EntreConjuntos
+EntreConjuntos -> finLinea  EntreConjuntos
+EntreConjuntos -> lambda
+
+FinalFichero -> comentario  FinalFichero
+FinalFichero -> finLinea  FinalFichero
+FinalFichero -> finFichero
+
+Conjuntos -> Term  SigTerm  Prod
+Conjuntos -> NTerm  SigNTerm  Prod
+Conjuntos -> Axi  SigAxi  Prod
+
+SigTerm -> NTerm  Axi
+SigTerm -> Axi  NTerm
+
+SigNTerm -> Term  Axi
+SigNTerm -> Axi  Term
+
+SigAxi -> Term  NTerm
+SigAxi -> NTerm  Term
+
+Term -> pETerminales  =  {  SimbTerm  }  EntreConjuntos
+
+SimbTerm -> IdTerminal  SigSimbTerm
+SimbTerm -> finLinea SimbTerm
+
+SigSimbTerm -> IdTerminal  SigSimbTerm
+SigSimbTerm -> finLinea  SigSimbTerm
+SigSimbTerm -> lambda
+
+IdTerminal -> idNormal
+IdTerminal -> idSimbolo
+IdTerminal -> pETerminales
+IdTerminal -> pENoTerminales
+IdTerminal -> pEAxioma 
+IdTerminal -> pEProducciones
+IdTerminal -> =
+IdTerminal -> {
+IdTerminal -> ->
+
+NTerm -> pENoTerminales  =  {  SimbNTerm  }  EntreConjuntos
+
+SimbNTerm -> IdNTerminal  SigSimbNTerm
+SimbNTerm -> finLinea  SimbNTerm
+
+SigSimbNTerm -> IdNTerminal  SigSimbNTerm
+SigSimbNTerm -> finLinea  SigSimbNTerm
+SigSimbNTerm -> lambda
+
+IdNTerminal -> idNormal
+IdNTerminal -> pETerminales
+IdNTerminal -> pENoTerminales
+IdNTerminal -> pEAxioma 
+IdNTerminal -> pEProducciones
+
+Axi -> pEAxioma  =  IdNTerminal  finLinea  EntreConjuntos
+
+Prod -> pEProducciones  =  {  finLinea  Prods  }
+
+Prods -> LinProd  Prods
+Prods -> finLinea  Prods
+Prods -> lambda
+
+LinProd -> IdNTerminal  ->  Consecuente  FinConsecuente
+
+Consecuente -> SimbLambda
+Consecuente -> IdConsecuente  SigConsecuente
+Consecuente -> }
+
+FinConsecuente -> finLinea
+FinConsecuente -> comentario finLinea
+
+SigConsecuente -> IdConsecuente  SigConsecuente
+SigConsecuente -> }
+SigConsecuente -> lambda
+
+IdConsecuente -> idNormal
+IdConsecuente -> idSimbolo
+IdConsecuente -> pETerminales
+IdConsecuente -> pENoTerminales
+IdConsecuente -> pEAxioma 
+IdConsecuente -> pEProducciones
+IdConsecuente -> =
+IdConsecuente -> {
+IdConsecuente -> ->
+}
+

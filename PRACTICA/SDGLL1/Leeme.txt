@@ -1,0 +1,12 @@
+	SDGLL1: Sistema detector de gramáticas LL(1)
+	============================================
+
+SDGLL1 (SDGLL(1)) es una aplicación que determina si una gramática cumple o no las condiciones LL(1). Contiene un completo editor para escribir la gramática que se desea analizar, así como un sistema de detección y localización de errores. También aporta información sobre el cálculo del los conjuntos FIRST y FOLLOW de los diferentes símbolos y producciones contenidas en la gramática, así como sobre la tabla sintáctica LL(1) derivada de la gramática, la cual se puede visualizar e incluso guardar en un fichero html. Todas estas características hacen de ésta una aplicación ideal para los estudiantes interesados en gramáticas y analizadores LL(1).
+
+Los ficheros incluidos en el paquete son:
+
+-leeme.txt: este fichero
+-historia.txt: listado de las diferente versiones de la aplicación, con los errores conocidos
+-SDGLL1.exe: ejecutable del programa, para el sistema operativo Windows
+-Manual de usuario.pdf: documento pdf que incluye el manual de uso de la aplicación
+-Ejemplos: Directorio que contiene una serie de ejemplos de ficheros que contienen gramáticas, que ilustran diferentes situaciones de gramáticas que no cumplen las condiciones LL(1) y la forma de solucionarlas. Además, se incluye el fichero sintactico.ll1, que contiene la gramática correspondiente al formato de los ficheros con las gramáticas de entrada para esta aplicación. Los ficheros de entrada deben ajustarse a esta gramática.

@@ -1,0 +1,29 @@
+//// Prueba 4
+//// Gramática que genera el mismo lenguaje que Prueba 3, pero sin recursividad por la izquierda
+
+//// Los símbolos terminales pueden contener en su nombre
+//// los caracteres que deseen
+Terminales= { 1! 2@ 3# }
+
+//// Sin embargo los terminales solo pueden tener
+//// letras, números y caracteres
+NoTerminales = { Simb_1	 Simb_2  Simb_3 }
+
+Axioma = Simb_1
+
+//// Las cadenas que genera la gramática son 1!* 2@* 3#*
+Producciones = {
+
+Simb_3 -> 3# Simb_3
+Simb_3 -> lambda
+
+Simb_2 -> 2@ Simb_2
+Simb_2 -> Simb_3
+
+Simb_1 -> 1! Simb_1
+Simb_1 -> Simb_2
+
+}
+
+//// Se ha cambiado la recursividad por la izquierda por la recursividad por la derecha
+//// Las producciones siguen siendo recursivas, pero ahora sí cumplen las condiciones LL(1)

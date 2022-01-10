@@ -1,0 +1,7 @@
+	SDGLL1: Sistema detector de gramáticas LL(1)
+	============================================
+
+Historia de versiones:
+
+15-9-2004 (Versión 1.0):
+Versión inicial del sistema.

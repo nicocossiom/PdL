@@ -1,0 +1,9 @@
+fc crp.c  ..\crp.c    | more
+fc crp.h  ..\crp.h    | more
+fc crs.h  ..\crs.h    | more
+fc crs.c  ..\crs.c    | more
+fc cre.h  ..\cre.h    | more
+fc crc.h  ..\crc.h    | more
+fc cr.c   ..\cr.c     | more
+fc cr.atg ..\cr.atg   | more
+fc cr.frm ..\cr.frm   | more

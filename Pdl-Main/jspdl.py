@@ -385,7 +385,7 @@ class Syntactic:
         elif self.equipara("postIncrem", 17) and self.equipara("puntoComa"):
             return
         #else:
-        #    self.error("Error sintáctico")
+        #    self.error("Error sintactico")
 
     def X(self) -> None:
         if self.token in First['E']:

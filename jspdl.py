@@ -1,7 +1,67 @@
 import os
+import string
 import sys
-from os import error
-from string import Template
+
+
+# GLOBAL VARIABLES -> used all along the program
+FILE, FILENAME, OUTPUTDIR, TOKENLIST, ERRORLIST, = None, None, None, None, None
+TOKENFILE, PARSEFILE, TSFILE, ERRORFILE = None, None, None, None
+
+
+def createProcessor():
+    """
+    Checks if a file name has been given as an argument, if it has and is a correct file does the following:
+    1. Creates the output folder with the name of the argument without an extension
+    2. Creates all files for output, those being:
+        - tokens.txt
+        - parse.txt
+        - ts.txt
+        - errors.txt
+    """
+    global FILE, FILENAME, OUTPUTDIR, TOKENLIST, ERRORLIST, TOKENFILE, PARSEFILE, TSFILE, ERRORFILE
+    if len(sys.argv) > 2: sys.exit("Input file path to analyze as program argument")
+    # manual path specification for debugging puropses
+    if len(sys.argv) == 1:
+        sys.exit(f"No file specified, see -h or -help for program usage")
+    # file that the lexer will generate tokens for
+    else:
+        if sys.argv[1] in "-help":
+            sys.exit("See help at https://github.com/nicocossiom/PdL")
+        elif os.path.exists(os.getcwd() + "/" + sys.argv[1]):
+            FILE = open(sys.argv[1], "r")
+            FILENAME = os.path.basename(FILE.name)
+            OUTPUTDIR = os.getcwd() + "/" + FILENAME.replace(".jspdl", "")
+            TOKENLIST = []
+            ERRORLIST = []
+            try:
+                os.mkdir(OUTPUTDIR)
+            except OSError:
+                f"Error al crear carpeta de volcado en: {OUTPUTDIR}"
+            except FileExistsError:
+                pass
+            print(f"Directorio de volcado del programa creado en: {OUTPUTDIR}")
+            TOKENFILE = open(OUTPUTDIR + "/tokens.txt", "w")
+            ERRORFILE = open(OUTPUTDIR + "/errors.txt", "w")
+            PARSEFILE = open(OUTPUTDIR + "/parse.txt", "w")
+            TSFILE = open(OUTPUTDIR + "/ts.txt", "w")
+        else:
+            sys.exit(f"File \'{sys.argv[1]}\' does not exist")
+
+
+class Error:
+    """
+    Global error class used for all parts of the procesor. Each part must define its own error() method
+    that creates an Error and adds it to the list of errors of said class
+    """
+
+    def __init__(self, msg: string, linea: int = None, attr=None):
+        """
+        msg = msg
+
+        """
+        self.msg = msg
+        self.line = linea
+        self.att = attr
 
 # Lenguage definitions by class
 RES_WORD = ["let", "function", "rn", "else", "input", "print", "while", "do", "true", "false", "int", "boolean",
@@ -22,58 +82,39 @@ SYMB_OPS = {
 }
 
 
-class Error:
-    """
-    Global error class used for all parts of the procesor. Each part must define its own error() method
-    that creates an Error and adds it to the list of errors of said class
-    """
-
-    def __init__(self, num: int, linea: int = None, attr=None):
-        """
-        num = code
-        
-        """
-        self.code = num
-        self.line = linea
-        self.att = attr
-
 
 class Token:
-    def __init__(self, type: str, attribute=None, line=None):
-        self.code = type
+    def __init__(self, error_string: str, attribute=None, line=None):
+        self.code = error_string
         self.att = attribute
         self.line = line
 
 
 class Lexer:
-    def __init__(self, f):
-        self.f = f
+    def __init__(self):
         self.num = 0  # current integer number being constructed
         self.lex = ""  # current string being constructed
-        self.filename = os.path.basename(self.f.name)
         self.car = ""  # current character being read
-        self.outputdir = os.getcwd() + "/" + self.filename.replace(".jspdl", "")
         self.line = 1
-        self.tokenList = []  # current list of tokens being generated and saved
-        self.errorList = []
+        self.tokenizing = True  # keeps track of if a token is being built -> True:yes, False:No
 
     def skipBlockComments(self):
         """Skips block comments and detects error in its specification"""
-        self.car = self.f.read(1)
+        self.car = FILE.read(1)
         if self.car == "*":
-            self.car = self.f.read(1)
+            self.car = FILE.read(1)
             while self.peekNextCar() != "/" and self.car != "*" and self.car != "":
-                self.car = self.f.read(1)
-                if self.car == "": self.error(3)
+                self.car = FILE.read(1)
+                if self.car == "": self.error("Comentario de bloque no cerrado")
                 if self.car == "/n": self.car += 1
-            self.car = self.f.read(1)
-            self.car = self.f.read(1)
+            self.car = FILE.read(1)
+            self.car = FILE.read(1)
         elif self.car == "/":
-            self.f.readline()
+            FILE.readline()
             self.line += 1
-            self.error(5)
+            self.error("Comentarios de tipo '//comentario' no estan permitidos")
         else:
-            self.error(4, self.car)
+            self.error("Simbolo '$simbolo' no pertenece al lenguaje", self.car)
 
     def skipDelimeters(self):
         """Skips delimiters such as \\t and \\n """
@@ -81,13 +122,12 @@ class Lexer:
             while self.car != "" and ord(self.car) < 33:
                 if self.car == "\n": self.line += 1
                 if self.car == "": break  # Block comment processing
-                self.car = self.f.read(1)
+                self.car = FILE.read(1)
             if self.car == "/": self.skipBlockComments()
 
     def next(self):
         """Retrieves next character recognized in the language for processing"""
-        # if self.peekNextCar()!="": self.car = self.f.read(1)
-        self.car = self.f.read(1)
+        self.car = FILE.read(1)
         if self.car != "":
             if self.car != "/":
                 self.skipDelimeters()
@@ -103,39 +143,30 @@ class Lexer:
         """Concatenates current char to lexeme in contruction"""
         self.lex += self.car
 
-    def printTokens(self):
+    def printToken(self, token: Token):
         """Creates a directory (specified in self.output dir which will contain all the output of the processor.\n
         Writes all tokens with the appropriate format to the file "tokens.txt" after tokenize() has been used"""
-
-        try:
-            os.mkdir(self.outputdir)
-        except OSError:
-            f"Error al crear carpeta de volcado en: {self.outputdir}"
-        except FileExistsError:
-            pass
-        print(f"Directorio de volcado del programa creado en: {self.outputdir}")
-        with open(self.outputdir + "/tokens.txt", "w") as f:
-            for token in self.tokenList:
-                f.write(f"< {token.code} , {token.att} >\n")  # del* < código del* , del* [atributo] del* > del* RE
+        TOKENFILE.write(f"< {token.code} , {token.att} >\n")  # del* < código del* , del* [atributo] del* > del* RE
 
     def peekNextCar(self) -> str:
         """Returns the character next to that which the file pointer is at, without advancing said file pointer"""
-        pos = self.f.tell()
-        car = self.f.read(1)
-        self.f.seek(pos)
+        pos = FILE.tell()
+        car = FILE.read(1)
+        FILE.seek(pos)
         return car
 
-    def error(self, num: int, linea: int = None, attr=None):
-        self.errorList.append(Error(num, linea, attr))
+    def error(self, msg: string, linea: int = None, attr=None):
+        self.errorList.append(Error(msg, linea, attr))
 
-    # < codigo , atributo > 
+    # < codigo , atributo >
     def genToken(self, code: str, attribute=None) -> Token:
         '''Generates a token and appends it to the list of tokens:\n
         -code: specifies token code (id,string,cteEnt,etc)
-        -attribute: (OPTIONAL) specifies an attribute if the token needs it i.e < cteEnt , valor > 
+        -attribute: (OPTIONAL) specifies an attribute if the token needs it i.e < cteEnt , valor >
         '''
         token = Token(code, attribute, self.line)
-        self.tokenList.append(token)
+        TOKENLIST.append(token)
+        self.printToken(token)
         self.lex = ""
         self.num = 0
         return token
@@ -144,16 +175,20 @@ class Lexer:
         """'
         Analyzes characters, generates tokens and errors if found
         """
+        result = None  # token to be returned to the Syntactic
+        self.tokenizing = True  # start to tokenize
         self.next()
-        while self.car != "":
+        if self.car == "":
+            result = self.genToken("eof")  # llega al final de archivo -> eof
+        while self.tokenizing:
             # Integer being formed
-            if (self.car).isdigit() and self.lex == "":
+            if self.car.isdigit() and self.lex == "":
                 self.generateNumber()
                 if not self.peekNextCar().isdigit():
                     if self.num < 32768:
-                        self.genToken("cteEnt", self.num)
+                        result = self.genToken("cteEnt", self.num)
                     else:
-                        error(2)
+                        self.error("Digito con valor mayor al permitido (32768) en el sistema")
 
             # Identifiers or Reserved Words
             elif self.car in LETTERS or self.lex != "":
@@ -161,116 +196,119 @@ class Lexer:
                 nextCar = self.peekNextCar()
                 if not nextCar.isdigit() and nextCar not in LETTERS and nextCar != "_" or nextCar == "":
                     if self.lex in RES_WORD:
-                        self.genToken(self.lex)
+                        result = self.genToken(self.lex)
                     else:
                         if len(self.lex) < 65:
-                            self.genToken("id", self.lex)
+                            result = self.genToken("id", self.lex)
                         else:
-                            error(1)
+                            self.error(
+                                f"Identificador {self.lex} excede el tamaño máximo de caracteres permitido (64)")
 
             # String (cadena) processing
             elif self.car == "\"":
                 self.next()
                 while self.car != "\"":
                     self.concatenate()
-                    self.car = self.f.read(1)
+                    self.car = FILE.read(1)
                 if len(self.lex) < 65:
-                    self.genToken("cadena", self.lex)
+                    result = self.genToken("cadena", self.lex)
                 else:
-                    error(1)
+                    self.error("Cadena excede el tamaño máximo de caracteres permitido (64)")
 
             # Operators, symbols
             elif self.car in SYMB_OPS:
                 # + or ++
                 if self.car == "+":
                     if self.peekNextCar() == "+":
-                        self.genToken("postIncrem")
+                        result = self.genToken("postIncrem")
                         self.next()
                     else:
-                        self.genToken("mas")
+                        result = self.genToken("mas")
                 # &&
                 elif self.car == "&":
                     if self.peekNextCar() == "&":
-                        self.genToken("and")
+                        result = self.genToken("and")
+                        self.next()
+                elif self.car == "|":
+                    if self.peekNextCar() == '|':
+                        result = self.genToken("or")
                         self.next()
                 # = or ==
                 elif self.car == "=":
                     if self.peekNextCar() == "=":
-                        self.genToken("equals")
+                        result = self.genToken("equals")
                         self.next()
                     else:
-                        self.genToken("asig")
+                        result = self.genToken("asig")
                 else:
-                    self.genToken(SYMB_OPS[self.car])
+                    result = self.genToken(SYMB_OPS[self.car])
             else:
                 if self.car in "\'":
-                    self.car = self.f.read(1)
+                    self.car = FILE.read(1)
                     while self.car != "\'":
-                        self.car = self.f.read(1)
+                        self.car = FILE.read(1)
                     if self.car != "":
-                        error(6)
+                        self.error("Cadena se debe especificar entre \" \", no con \' \'")
                     else:
-                        error(7)
+                        self.error("Cadenas deben ir entre \" \"")
                 else:
-                    error(4, self.car)
-            if self.car != "": self.next()
-        self.genToken("eof")  # llega al final de archivo -> eof
-
-
-# -------------------------Syntactic-------------------------------
+                    self.error(
+                        f"Símbolo:\"{self.car}\" no permitido. \nNo pertence al lenguaje, consulte la documentación para ver carácteres aceptados")
+        return result
 
 First = {
-    'P':  ["function", "eof", "let", "if", "do","id", "return", "print", "input"],
-    'B':  ["let", "if", "do", "id", "return", "print", "input"],
-    "T":  ["int", "boolean", "string","id", "return", "print", "input"],
-    "S":  ["id", "return", "print", "input"],
+    'P': ["function", "eof", "let", "if", "do", "id", "return", "print", "input"],
+    'B': ["let", "if", "do", "id", "return", "print", "input"],
+    "T": ["int", "boolean", "string"],
+    "S": ["id", "return", "print", "input"],
     "Sp": ["asig", "parAbierto", "postIncrem"],
-    "Spp":["puntoComa", "lambda"],
-    "X":  ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF", "lambda"],
-    "C":  ["let", "if", "id", "return", "print", "input", "do"],
-    "L":  ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF"],
-    "Q":  "coma",
-    "F":  "function",
-    "H":  ["int", "boolean", "string"],
-    "A":  ["int", "boolean", "string"],
-    "K":  "coma",
-    "E":  ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF"],
-    "O":  ["and", "mas", "equals", "por", "mayor", "lambda"],
-    "R":  ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF"],
+    "X": ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF", "lambda"],
+    "C": ["let", "if", "id", "return", "print", "input", "do"],
+    "L": ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF"],
+    "Q": "coma",
+    "F": "function",
+    "H": ["int", "boolean", "string"],
+    "A": ["int", "boolean", "string"],
+    "K": "coma",
+    "E": ["mas", "por", "lambda"],
+    "N": ["equals", "mayor", "lambda"],
+    "Z": ["or", "and", "lambda"],
+    "O1": ["mas", "por", "lambda"],
+    "O2": ["equals", "mayor", "lambda"],
+    "O3": ["or", "and", "lambda"],
+    "R": ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF"],
     "Rp": ["parAbierto", "postIncrem", "lambda"],
 }
 
 # usamos eof como $ para marcar fin de sentencia admisible
 Follow = {
-    "O":  ["puntoComa", "parCerrado", "coma"],
-    "X":  "puntoComa",
-    "C":  "llaveCerrado",
-    "L":  "parCerrado",
-    "Q":  "parCerrado",
-    "H":  "parAbierto",
-    "A":  "parCerrado",
-    "K":  "parCerrado",
-    "Rp": ["and",  "mas", "por", "equals", "mayor", "lambda", "coma", "puntoComa", "parCerrado"],
-    "Spp": [""]
+    "O1": ["puntoComa", "parCerrado", "coma"],
+    "O2": ["mas", "por", "lambda"],
+    "O3": ["equals", "mayor", "lambda"],
+    "X": "puntoComa",
+    "C": "llaveAbierto",
+    "L": "parCerrado",
+    "Q": "parCerrado",
+    "H": "parAbierto",
+    "A": "parCerrado",
+    "K": "parCerrado",
+    "Rp": ["and", "mas", "por", "equals", "mayor", "lambda", "coma", "puntoComa", "parCerrado"],
 }
 
-
 class Syntactic:
-    def __init__(self, lexer: Lexer) -> None:
-        self.lexer = lexer
-        self.tokenList = lexer.tokenList
+    def __init__(self) -> None:
+        self.lexer = LEXER
         self.index = 0  # indice que apunta al elemento actual de la lista de tokens
-        self.actualToken = self.tokenList[self.index]
+        self.actualToken = TOKENLIST[self.index]
         self.token = self.actualToken.code
         self.reglas = []
-        self.outputdir = lexer.outputdir
         self.errorList = []
 
     def next(self) -> Token:
         if self.token != "eof":
             compStr = "\nnext: " + self.token
             self.index += 1
-            self.actualToken = self.tokenList[self.index]
+            self.actualToken = self.lexer.tokenize()
             self.token = self.actualToken.code
             print(compStr + " -> " + self.token)
             return self.token
@@ -284,19 +322,19 @@ class Syntactic:
                 self.reglas.append(regla)
             self.next()
             return True
-        if regla is None: # after first check (means we're in the middle of a state
+        if regla is None:  # after first check (means we're in the middle of a state
             # we expected a certain token but it was not it, now we can say it's an error
-            self.error(8, self.tokenList[self.index].line)
+            self.error(f"Received {code} - Expected another certain token", TOKENLIST[self.index].line)
         print("INCORRECTO -> siguiente")
         return False
 
-    def error(self, num: int, linea: int = None, attr=None):
-        self.errorList.append(Error(num, linea, attr))
+    def error(self, msg: string, linea: int = None, attr=None):
+        self.errorList.append(Error(msg, linea, attr))
 
     def exportParse(self) -> None:
         """Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
         Writes all tokens with the appropiate format to the file "tokens.txt" after tokenize() has been used"""
-        with open(self.outputdir + "/parse.txt", "w") as f:
+        with open(OUTPUTDIR + "/parse.txt", "w") as f:
             f.write("Descendente ")
             for regla in self.reglas:
                 f.write(f"{regla} ".replace("None", ""))
@@ -304,7 +342,7 @@ class Syntactic:
     def startSyntactic(self):
         self.P()
         # if self.next() != "eof":
-        #     self.error(8)
+        #     self.error("Error sintáctico")
         # else:
         print("Terminado ")
 
@@ -315,7 +353,7 @@ class Syntactic:
             self.P()
         elif self.token in First['F']:
             self.reglas.append(2)
-            self.F()
+            FILE()
             self.P()
         elif self.equipara("eof"):
             self.reglas.append(3)
@@ -361,9 +399,10 @@ class Syntactic:
             if self.equipara("parAbierto"):
                 self.E()
                 if self.equipara("parCerrado") and self.equipara("puntoComa"):
-                     return
-        elif (self.equipara("input", 14) and self.equipara("parAbierto") and self.equipara("id") and self.equipara(
-                "parCerrado") and self.equipara("puntoComa")):
+                    return
+        elif (self.equipara("input", 14) and self.equipara("parAbierto") and self.equipara(
+                "id") and self.equipara(
+            "parCerrado") and self.equipara("puntoComa")):
             return
 
     def Sp(self) -> None:
@@ -377,8 +416,6 @@ class Syntactic:
                 return
         elif self.equipara("postIncrem", 17) and self.equipara("puntoComa"):
             return
-        else:
-            self.error(8)
 
     def X(self) -> None:
         if self.token in First['E']:
@@ -387,7 +424,7 @@ class Syntactic:
         elif self.token in Follow['X']:
             self.reglas.append(19)
         else:
-            self.error(8)
+            self.error(f"Expected ';' to terminate sentence after return")
 
     def C(self) -> None:
         if self.token in First["B"]:
@@ -405,7 +442,7 @@ class Syntactic:
         elif self.token in Follow['L']:
             self.reglas.append(23)
         else:
-            self.error(8)
+            self.error("No se ha cerrado paréntesis en la llamada a la función")
 
     def Q(self) -> None:
         if self.equipara("coma", 24):
@@ -431,7 +468,7 @@ class Syntactic:
         elif self.token in Follow['H']:
             self.reglas.append(28)
         else:
-            self.error(8)
+            self.error(f"Tipo de función no aceptado. Debe usar {First['T']} o \"\" (no poner nada para void)")
 
     def A(self) -> None:
         if self.token in First['T']:
@@ -442,7 +479,7 @@ class Syntactic:
         elif self.token in Follow['A']:
             self.reglas.append(30)
         else:
-            self.error(8)
+            self.error(f"No ha cerrado paréntesis en la llamada a la función")
 
     def K(self) -> None:
         if self.equipara("coma", 31):
@@ -452,57 +489,88 @@ class Syntactic:
         elif self.token in Follow['K']:
             self.reglas.append(32)
         else:
-            self.error(8)
+            self.error("Los argumentos de las funciones deben estar separados por ','")
 
     def E(self) -> None:
-        if self.token in First["R"]:
+        if self.token in First["N"]:
             self.reglas.append(33)
-            self.R()
-            self.O()
+            self.N()
+            self.O1()
 
-    def O(self) -> None:
-        if self.equipara("coma", 34):
+    def N(self) -> None:
+        if self.token in First["Z"]:
+            self.reglas.append(34)
+            self.Z()
+            self.O2()
+
+    def Z(self) -> None:
+        if self.token in First["R"]:
+            self.reglas.append(35)
             self.R()
-            self.O()
-        elif self.equipara("mas", 35):
+            self.O3()
+
+    def O1(self) -> None:
+        if self.equipara("mas", 36):
             self.R()
-            self.O()
-        elif self.equipara("por", 36):
+            self.O1()
+        elif self.equipara("por", 37):
             self.R()
-            self.O()
-        elif self.equipara("equals", 37):
-            self.R()
-            self.O()
-        elif self.equipara("mayor", 38):
-            self.R()
-            self.O()
-        elif self.token in Follow["O"]:
-            self.reglas.append(39)
+            self.O1()
+        elif self.token in Follow['O1']:
+            self.reglas.append(38)
         else:
-            self.error(8)
+            self.error(f"Esperaba uno de los siguientes símbolos{Follow['O1']}")
+
+    def O2(self) -> None:
+        if self.equipara("equals", 39):
+            self.R()
+            self.O2()
+        elif self.equipara("mayor", 40):
+            self.R()
+            self.O2()
+        elif self.token in Follow['O2']:
+            self.reglas.append(41)
+        else:
+            self.error(f"Esperaba uno de los siguientes símbolos{Follow['O2']}")
+
+    def O3(self) -> None:
+        if self.equipara("or", 42):
+            self.R()
+            self.O3()
+        elif self.equipara("and", 43):
+            self.R()
+            self.O3()
+        elif self.token in Follow['O3']:
+            self.reglas.append(44)
+        else:
+            self.error(f"Esperaba uno de los siguientes símbolos{Follow['O3']}")
 
     def R(self) -> None:
-        if self.equipara("id", 40):
+        if self.equipara("id", 45):
             self.Rp()
-        elif self.equipara("parAbirto", 41): return
-        elif self.equipara("cteEnt", 42): return
-        elif self.equipara("cadena", 43): return
-        elif self.equipara("boolT", 44): return
-        elif self.equipara("boolF", 45): return
-        else:
-            self.error(8)
+        elif self.equipara("parAbirto", 46):
+            return
+        elif self.equipara("cteEnt", 47):
+            return
+        elif self.equipara("cadena", 48):
+            return
+        elif self.equipara("boolT", 49):
+            return
+        elif self.equipara("boolF", 50):
+            return
 
     def Rp(self) -> None:
-        if self.equipara("parAbierto", 45):
+        if self.equipara("parAbierto", 51):
             self.L()
-            if self.equipara("parCerrado", 46): return
-        elif self.equipara("postIncrem", 47): return
+            if self.equipara("parCerrado"): return
+        elif self.equipara("postIncrem", 52):
+            return
         elif self.token in Follow["Rp"]:
-            self.reglas.append("48")
+            self.reglas.append(53)
 
 class TS():
-    def __init__(self, lexer: Lexer):
-        self.lexer = lexer
+    def __init__(self):
+        pass
 
     def setIds(self):
         from ordered_set import OrderedSet
@@ -518,133 +586,41 @@ class TS():
             for lexId in self.setIds():
                 f.write(f"\n*Lexema: '{lexId}'")
 
+# class ErrorHandler:
+#     def __init__(self, lexer: Lexer, syntactic: Syntactic = None) -> None:
+#         self.lexer = lexer
+#         self.syntactic = syntactic
+#
+#     def createErrorString(self, tipo: str, f) -> None:
+#         errList = None  # empty initializd
+#         if tipo == "lex":
+#             errList = self.lexer.errorList
+#         elif tipo == "syn":
+#             errList = self.syntactic.errorList
+#         if errList is not None:
+#             for errElem in errList:
+#                 errorString = f"\nError code'{errElem.code}': {ERROR_MSG[errElem.code]}"
+#                 if errElem.code == 4: errorString = Template(errorString).substitute(simbolo=errElem.att)
+#                 if errElem.code == 7: errorString += ERROR_MSG[7]
+#                 errorString += f"--> linea {errElem.line}"
+#                 f.write(errorString)
+#         else:
+#             sys.exit("se ha intentado crear un ErrorString especificando mal de donde viene")
+#
+#     def errorPrinter(self):
+#         with open(self.lexer.outputdir + "/errors.txt", "w") as f:
+#             header = f"Errors output for file '{self.lexer.filename}':\n "
+#             times = len(header) - 1
+#             header += "-" * times
+#             header = "-" * times + "\n" + header + "\nLexical errors: "
+#             f.write(header)
+#             self.createErrorString("lex", f)
+#             header = f"\nSyntactic errors':\n"
+#             times = len(header) - 1
+#             header += "-" * times
+#             header = "-" * times + "\n" + header
+#             f.write(header)
+#             self.createErrorString("syn", f)
 
-ERROR_MSG = {
-    0: "Uso erroneo de comentario de bloque\n\tFormato:\'/* Comentario de bloque */ \'",
-    1: "Lexema excede el tamaño maximo de caracteres permitido",
-    2: "Digito con valor mayor al permitido (32768) en el sistema",
-    3: "Comentario de bloque no cerrado",
-    4: "Simbolo '$simbolo' no pertenece al lenguaje",
-    5: "Comentarios de tipo: '//comentario', no estan permitidos",
-    6: "Cadena se debe especificar entre \" \", no con \' \'",
-    7: "cadena no cerrada",
-    8: "Error sintáctico"
-}
-
-
-class errorHandler:
-    def __init__(self, lexer: Lexer, syntactic: Syntactic = None) -> None:
-        self.lexer = lexer
-        self.syntactic = syntactic
-
-    def createErrorString(self, tipo: str, f) -> None:
-        errList = None  # empty initializd
-        if tipo == "lex":
-            errList = self.lexer.errorList
-        elif tipo == "syn":
-            errList = self.syntactic.errorList
-        if errList is not None:
-            for errElem in errList:
-                errorString = f"\nError code'{errElem.code}': {ERROR_MSG[errElem.code]}"
-                if errElem.code == 4: errorString = Template(errorString).substitute(simbolo=errElem.att)
-                if errElem.code == 7: errorString += ERROR_MSG[7]
-                errorString += f"--> linea {errElem.line}"
-                f.write(errorString)
-        else:
-            sys.exit("se ha intentado crear un ErrorString especificando mal de donde viene")
-
-    def errorPrinter(self):
-        with open(self.lexer.outputdir + "/errors.txt", "w") as f:
-            header = f"Errors output for file '{self.lexer.filename}':\n "
-            times = len(header) - 1
-            header += "-" * times
-            header = "-" * times + "\n" + header + "\nLexical errors: "
-            f.write(header)
-            self.createErrorString("lex", f)
-            header = f"\nSyntactic errors':\n"
-            times = len(header) - 1
-            header += "-" * times
-            header = "-" * times + "\n" + header
-            f.write(header)
-            self.createErrorString("syn", f)
-
-
-def pipInstall(package):
-    import subprocess
-    import sys
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-
-def checkDependencies(dependencies):
-    """
-       Checks and installs all dependencies needed for a projects
-
-       Parameters
-       ----------
-       dependencies : Dict{key : str -> value : str}
-           List of strings of dependencies that are wanted to be checked
-           Must be named after pip given list
-           Example:
-       """
-    import pkg_resources
-    installed = [d for d in pkg_resources.working_set]
-    for dep, realname in dependencies.items():
-        if dep not in str(installed):
-            print(f'Module {realname} is not installed and is necessary to run')
-            answer = input('Do you want to install it (Y/N): ')
-            if answer == "N" or answer == "n" or answer == "No":
-                print(f"Exiting ... You must install the {realname} module for the processor to work")
-                sys.exit()
-            elif answer == "Y" or answer == "y" or answer == "Yes":
-                print(f"Installing {realname}...")
-                pipInstall(realname)
-
-
-def getInput():
-    """
-    Gets the input from stdin or executes a certain file if none is given
-
-    Parameters
-    ----------
-    file : str
-        path to file to be executed, ignores stdin file
-    """
-    if len(sys.argv) > 2: sys.exit("Input file path to analyze as program argument")
-    # manual path specification for debugging puropses
-    if len(sys.argv) == 1:
-        sys.exit(f"No file specified, see -h or -help for program usage")
-    # file that the lexer will generate tokens for
-    else:
-        if sys.argv[1] in "-help":
-            sys.exit("See help at https://github.com/nicocossiom/PdL")
-        elif os.path.exists(os.getcwd() + "/" + sys.argv[1]):
-            return open(sys.argv[1], "r")
-        else:
-            sys.exit(f"File \'{sys.argv[1]}\' does not exist")
-
-
-def main():
-    # dictionary of dependencies where key is the string used in the working set and value is the
-    # actual name of the package that
-    deps = {"ordered-set": "ordered_set"}
-    checkDependencies(deps)
-
-    f = getInput()
-
-    lexer = Lexer(f)
-    lexer.tokenize()
-    lexer.printTokens()
-
-    ts = TS(lexer)
-    ts.printTS()
-
-    syntactic = Syntactic(lexer)
-    syntactic.startSyntactic()
-    syntactic.exportParse()
-
-    EH = errorHandler(lexer, syntactic)
-    EH.errorPrinter()
-
-
-if __name__ == "__main__":
-    main()
+if __name__ ==  "__main__":
+    createProcessor()

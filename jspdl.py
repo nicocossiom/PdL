@@ -108,6 +108,7 @@ class Lexer:
         self.car = ""  # current character being read
         self.line = 1
         self.tokenizing = True  # keeps track of if a token is being built -> True:yes, False:No
+        self.col = 0
 
     def skipBlockComments(self):
         """Skips block comments and detects error in its specification"""
@@ -126,6 +127,15 @@ class Lexer:
             self.error("Comentarios de tipo '//comentario' no estan permitidos")
         else:
             self.error("Simbolo '$simbolo' no pertenece al lenguaje", self.car)
+
+    def nextChar(self):
+        self.car = FILE.read(1)
+        if self.car == "/n":
+            self.col = 0
+        else:
+            self.col+= 1
+
+
 
     def skipDelimeters(self):
         """Skips delimiters such as \\t and \\n """
@@ -180,24 +190,29 @@ class Lexer:
         self.tokenizing = False
         token = Token(code, attribute, self.line)
         TOKENLIST.append(token)
-        print(code, attribute)
         self.printToken(token)
         self.lex = ""
         self.num = 0
         return token
 
     def getQuotation(self):
-        if self.car == "\\" and self.peekNextCar() == '\"':
+        """
+        Looks for \" inside a string, if found it concatenates " to the string and advances to
+        the next (not looked at) character and tries to find another following quotation
+        :return: False if there is no next quotation
+        """
+        if self.car != "" and self.car == "\\" and self.peekNextCar() == '\"':
             self.car = FILE.read(1)
             self.concatenate()
             self.car = FILE.read(1)
             return True if self.getQuotation() else False
-        else :
+        else:
             return False
 
     def tokenize(self):
-        """'
-        Analyzes characters, generates tokens and errors if found
+        """
+        Goes through the characters, generates a token if found, and lexical errors if any occur.
+        Returns said Token
         """
         result = None  # token to be returned to the Syntactic
         self.tokenizing = True  # start to tokenize
@@ -611,6 +626,16 @@ class TS():
             if token.code == "id": setTokenList.add(token.att)
         return setTokenList
 
+def dictFromTokenList():
+    d = {}
+    for token in TOKENLIST:
+        try:
+            d[token.line] += f"  |  <{token.code},{token.att}>"
+        except KeyError:
+            d[token.line] = f"   {token.code} {token.att}"
+    for line, tokens in d.items():
+        print(f"{line}-> {tokens}")
+    return d
 
 # class ErrorHandler:
 #     def __init__(self, lexer: Lexer, syntactic: Syntactic = None) -> None:

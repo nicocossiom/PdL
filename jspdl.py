@@ -2,10 +2,10 @@ import os
 import string
 import sys
 
-
 # GLOBAL VARIABLES -> used all along the program
-FILE, FILENAME, OUTPUTDIR, TOKENLIST, ERRORLIST, = None, None, None, None, None
+FILE, FILENAME, OUTPUTDIR, TOKENLIST = None, None, None, []
 TOKENFILE, PARSEFILE, TSFILE, ERRORFILE = None, None, None, None
+LEXER, SYNTACTIC, SEMANTYC = None, None, None
 
 
 def createProcessor():
@@ -18,34 +18,38 @@ def createProcessor():
         - ts.txt
         - errors.txt
     """
-    global FILE, FILENAME, OUTPUTDIR, TOKENLIST, ERRORLIST, TOKENFILE, PARSEFILE, TSFILE, ERRORFILE
-    if len(sys.argv) > 2: sys.exit("Input file path to analyze as program argument")
-    # manual path specification for debugging puropses
-    if len(sys.argv) == 1:
-        sys.exit(f"No file specified, see -h or -help for program usage")
-    # file that the lexer will generate tokens for
-    else:
+    global FILE, FILENAME, OUTPUTDIR, TOKENLIST, TOKENFILE, PARSEFILE, TSFILE, ERRORFILE
+    num = len(sys.argv)
+    if num > 2:
+        sys.exit("Input file path to analyze as program argument")
+    # elif num == 1:
+    #     FILE = sys.stdin
+    #     TOKENFILE = sys.stdout
+    #     ERRORFILE = sys.stderr
+    #     PARSEFILE = sys.stdout
+    #     TSFILE = sys.stdout
+    #     FILE.write(FILE.readline())
+    elif num == 2:
         if sys.argv[1] in "-help":
             sys.exit("See help at https://github.com/nicocossiom/PdL")
-        elif os.path.exists(os.getcwd() + "/" + sys.argv[1]):
-            FILE = open(sys.argv[1], "r")
-            FILENAME = os.path.basename(FILE.name)
-            OUTPUTDIR = os.getcwd() + "/" + FILENAME.replace(".jspdl", "")
-            TOKENLIST = []
-            ERRORLIST = []
-            try:
-                os.mkdir(OUTPUTDIR)
-            except OSError:
-                f"Error al crear carpeta de volcado en: {OUTPUTDIR}"
-            except FileExistsError:
-                pass
-            print(f"Directorio de volcado del programa creado en: {OUTPUTDIR}")
-            TOKENFILE = open(OUTPUTDIR + "/tokens.txt", "w")
-            ERRORFILE = open(OUTPUTDIR + "/errors.txt", "w")
-            PARSEFILE = open(OUTPUTDIR + "/parse.txt", "w")
-            TSFILE = open(OUTPUTDIR + "/ts.txt", "w")
         else:
-            sys.exit(f"File \'{sys.argv[1]}\' does not exist")
+            if os.path.exists(os.getcwd() + "/" + sys.argv[1]):
+                FILE = open(sys.argv[1], "r")
+                FILENAME = os.path.basename(FILE.name)
+                OUTPUTDIR = os.getcwd() + "/" + FILENAME.replace(".jspdl", "")
+                try:
+                    os.mkdir(OUTPUTDIR)
+                except OSError:
+                    f"Error al crear carpeta de volcado en: {OUTPUTDIR}"
+                except FileExistsError:
+                    pass
+                print(f"Directorio de volcado del programa creado en: {OUTPUTDIR}")
+                TOKENFILE = open(OUTPUTDIR + "/tokens.txt", "w")
+                ERRORFILE = open(OUTPUTDIR + "/errors.txt", "w")
+                PARSEFILE = open(OUTPUTDIR + "/parse.txt", "w")
+                TSFILE = open(OUTPUTDIR + "/ts.txt", "w")
+            else:
+                sys.exit(f"File \'{sys.argv[1]}\' does not exist")
 
 
 class Error:
@@ -54,7 +58,7 @@ class Error:
     that creates an Error and adds it to the list of errors of said class
     """
 
-    def __init__(self, msg: string, linea: int = None, attr=None):
+    def __init__(self, msg: string, origin: str, linea: int, attr=None):
         """
         msg = msg
 
@@ -62,6 +66,14 @@ class Error:
         self.msg = msg
         self.line = linea
         self.att = attr
+        self.origin = origin
+        self.printError()
+
+    def printError(self):
+        error_str = f"{self.origin} error at {self.line}: {self.msg}"
+        print(error_str)
+        ERRORFILE.write(error_str)
+
 
 # Lenguage definitions by class
 RES_WORD = ["let", "function", "rn", "else", "input", "print", "while", "do", "true", "false", "int", "boolean",
@@ -80,7 +92,6 @@ SYMB_OPS = {
     "{": "llaveAbierto",
     "}": "llaveCerrado"
 }
-
 
 
 class Token:
@@ -106,7 +117,7 @@ class Lexer:
             while self.peekNextCar() != "/" and self.car != "*" and self.car != "":
                 self.car = FILE.read(1)
                 if self.car == "": self.error("Comentario de bloque no cerrado")
-                if self.car == "/n": self.car += 1
+                if self.car == "/n": self.line += 1
             self.car = FILE.read(1)
             self.car = FILE.read(1)
         elif self.car == "/":
@@ -123,7 +134,9 @@ class Lexer:
                 if self.car == "\n": self.line += 1
                 if self.car == "": break  # Block comment processing
                 self.car = FILE.read(1)
-            if self.car == "/": self.skipBlockComments()
+            if self.car == "/":
+                self.skipBlockComments()
+                self.skipDelimeters()
 
     def next(self):
         """Retrieves next character recognized in the language for processing"""
@@ -144,8 +157,7 @@ class Lexer:
         self.lex += self.car
 
     def printToken(self, token: Token):
-        """Creates a directory (specified in self.output dir which will contain all the output of the processor.\n
-        Writes all tokens with the appropriate format to the file "tokens.txt" after tokenize() has been used"""
+        """Writes the given token in the token.txt file"""
         TOKENFILE.write(f"< {token.code} , {token.att} >\n")  # del* < código del* , del* [atributo] del* > del* RE
 
     def peekNextCar(self) -> str:
@@ -155,8 +167,9 @@ class Lexer:
         FILE.seek(pos)
         return car
 
-    def error(self, msg: string, linea: int = None, attr=None):
-        self.errorList.append(Error(msg, linea, attr))
+    def error(self, msg: string, attr=None):
+        self.tokenizing = False
+        Error(msg, "Lexical", self.line, attr)
 
     # < codigo , atributo >
     def genToken(self, code: str, attribute=None) -> Token:
@@ -164,12 +177,23 @@ class Lexer:
         -code: specifies token code (id,string,cteEnt,etc)
         -attribute: (OPTIONAL) specifies an attribute if the token needs it i.e < cteEnt , valor >
         '''
+        self.tokenizing = False
         token = Token(code, attribute, self.line)
         TOKENLIST.append(token)
+        print(code, attribute)
         self.printToken(token)
         self.lex = ""
         self.num = 0
         return token
+
+    def getQuotation(self):
+        if self.car == "\\" and self.peekNextCar() == '\"':
+            self.car = FILE.read(1)
+            self.concatenate()
+            self.car = FILE.read(1)
+            return True if self.getQuotation() else False
+        else :
+            return False
 
     def tokenize(self):
         """'
@@ -177,10 +201,10 @@ class Lexer:
         """
         result = None  # token to be returned to the Syntactic
         self.tokenizing = True  # start to tokenize
-        self.next()
-        if self.car == "":
+        if self.peekNextCar() == "":
             result = self.genToken("eof")  # llega al final de archivo -> eof
         while self.tokenizing:
+            self.next()
             # Integer being formed
             if self.car.isdigit() and self.lex == "":
                 self.generateNumber()
@@ -207,7 +231,7 @@ class Lexer:
             # String (cadena) processing
             elif self.car == "\"":
                 self.next()
-                while self.car != "\"":
+                while not self.getQuotation() and self.car != "\"":
                     self.concatenate()
                     self.car = FILE.read(1)
                 if len(self.lex) < 65:
@@ -242,19 +266,19 @@ class Lexer:
                         result = self.genToken("asig")
                 else:
                     result = self.genToken(SYMB_OPS[self.car])
-            else:
-                if self.car in "\'":
+            elif self.car in "\'":
+                self.car = FILE.read(1)
+                while self.car != "\'":
                     self.car = FILE.read(1)
-                    while self.car != "\'":
-                        self.car = FILE.read(1)
-                    if self.car != "":
-                        self.error("Cadena se debe especificar entre \" \", no con \' \'")
-                    else:
-                        self.error("Cadenas deben ir entre \" \"")
+                if self.car != "":
+                    self.error("Cadena se debe especificar entre \" \", no con \' \'")
                 else:
-                    self.error(
-                        f"Símbolo:\"{self.car}\" no permitido. \nNo pertence al lenguaje, consulte la documentación para ver carácteres aceptados")
+                    self.error("Cadenas deben ir entre \" \"")
+            else:
+                self.error(
+                    f"Símbolo: \"{self.car}\" no permitido. \nNo pertence al lenguaje, consulte la documentación para ver carácteres aceptados")
         return result
+
 
 First = {
     'P': ["function", "eof", "let", "if", "do", "id", "return", "print", "input"],
@@ -262,9 +286,9 @@ First = {
     "T": ["int", "boolean", "string"],
     "S": ["id", "return", "print", "input"],
     "Sp": ["asig", "parAbierto", "postIncrem"],
-    "X": ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF", "lambda"],
+    "X": ["id", "parAbierto", "cteEnt", "cadena", "true", "false", "lambda"],
     "C": ["let", "if", "id", "return", "print", "input", "do"],
-    "L": ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF"],
+    "L": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
     "Q": "coma",
     "F": "function",
     "H": ["int", "boolean", "string"],
@@ -276,7 +300,7 @@ First = {
     "O1": ["mas", "por", "lambda"],
     "O2": ["equals", "mayor", "lambda"],
     "O3": ["or", "and", "lambda"],
-    "R": ["id", "parAbierto", "cteEnt", "cadena", "boolT", "boolF"],
+    "R": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
     "Rp": ["parAbierto", "postIncrem", "lambda"],
 }
 
@@ -295,20 +319,26 @@ Follow = {
     "Rp": ["and", "mas", "por", "equals", "mayor", "lambda", "coma", "puntoComa", "parCerrado"],
 }
 
+
+def createLexer():
+    global LEXER
+    LEXER = Lexer()
+    print("created lexer")
+
+
 class Syntactic:
+
     def __init__(self) -> None:
-        self.lexer = LEXER
+        createLexer()
         self.index = 0  # indice que apunta al elemento actual de la lista de tokens
         self.actualToken = TOKENLIST[self.index]
         self.token = self.actualToken.code
-        self.reglas = []
-        self.errorList = []
 
     def next(self) -> Token:
         if self.token != "eof":
             compStr = "\nnext: " + self.token
             self.index += 1
-            self.actualToken = self.lexer.tokenize()
+            self.actualToken = LEXER.tokenize()
             self.token = self.actualToken.code
             print(compStr + " -> " + self.token)
             return self.token
@@ -329,15 +359,16 @@ class Syntactic:
         return False
 
     def error(self, msg: string, linea: int = None, attr=None):
-        self.errorList.append(Error(msg, linea, attr))
+        Error(msg, linea, attr)
 
-    def exportParse(self) -> None:
-        """Creates a directory (specified in self.ouput dir which will contain all the output of the processor.\n
-        Writes all tokens with the appropiate format to the file "tokens.txt" after tokenize() has been used"""
-        with open(OUTPUTDIR + "/parse.txt", "w") as f:
-            f.write("Descendente ")
-            for regla in self.reglas:
-                f.write(f"{regla} ".replace("None", ""))
+    def addParseElement(self, regla: int) -> None:
+        "Writes the given parse element int the tokens.txt "
+
+        if regla == 1 or regla == 2:
+            parsed_str = f"Descendente {regla}, ".replace("None", "")
+        else:
+            parsed_str = f"{regla} ".replace("None", "")
+        PARSEFILE.write(parsed_str, 'a')
 
     def startSyntactic(self):
         self.P()
@@ -353,7 +384,7 @@ class Syntactic:
             self.P()
         elif self.token in First['F']:
             self.reglas.append(2)
-            FILE()
+            self.F()
             self.P()
         elif self.equipara("eof"):
             self.reglas.append(3)
@@ -548,15 +579,15 @@ class Syntactic:
     def R(self) -> None:
         if self.equipara("id", 45):
             self.Rp()
-        elif self.equipara("parAbirto", 46):
+        elif self.equipara("parAbierto", 46):
             return
         elif self.equipara("cteEnt", 47):
             return
         elif self.equipara("cadena", 48):
             return
-        elif self.equipara("boolT", 49):
+        elif self.equipara("true", 49):
             return
-        elif self.equipara("boolF", 50):
+        elif self.equipara("false", 50):
             return
 
     def Rp(self) -> None:
@@ -568,33 +599,28 @@ class Syntactic:
         elif self.token in Follow["Rp"]:
             self.reglas.append(53)
 
+
 class TS():
     def __init__(self):
         pass
 
-    def setIds(self):
+    def setId(self):
         from ordered_set import OrderedSet
         setTokenList = OrderedSet()
-        for token in self.lexer.tokenList:
+        for token in TOKENLIST:
             if token.code == "id": setTokenList.add(token.att)
         return setTokenList
 
-    def printTS(self):
-        """Outputs containing Symbol Table with correct format to 'ts.txt' in directory specified in $lexer.outputdir"""
-        with open(self.lexer.outputdir + "/ts.txt", "w") as f:
-            f.write("TS GLOBAL #1")
-            for lexId in self.setIds():
-                f.write(f"\n*Lexema: '{lexId}'")
 
 # class ErrorHandler:
 #     def __init__(self, lexer: Lexer, syntactic: Syntactic = None) -> None:
-#         self.lexer = lexer
+#         LEXER = lexer
 #         self.syntactic = syntactic
 #
 #     def createErrorString(self, tipo: str, f) -> None:
 #         errList = None  # empty initializd
 #         if tipo == "lex":
-#             errList = self.lexer.errorList
+#             errList = LEXER.errorList
 #         elif tipo == "syn":
 #             errList = self.syntactic.errorList
 #         if errList is not None:
@@ -608,8 +634,8 @@ class TS():
 #             sys.exit("se ha intentado crear un ErrorString especificando mal de donde viene")
 #
 #     def errorPrinter(self):
-#         with open(self.lexer.outputdir + "/errors.txt", "w") as f:
-#             header = f"Errors output for file '{self.lexer.filename}':\n "
+#         with open(LEXER.outputdir + "/errors.txt", "w") as f:
+#             header = f"Errors output for file '{LEXER.filename}':\n "
 #             times = len(header) - 1
 #             header += "-" * times
 #             header = "-" * times + "\n" + header + "\nLexical errors: "
@@ -622,5 +648,10 @@ class TS():
 #             f.write(header)
 #             self.createErrorString("syn", f)
 
-if __name__ ==  "__main__":
+if __name__ == "__main__":
     createProcessor()
+    createLexer()
+    while True:
+        token = LEXER.tokenize()
+        if token is not None and token.code == "eof":
+            break

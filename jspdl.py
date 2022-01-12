@@ -2,11 +2,25 @@ import os
 import string
 import sys
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 # GLOBAL VARIABLES -> used all along the program
 FILE, FILENAME, OUTPUTDIR, TOKENLIST = None, None, None, []
 TOKENFILE, PARSEFILE, TSFILE, ERRORFILE = None, None, None, None
 LEXER, SYNTACTIC, SEMANTYC = None, None, None
+LINES = None
 
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 def createProcessor():
     """
@@ -52,6 +66,20 @@ def createProcessor():
                 sys.exit(f"File \'{sys.argv[1]}\' does not exist")
 
 
+
+def getErrorLine(line, start, end):
+    global LINES
+    if not LINES:
+        fd = open(sys.argv[1], "r")
+        LINES = fd.readlines()
+    line = bcolors.OKBLUE + LINES[line - 1]
+    if line[-1:] != "\n": line+="\n"
+    line = bcolors.ENDC + line + bcolors.FAIL
+    line += " " * start
+    line += bcolors.WARNING + "^" + "~" * (end-1) + bcolors.FAIL
+    return line
+
+
 class Error:
     """
     Global error class used for all parts of the procesor. Each part must define its own error() method
@@ -70,8 +98,8 @@ class Error:
         self.printError()
 
     def printError(self):
-        error_str = f"{self.origin} error at {self.line}: {self.msg}"
-        print(error_str)
+        error_str = f"{self.origin} error at line {self.line}: \n{self.msg}"
+        eprint(bcolors.FAIL +  error_str + bcolors.ENDC)
         ERRORFILE.write(error_str)
 
 
@@ -95,10 +123,15 @@ SYMB_OPS = {
 
 
 class Token:
-    def __init__(self, error_string: str, attribute=None, line=None):
+    def __init__(self, error_string: str, line, startCol, endCol, attribute=None):
         self.code = error_string
         self.att = attribute
         self.line = line
+        self.startCol = startCol
+        self.endCol = endCol
+
+    def print(self):
+        print(f"{self.code},{self.att} line: {self.line}, cols: {self.startCol} -> {self.endCol}")
 
 
 class Lexer:
@@ -109,48 +142,52 @@ class Lexer:
         self.line = 1
         self.tokenizing = True  # keeps track of if a token is being built -> True:yes, False:No
         self.col = 0
+        self.startCol = 0
 
     def skipBlockComments(self):
         """Skips block comments and detects error in its specification"""
-        self.car = FILE.read(1)
+        self.nextChar()
         if self.car == "*":
-            self.car = FILE.read(1)
+            self.nextChar()
             while self.peekNextCar() != "/" and self.car != "*" and self.car != "":
-                self.car = FILE.read(1)
+                self.nextChar()
                 if self.car == "": self.error("Comentario de bloque no cerrado")
-                if self.car == "/n": self.line += 1
-            self.car = FILE.read(1)
-            self.car = FILE.read(1)
+                if self.car == "\n":
+                    self.line += 1
+                    self.startCol = 0
+                    self.col = 0
+            self.nextChar()
+            self.nextChar()
         elif self.car == "/":
             FILE.readline()
             self.line += 1
+            self.col = 0
             self.error("Comentarios de tipo '//comentario' no estan permitidos")
         else:
             self.error("Simbolo '$simbolo' no pertenece al lenguaje", self.car)
 
     def nextChar(self):
         self.car = FILE.read(1)
-        if self.car == "/n":
-            self.col = 0
-        else:
-            self.col+= 1
-
-
+        self.col += 1
 
     def skipDelimeters(self):
         """Skips delimiters such as \\t and \\n """
         if self.car != "":
             while self.car != "" and ord(self.car) < 33:
-                if self.car == "\n": self.line += 1
-                if self.car == "": break  # Block comment processing
-                self.car = FILE.read(1)
+                if self.car == "\n":
+                    self.line += 1
+                    self.col = -1
+                    self.startCol = 0
+                if self.car == "":
+                    break  # Block comment processing
+                self.nextChar()
             if self.car == "/":
                 self.skipBlockComments()
                 self.skipDelimeters()
 
     def next(self):
         """Retrieves next character recognized in the language for processing"""
-        self.car = FILE.read(1)
+        self.nextChar()
         if self.car != "":
             if self.car != "/":
                 self.skipDelimeters()
@@ -166,7 +203,7 @@ class Lexer:
         """Concatenates current char to lexeme in contruction"""
         self.lex += self.car
 
-    def printToken(self, token: Token):
+    def writeToken(self, token: Token):
         """Writes the given token in the token.txt file"""
         TOKENFILE.write(f"< {token.code} , {token.att} >\n")  # del* < código del* , del* [atributo] del* > del* RE
 
@@ -179,20 +216,20 @@ class Lexer:
 
     def error(self, msg: string, attr=None):
         self.tokenizing = False
-        Error(msg, "Lexical", self.line, attr)
+        error_string = getErrorLine(self.line, self.startCol, self.col) + "\n" + msg
+        Error(error_string, "Lexical", self.line, attr)
 
     # < codigo , atributo >
-    def genToken(self, code: str, attribute=None) -> Token:
+    def genToken(self, error_string: str, attribute=None) -> Token:
         '''Generates a token and appends it to the list of tokens:\n
         -code: specifies token code (id,string,cteEnt,etc)
         -attribute: (OPTIONAL) specifies an attribute if the token needs it i.e < cteEnt , valor >
         '''
         self.tokenizing = False
-        token = Token(code, attribute, self.line)
+        token = Token(error_string, self.line, self.startCol, self.col, attribute)
         TOKENLIST.append(token)
-        self.printToken(token)
+        self.writeToken(token)
         self.lex = ""
-        self.num = 0
         return token
 
     def getQuotation(self):
@@ -202,9 +239,9 @@ class Lexer:
         :return: False if there is no next quotation
         """
         if self.car != "" and self.car == "\\" and self.peekNextCar() == '\"':
-            self.car = FILE.read(1)
+            self.nextChar()
             self.concatenate()
-            self.car = FILE.read(1)
+            self.nextChar()
             return True if self.getQuotation() else False
         else:
             return False
@@ -218,6 +255,7 @@ class Lexer:
         self.tokenizing = True  # start to tokenize
         if self.peekNextCar() == "":
             result = self.genToken("eof")  # llega al final de archivo -> eof
+        self.startCol = self.col
         while self.tokenizing:
             self.next()
             # Integer being formed
@@ -248,7 +286,7 @@ class Lexer:
                 self.next()
                 while not self.getQuotation() and self.car != "\"":
                     self.concatenate()
-                    self.car = FILE.read(1)
+                    self.nextChar()
                 if len(self.lex) < 65:
                     result = self.genToken("cadena", self.lex)
                 else:
@@ -264,12 +302,10 @@ class Lexer:
                     else:
                         result = self.genToken("mas")
                 # &&
-                elif self.car == "&":
-                    if self.peekNextCar() == "&":
+                elif self.car == "&" and self.peekNextCar() == "&":
                         result = self.genToken("and")
                         self.next()
-                elif self.car == "|":
-                    if self.peekNextCar() == '|':
+                elif self.car == "|" and self.peekNextCar() == '|':
                         result = self.genToken("or")
                         self.next()
                 # = or ==
@@ -282,9 +318,9 @@ class Lexer:
                 else:
                     result = self.genToken(SYMB_OPS[self.car])
             elif self.car in "\'":
-                self.car = FILE.read(1)
+                self.nextChar()
                 while self.car != "\'":
-                    self.car = FILE.read(1)
+                    self.nextChar()
                 if self.car != "":
                     self.error("Cadena se debe especificar entre \" \", no con \' \'")
                 else:
@@ -626,16 +662,18 @@ class TS():
             if token.code == "id": setTokenList.add(token.att)
         return setTokenList
 
+
 def dictFromTokenList():
     d = {}
     for token in TOKENLIST:
         try:
-            d[token.line] += f"  |  <{token.code},{token.att}>"
+            d[token.line] += f"  |  <{token.code},{token.att} {token.startCol} {token.endCol}>"
         except KeyError:
-            d[token.line] = f"   {token.code} {token.att}"
+            d[token.line] = f"   {token.code} {token.att} {token.startCol} {token.endCol}"
     for line, tokens in d.items():
         print(f"{line}-> {tokens}")
     return d
+
 
 # class ErrorHandler:
 #     def __init__(self, lexer: Lexer, syntactic: Syntactic = None) -> None:
@@ -680,3 +718,8 @@ if __name__ == "__main__":
         token = LEXER.tokenize()
         if token is not None and token.code == "eof":
             break
+    # dictFromTokenList()
+    if TOKENFILE: TOKENFILE.close()
+    if ERRORFILE: ERRORFILE.close()
+    if PARSEFILE: PARSEFILE.close()
+    if TSFILE: TSFILE.close()

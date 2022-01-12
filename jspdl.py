@@ -16,14 +16,29 @@ class Colors:
     UNDERLINE = '\033[4m'
 
 
-# GLOBAL VARIABLES -> used all along the program
+# GLOBAL VARIABLES
 FILE, FILENAME, OUTPUTDIR, TOKENLIST = None, None, None, [], 
 TOKENFILE, PARSEFILE, TSFILE, ERRORFILE = None, None, None, None
 LEXER, SYNTACTIC, SEMANTYC = None, None, None
 LINES = None
 
+def close_all_files():
+    if TOKENFILE:
+        TOKENFILE.close()
+    if ERRORFILE:
+        ERRORFILE.close()
+    if PARSEFILE:
+        PARSEFILE.close()
+    if TSFILE:
+        TSFILE.close()
+
 
 def eprint(*args, **kwargs):
+    """
+    Prints the given parameters to stderr using special colors
+    :param args:
+    :param kwargs:
+    """
     print(*args, file=sys.stderr, **kwargs)
 
 
@@ -72,6 +87,13 @@ def createProcessor():
 
 
 def ger_error_line(line, start, end):
+    """
+
+    :param line: line from the given input file to get
+    :param start: starting column to highlight from
+    :param end: ending column to highlight to
+    :return:
+    """
     global LINES
     if not LINES:
         fd = open(sys.argv[1], "r")
@@ -91,10 +113,13 @@ class Error:
     that creates an Error and adds it to the list of errors of said class
     """
 
-    def __init__(self, msg: string, origin: str, linea: int, attr=None):
+    def __init__(self, msg: str, origin: str, linea: int, attr=None):
         """
-        msg = msg
 
+        :param msg[str]: Error message
+        :param origin[str]: string that signalizes from which part of the processor the error comes from
+        :param linea[int]: line in that error occurs in
+        :param attr[]:
         """
         self.msg = msg
         self.line = linea
@@ -103,6 +128,9 @@ class Error:
         self.print()
 
     def print(self):
+        """
+        Prints the error through stderr
+        """
         error_str = f"{self.origin} at line {self.line}: \n{self.msg}"
         eprint(Colors.FAIL + error_str + Colors.ENDC)
         ERRORFILE.write(error_str)
@@ -128,8 +156,17 @@ SYMB_OPS = {
 
 
 class Token:
-    def __init__(self, error_string: str, line, start_col, end_col, attribute=None):
-        self.code = error_string
+    """A token representation for the processor"""
+    def __init__(self, code: str, line, start_col, end_col, attribute=None):
+        """
+
+        :param error_string:
+        :param line:
+        :param start_col:
+        :param end_col:
+        :param attribute:
+        """
+        self.code = code
         self.att = attribute
         self.line = line
         self.startCol = start_col
@@ -211,8 +248,10 @@ class Lexer:
         
     @staticmethod
     def writeToken(given_token: Token):
-        """Writes the given token in the token.txt file"""
-        # del* < código del* , del* [atributo] del* > del* RE
+        """Writes the given token in the token.txt file \n
+        Format:  < code , [attribute] >
+        """
+        #
         TOKENFILE.write(f"< {given_token.code} , {given_token.att} >\n")  
     
     @staticmethod
@@ -229,13 +268,13 @@ class Lexer:
         Error(error_string, "Lexical error", self.line, attr)
 
     # < codigo , atributo >
-    def genToken(self, error_string: str, attribute=None) -> Token:
+    def genToken(self, code: str, attribute=None) -> Token:
         """Generates a token and appends it to the list of tokens:\n
         -code: specifies token code (id,string,cteEnt,etc)
         -attribute: (OPTIONAL) specifies an attribute if the token needs it i.e < cteEnt , valor >
         """
         self.tokenizing = False
-        generated_token = Token(error_string, self.line, self.startCol, self.col, attribute)
+        generated_token = Token(code, self.line, self.startCol, self.col, attribute)
         TOKENLIST.append(generated_token)
         self.writeToken(generated_token)
         self.lex = ""
@@ -743,6 +782,7 @@ class TS:
             self.numparam = len(self.tipo_params)
             self.tipo_dev = self.tipo
 
+
 def dictFromTokenList():
     d = {}
     for token in TOKENLIST:
@@ -755,42 +795,6 @@ def dictFromTokenList():
     return d
 
 
-# class ErrorHandler:
-#     def __init__(self, lexer: Lexer, syntactic: Syntactic = None) -> None:
-#         LEXER = lexer
-#         self.syntactic = syntactic
-#
-#     def createErrorString(self, tipo: str, f) -> None:
-#         errList = None  # empty initializd
-#         if tipo == "lex":
-#             errList = LEXER.errorList
-#         elif tipo == "syn":
-#             errList = self.syntactic.errorList
-#         if errList is not None:
-#             for errElem in errList:
-#                 errorString = f"\nError code'{errElem.code}': {ERROR_MSG[errElem.code]}"
-#                 if errElem.code == 4: errorString = Template(errorString).substitute(simbolo=errElem.att)
-#                 if errElem.code == 7: errorString += ERROR_MSG[7]
-#                 errorString += f"--> linea {errElem.line}"
-#                 f.write(errorString)
-#         else:
-#             sys.exit("se ha intentado crear un ErrorString especificando mal de donde viene")
-#
-#     def errorPrinter(self):
-#         with open(LEXER.outputdir + "/errors.txt", "w") as f:
-#             header = f"Errors output for file '{LEXER.filename}':\n "
-#             times = len(header) - 1
-#             header += "-" * times
-#             header = "-" * times + "\n" + header + "\nLexical errors: "
-#             f.write(header)
-#             self.createErrorString("lex", f)
-#             header = f"\nSyntactic errors':\n"
-#             times = len(header) - 1
-#             header += "-" * times
-#             header = "-" * times + "\n" + header
-#             f.write(header)
-#             self.createErrorString("syn", f)
-
 if __name__ == "__main__":
     createProcessor()
     createLexer()
@@ -798,12 +802,4 @@ if __name__ == "__main__":
         token = LEXER.tokenize()
         if token is not None and token.code == "eof":
             break
-    # dictFromTokenList()
-    if TOKENFILE:
-        TOKENFILE.close()
-    if ERRORFILE:
-        ERRORFILE.close()
-    if PARSEFILE:
-        PARSEFILE.close()
-    if TSFILE:
-        TSFILE.close()
+    close_all_files() #closes all file descriptors

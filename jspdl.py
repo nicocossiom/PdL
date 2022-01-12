@@ -664,21 +664,41 @@ class Syntactic:
             self.reglas.append(53)
 
 
-class TS:
-    class TSElement:
-        def __init__(self, identifier: str, tipo, tipo_param: List[str] = None, tipo_dev: str = None):
-            self.lex = identifier
-            self.tipo = tipo
-            if tipo == "function":
-                self.tipo_params = tipo_param
-                self.numparam = len(tipo_param)
-                self.tipo_dev = tipo_dev
-            self.desp = TS.pos
-            TS.pos += self.desp
 
+
+class TS:
     def __init__(self, name=None):
         self.map = {}
-        self.name = "TSG" if not None else name
+        self.name = "TSG" if name is None else name
+        self.pos = 0
+
+    def __str__(self):
+        size_sep = 50
+        final_string = "\n" + "-"*size_sep + f"\n\t\t\tTABLA DE {self.name}\n" + "-"*size_sep
+        for lex, entrada in self.map.items():
+            if isinstance(entrada, TS.FunctionElement):
+                final_string += f"\n* Lex:     {lex}"
+                final_string += f"\n  Desp:    {entrada.desp}"
+                final_string += f"\n  TipoDev: {entrada.tipo_dev}\n\t-numParams: {entrada.numparam}\n\t-tipoParams:" f"{entrada.tipo_params}\n"
+            else:
+                final_string += f"\n* Lex:  {lex}"
+                final_string += f"\n  Tipo: {entrada.tipo}"
+                final_string += f"\n  Desp: {entrada.desp}\n"
+        return final_string + "-"*size_sep
+
+    @staticmethod
+    def get_desp(tipo):
+        """
+        :type tipo: str
+        """
+        res = 0  # function
+        if tipo == "boolean":
+            res = 2
+        elif tipo == "int":
+            res = 2
+        elif tipo == "string":
+            res = 128
+        return res
 
     def buscarId(self, given_id):
         try:
@@ -687,12 +707,41 @@ class TS:
             return False
         return True
 
-    def addId(self, given_id, **kwargs):
+    def addId(self, given_id, tipo,  *args):
         if not self.buscarId(given_id):
-            TS.TSElement(given_id, kwargs[1], kwargs[2], kwargs[3], kwargs[4])
+            if len(args) == 0:
+                elem = TS.TSElement(self, given_id, tipo)
+            else:
+                elem = TS.FunctionElement(self, given_id, tipo, args)
+            self.map[given_id] = elem
         else:
             raise Exception("Identificador ya existe en la TS actual")
 
+    class TSElement:
+        def __init__(self, ts, identifier: str, tipo: str):
+            """
+            :param identifier:
+            :param tipo:
+            """
+            self.ts = ts
+            self.lex = identifier
+            self.tipo = tipo
+            self.desp = self.ts.pos
+            self.ts.pos += TS.get_desp(tipo)
+
+    class FunctionElement(TSElement):
+        def __init__(self, *args):
+            """
+            :param identifier:
+            :param tipo
+            :param *args:
+                See below
+            *param 1(List[str]): tipo_params
+            """
+            super().__init__(args[0], args[1], args[2])
+            self.tipo_params = [elem for elem in args[3][0]]
+            self.numparam = len(self.tipo_params)
+            self.tipo_dev = self.tipo
 
 def dictFromTokenList():
     d = {}

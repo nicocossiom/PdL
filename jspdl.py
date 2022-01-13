@@ -417,7 +417,7 @@ First = {
 Follow = {
     "O1": ["puntoComa", "parCerrado", "coma"],
     "O2": ["mas", "por", "coma", "parCerrado", "puntoComa"],
-    "O3": ["equals", "mayor", "mas", "por","coma", "parCerrado", "puntoComa"],
+    "O3": ["equals", "mayor", "mas", "por", "coma", "parCerrado", "puntoComa"],
     "X": "puntoComa",
     "C": "llaveAbierto",
     "L": "parCerrado",
@@ -732,30 +732,41 @@ def createSyntactic():
 
 
 class TS:
+    CREATION_COUNTER = 0
+
     def __init__(self, name=None):
         self.map = {}
         self.name = "TSG" if name is None else name
         self.pos = 0
+        self.creation_number = TS.CREATION_COUNTER
+        TS.CREATION_COUNTER += 1
 
     def writeTS(self):
-        """Writes the given token in the token.txt file \n
-        Format:  < code , [attribute] >
         """
-        #
+        Writes the TS (self) in th the TS.txt file in the output directory
+        :return:
+        """
         TSFILE.write(str(self))
 
     def __str__(self):
-        size_sep = 50
-        final_string = "\n" + "-" * size_sep + f"\n\t\t\tTABLA DE {self.name}\n" + "-" * size_sep
+        size_sep = 100
+        name = "TABLA PRINCIPAL" if self.name == "TSG" else f"TABLA de función \"{self.name}\""
+        final_string = "\n" + "-" * size_sep + f"\n\t\t\t{name} #{self.creation_number}\n"
         for lex, entrada in self.map.items():
+            final_string += f"\n*  LEXEMA :     \"{lex}\"\n" \
+                            f"\n   ATRIBUTOS : \n" \
+                            f"\+Tipo: {entrada.tipo}\n" \
+
             if isinstance(entrada, TS.FunctionElement):
-                final_string += f"\n* Lex:     {lex}"
-                final_string += f"\n  Desp:    {entrada.desp}"
-                final_string += f"\n  TipoDev: {entrada.tipo_dev}\n\t-numParams: {entrada.numparam}\n\t-tipoParams:" f"{entrada.tipo_params}\n"
+                final_string += f"\t\t+numParam: {entrada.numparam}\n\t\t\t"
+
+                for i in range(len(entrada.tipo_params)):
+                    final_string += f"+TipoParam{i}: {entrada.tipo_params[i]}\n\t\t\t"
+
+                final_string += f"+TipoRetorno: {entrada.tipo_dev}" \
+
             else:
-                final_string += f"\n* Lex:  {lex}"
-                final_string += f"\n  Tipo: {entrada.tipo}"
-                final_string += f"\n  Desp: {entrada.desp}\n"
+                final_string += f"\n  Despl: {entrada.desp}\n"
         return final_string + "-" * size_sep
 
     @staticmethod
@@ -767,14 +778,14 @@ class TS:
         """
         res = 0  # function
         if tipo == "boolean":
-            res = 2
+            res = 1
         elif tipo == "int":
-            res = 2
+            res = 1
         elif tipo == "string":
-            res = 128
+            res = 8
         return res
 
-    def buscarId(self, given_id :str):
+    def buscarId(self, given_id: str):
         """
         Searches for an id in the table
         :param given_id: id we want to check

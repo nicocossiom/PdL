@@ -15,9 +15,6 @@ class Colors:
     UNDERLINE = '\033[4m'
 
 
-
-
-
 def close_all_files():
     if TOKENFILE:
         TOKENFILE.close()
@@ -106,7 +103,7 @@ def gen_error_line(line, start, end):
         writing_line += "\n"
     line = Colors.ENDC + line + Colors.FAIL
     line += " " * start
-    writing_line = " " * start + "^" + "~" * (end - 1)
+    writing_line += " " * start + "^" + "~" * (end - 1)
     line += Colors.WARNING + "^" + "~" * (end - 1) + Colors.FAIL
     return line, writing_line
 
@@ -136,8 +133,8 @@ class Error:
         """
         Prints the error through stderr
         """
-        error_str = "*" * 100 + f"\n{self.origin} at line {self.line}: \n{self.msg}\n" + "*" * 100 + "\n\n"
-        writing_line = "*" * 100 + f"\n{self.origin} at line {self.line}: \n{self.writing_line}\n" + "*" * 100 + "\n\n"
+        error_str = "*" * 75 + f"\n{self.origin} at line {self.line}: \n{self.msg}\n" + "*" * 75 + "\n\n"
+        writing_line = "*" * 75 + f"\n{self.origin} at line {self.line}: \n{self.writing_line}\n" + "*" * 75 + "\n\n"
         eprint(Colors.FAIL + error_str + Colors.ENDC)
         ERRORFILE.write(writing_line)
 
@@ -160,6 +157,8 @@ SYMB_OPS = {
     "}": "llaveCerrado",
     "|": "or"
 }
+
+
 
 
 class Token:
@@ -277,7 +276,7 @@ class Lexer:
     def error(self, msg: string, attr=None):
         self.tokenizing = False
         strings = gen_error_line(self.line, self.startCol, self.col)
-        Error(strings[0]+ "\n" + msg, "Lexical error", self.line, strings[1]+ "\n" + msg, attr)
+        Error(strings[0] + "\n" + msg, "Lexical error", self.line, strings[1] + "\n" + msg, attr)
 
     # < codigo , atributo >
     def genToken(self, code: str, attribute=None) -> Token:
@@ -287,6 +286,7 @@ class Lexer:
         """
         self.tokenizing = False
         generated_token = Token(code, self.line, self.startCol, self.col, attribute)
+        global TOKENLIST
         TOKENLIST.append(generated_token)
         self.writeToken(generated_token)
         self.lex = ""
@@ -430,6 +430,20 @@ Follow = {
     "K": "parCerrado",
     "Rp": ["and", "mas", "por", "coma", "puntoComa", "parCerrado"],
 }
+SYMB_OPS_R = {
+    "mas": "+",
+    "por": "*",
+    "and": "&&",
+    "asig": "=",
+    "mayor": ">",
+    "coma": ",",
+    "puntoComa": ";",
+    "parAbierto": "(",
+    "parCerrado": ")",
+    "llaveAbierto": "{",
+    "llaveCerrado": "}",
+    "or": "||"
+}
 
 
 def createLexer():
@@ -443,6 +457,7 @@ class Syntactic:
         self.index = 0  # indice que apunta al elemento actual de la lista de tokens
         self.actualToken = None
         self.token = None
+        self.lastToken = None
 
     def next(self) -> str:
         """
@@ -450,6 +465,7 @@ class Syntactic:
         :return: next Token
         """
         if self.token != "eof":
+            self.lastToken = self.actualToken
             self.actualToken: Token = LEXER.tokenize()
             self.token = self.actualToken.code
             return self.token
@@ -475,15 +491,18 @@ class Syntactic:
             return True
         if rule is None:  # after first check (means we're in the middle of a state
             # we expected a certain token but it was not it, now we can say it's an error
-            self.error("WrongTokenError", f"Received {code} - Expected another certain token",
-                       TOKENLIST[self.index].line)
+            try:
+                symbol = SYMB_OPS_R[code]
+            except KeyError:
+                symbol = code
+            self.error("WrongTokenError", f"Received {symbol} - Expected a different token", True)
         print("INCORRECTO -> siguiente")
         return False
 
     def error(self, error_type, msg: string, attr=None):
-        strings = gen_error_line(self.actualToken.line, self.actualToken.startCol,
-                                      self.actualToken.endCol)
-        Error(strings[0] + "\n" + msg, error_type, self.actualToken.line,
+        token = self.actualToken if attr else self.lastToken
+        strings = gen_error_line(token.line, token.startCol, token.endCol)
+        Error(strings[0] + "\n" + msg, error_type, token.line,
               strings[1] + "\n" + msg, attr)
 
     @staticmethod
@@ -673,8 +692,7 @@ class Syntactic:
         elif self.token in Follow['K']:
             Syntactic.addParseElement(32)
         else:
-            self.error("FunctionArgumentDeclarationError", "Los argumentos de las funciones deben estar separados por "
-                                                           "','")
+            self.error("FunctionArgumentDeclarationError", "Los argumentos de las funciones deben estar separados por \',\'")
 
     def E(self) -> None:
         if self.token in First["N"]:
@@ -759,6 +777,7 @@ def createSyntactic():
     """Creates the Syntactic parser"""
     global SYNTACTIC
     SYNTACTIC = Syntactic()
+    SYNTACTIC.start()
 
 
 class TS:
@@ -779,7 +798,7 @@ class TS:
         TSFILE.write(str(self))
 
     def __str__(self):
-        size_sep = 100
+        size_sep = 75
         name = "TABLA PRINCIPAL" if self.name == "TSG" else f"TABLA de función \"{self.name}\""
         final_string = "\n" + "-" * size_sep + f"\n\t\t\t{name} #{self.creation_number}\n"
         for lex, entrada in self.map.items():
@@ -871,6 +890,7 @@ class TS:
 
 def dictFromTokenList():
     d = {}
+    global TOKENLIST
     for token in TOKENLIST:
         try:
             d[token.line] += f"  |  <{token.code},{token.att} {token.startCol} {token.endCol}>"
@@ -885,7 +905,7 @@ if __name__ == "__main__":
     createProcessor()
     createLexer()
     createSyntactic()
-    SYNTACTIC.start()
+
     # while True:
     #     token = LEXER.tokenize()
     #     if token is not None and token.code == "eof":

@@ -416,8 +416,8 @@ First = {
 # usamos eof como $ para marcar fin de sentencia admisible
 Follow = {
     "O1": ["puntoComa", "parCerrado", "coma"],
-    "O2": ["mas", "por", "lambda", "puntoComa"],
-    "O3": ["equals", "mayor", "lambda", "puntoComa"],
+    "O2": ["mas", "por", "coma", "parCerrado", "puntoComa"],
+    "O3": ["equals", "mayor", "mas", "por","coma", "parCerrado", "puntoComa"],
     "X": "puntoComa",
     "C": "llaveAbierto",
     "L": "parCerrado",
@@ -425,7 +425,7 @@ Follow = {
     "H": "parAbierto",
     "A": "parCerrado",
     "K": "parCerrado",
-    "Rp": ["and", "mas", "por", "equals", "mayor", "lambda", "coma", "puntoComa", "parCerrado"],
+    "Rp": ["and", "mas", "por", "coma", "puntoComa", "parCerrado"],
 }
 
 

@@ -1,7 +1,6 @@
 import os
 import string
 import sys
-from typing import List
 
 
 class Colors:
@@ -16,11 +15,7 @@ class Colors:
     UNDERLINE = '\033[4m'
 
 
-# GLOBAL VARIABLES
-FILE, FILENAME, OUTPUTDIR, TOKENLIST, PARSESTRING = None, None, None, [], None
-TOKENFILE, PARSEFILE, TSFILE, ERRORFILE = None, None, None, None
-LEXER, SYNTACTIC, SEMANTYC = None, None, None
-LINES = None
+
 
 
 def close_all_files():
@@ -53,7 +48,12 @@ def createProcessor():
         - ts.txt
         - errors.txt
     """
-    global FILE, FILENAME, OUTPUTDIR, TOKENLIST, TOKENFILE, PARSEFILE, TSFILE, ERRORFILE
+    global FILE, FILENAME, OUTPUTDIR, TOKENLIST, TOKENFILE, PARSEFILE, TSFILE, ERRORFILE, PARSESTRING, LINES
+
+    FILE, FILENAME, OUTPUTDIR, TOKENLIST, PARSESTRING = None, None, None, [], None
+    TOKENFILE, PARSEFILE, TSFILE, ERRORFILE = None, None, None, None
+    LINES = None
+
     num = len(sys.argv)
     if num > 2:
         sys.exit("Input file path to analyze as program argument")
@@ -99,13 +99,16 @@ def gen_error_line(line, start, end):
     if not LINES:
         fd = open(sys.argv[1], "r")
         LINES = fd.readlines()
+    writing_line = LINES[line - 1]
     line = Colors.OKBLUE + LINES[line - 1]
     if line[-1:] != "\n":
         line += "\n"
+        writing_line += "\n"
     line = Colors.ENDC + line + Colors.FAIL
     line += " " * start
+    writing_line = " " * start + "^" + "~" * (end - 1)
     line += Colors.WARNING + "^" + "~" * (end - 1) + Colors.FAIL
-    return line
+    return line, writing_line
 
 
 class Error:
@@ -114,7 +117,7 @@ class Error:
     that creates an Error and adds it to the list of errors of said class
     """
 
-    def __init__(self, msg: str, origin: str, linea: int, attr=None):
+    def __init__(self, msg: str, origin: str, linea: int, writing_line: str, attr=None):
         """
 
         :param msg[str]: Error message
@@ -126,6 +129,7 @@ class Error:
         self.line = linea
         self.att = attr
         self.origin = origin
+        self.writing_line = writing_line
         self.print()
 
     def print(self):
@@ -133,8 +137,9 @@ class Error:
         Prints the error through stderr
         """
         error_str = "*" * 100 + f"\n{self.origin} at line {self.line}: \n{self.msg}\n" + "*" * 100 + "\n\n"
+        writing_line = "*" * 100 + f"\n{self.origin} at line {self.line}: \n{self.writing_line}\n" + "*" * 100 + "\n\n"
         eprint(Colors.FAIL + error_str + Colors.ENDC)
-        ERRORFILE.write(error_str)
+        ERRORFILE.write(writing_line)
 
 
 # Lenguage definitions by class
@@ -162,8 +167,6 @@ class Token:
 
     def __init__(self, code: str, line, start_col, end_col, attribute=None):
         """
-
-        :param error_string:
         :param line:
         :param start_col:
         :param end_col:
@@ -273,8 +276,8 @@ class Lexer:
 
     def error(self, msg: string, attr=None):
         self.tokenizing = False
-        error_string = gen_error_line(self.line, self.startCol, self.col) + "\n" + msg
-        Error(error_string, "Lexical error", self.line, attr)
+        strings = gen_error_line(self.line, self.startCol, self.col)
+        Error(strings[0]+ "\n" + msg, "Lexical error", self.line, strings[1]+ "\n" + msg, attr)
 
     # < codigo , atributo >
     def genToken(self, code: str, attribute=None) -> Token:
@@ -478,9 +481,10 @@ class Syntactic:
         return False
 
     def error(self, error_type, msg: string, attr=None):
-        error_string = gen_error_line(self.actualToken.line, self.actualToken.startCol,
-                                      self.actualToken.endCol) + "\n" + msg
-        Error(error_string, error_type, self.actualToken.line, attr)
+        strings = gen_error_line(self.actualToken.line, self.actualToken.startCol,
+                                      self.actualToken.endCol)
+        Error(strings[0] + "\n" + msg, error_type, self.actualToken.line,
+              strings[1] + "\n" + msg, attr)
 
     @staticmethod
     def addParseElement(regla: int) -> None:
@@ -491,6 +495,32 @@ class Syntactic:
         else:
             PARSESTRING += f"{regla},"
         print(PARSESTRING)
+
+    class ProductionObject:
+        def __init__(self, **kwargs):
+            r"""
+            An object representing a Syntactic production rule which holds values for a Semantic functions
+            :param \**kwargs:
+                    See below
+                :Keyword Arguments:
+                * *tipo* (``str``) --
+                  Extra stuff
+                * *ancho* (``str``) --
+                * *tipoRet* (``str``) --
+
+            """
+            try:
+                self.tipo = kwargs["tipo"]
+            except KeyError:
+                self.tipo = None
+            try:
+                self.ancho = kwargs["ancho"]
+            except KeyError:
+                self.ancho = None
+            try:
+                self.tipoRet = kwargs["tipoRet"]
+            except KeyError:
+                self.tipoRet = None
 
     def start(self):
         """Starts the Syntactic process"""
@@ -754,17 +784,15 @@ class TS:
         final_string = "\n" + "-" * size_sep + f"\n\t\t\t{name} #{self.creation_number}\n"
         for lex, entrada in self.map.items():
             final_string += f"\n*  LEXEMA :     \"{lex}\"\n" \
-                            f"\n   ATRIBUTOS : \n" \
-                            f"\+Tipo: {entrada.tipo}\n" \
-
+                            f"\n   ATRIBUTOS : \n\t\t" \
+                            f"+Tipo: {entrada.tipo}\n"
             if isinstance(entrada, TS.FunctionElement):
                 final_string += f"\t\t+numParam: {entrada.numparam}\n\t\t\t"
 
                 for i in range(len(entrada.tipo_params)):
                     final_string += f"+TipoParam{i}: {entrada.tipo_params[i]}\n\t\t\t"
 
-                final_string += f"+TipoRetorno: {entrada.tipo_dev}" \
-
+                final_string += f"+TipoRetorno: {entrada.tipo_dev}"
             else:
                 final_string += f"\n  Despl: {entrada.desp}\n"
         return final_string + "-" * size_sep

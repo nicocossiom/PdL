@@ -17,10 +17,11 @@ class Colors:
 
 
 # GLOBAL VARIABLES
-FILE, FILENAME, OUTPUTDIR, TOKENLIST = None, None, None, [], 
+FILE, FILENAME, OUTPUTDIR, TOKENLIST, PARSESTRING = None, None, None, [], None
 TOKENFILE, PARSEFILE, TSFILE, ERRORFILE = None, None, None, None
 LEXER, SYNTACTIC, SEMANTYC = None, None, None
 LINES = None
+
 
 def close_all_files():
     if TOKENFILE:
@@ -86,7 +87,7 @@ def createProcessor():
                 sys.exit(f"File \'{sys.argv[1]}\' does not exist")
 
 
-def ger_error_line(line, start, end):
+def gen_error_line(line, start, end):
     """
 
     :param line: line from the given input file to get
@@ -99,7 +100,7 @@ def ger_error_line(line, start, end):
         fd = open(sys.argv[1], "r")
         LINES = fd.readlines()
     line = Colors.OKBLUE + LINES[line - 1]
-    if line[-1:] != "\n": 
+    if line[-1:] != "\n":
         line += "\n"
     line = Colors.ENDC + line + Colors.FAIL
     line += " " * start
@@ -131,7 +132,7 @@ class Error:
         """
         Prints the error through stderr
         """
-        error_str = f"{self.origin} at line {self.line}: \n{self.msg}"
+        error_str = "*" * 100 + f"\n{self.origin} at line {self.line}: \n{self.msg}\n" + "*" * 100 + "\n\n"
         eprint(Colors.FAIL + error_str + Colors.ENDC)
         ERRORFILE.write(error_str)
 
@@ -151,12 +152,14 @@ SYMB_OPS = {
     "(": "parAbierto",
     ")": "parCerrado",
     "{": "llaveAbierto",
-    "}": "llaveCerrado"
+    "}": "llaveCerrado",
+    "|": "or"
 }
 
 
 class Token:
     """A token representation for the processor"""
+
     def __init__(self, code: str, line, start_col, end_col, attribute=None):
         """
 
@@ -193,7 +196,7 @@ class Lexer:
             self.nextChar()
             while Lexer.peekNextCar() != "/" and self.car != "*" and self.car != "":
                 self.nextChar()
-                if self.car == "": 
+                if self.car == "":
                     self.error("Comentario de bloque no cerrado")
                 if self.car == "\n":
                     self.line += 1
@@ -203,13 +206,19 @@ class Lexer:
             self.nextChar()
         elif self.car == "/":
             FILE.readline()
-            self.line += 1
             self.col = 0
+            self.nextChar()
             self.error("Comentarios de tipo '//comentario' no estan permitidos")
+            self.line += 1
+
         else:
-            self.error("Simbolo '$simbolo' no pertenece al lenguaje", self.car)
+            self.error(f"Simbolo {self.car} no pertenece al lenguaje")
 
     def nextChar(self):
+        """
+        Reads the next character from the file while augmenting the column counter at the same time
+        :return:
+        """
         self.car = FILE.read(1)
         self.col += 1
 
@@ -245,15 +254,15 @@ class Lexer:
     def concatenate(self):
         """Concatenates current char to lexeme in contruction"""
         self.lex += self.car
-        
+
     @staticmethod
     def writeToken(given_token: Token):
         """Writes the given token in the token.txt file \n
         Format:  < code , [attribute] >
         """
         #
-        TOKENFILE.write(f"< {given_token.code} , {given_token.att} >\n")  
-    
+        TOKENFILE.write(f"< {given_token.code} , {given_token.att} >\n")
+
     @staticmethod
     def peekNextCar() -> str:
         """Returns the character next to that which the file pointer is at, without advancing said file pointer"""
@@ -264,7 +273,7 @@ class Lexer:
 
     def error(self, msg: string, attr=None):
         self.tokenizing = False
-        error_string = ger_error_line(self.line, self.startCol, self.col) + "\n" + msg
+        error_string = gen_error_line(self.line, self.startCol, self.col) + "\n" + msg
         Error(error_string, "Lexical error", self.line, attr)
 
     # < codigo , atributo >
@@ -303,9 +312,9 @@ class Lexer:
         self.tokenizing = True  # start to tokenize
         if Lexer.peekNextCar() == "":
             result = self.genToken("eof")  # llega al final de archivo -> eof
-        self.startCol = self.col
         while self.tokenizing:
             self.next()
+            self.startCol = self.col
             # Integer being formed
             if self.car.isdigit() and self.lex == "":
                 self.generateNumber()
@@ -327,7 +336,6 @@ class Lexer:
                             result = self.genToken("id", self.lex)
                         else:
                             self.error(f"Identificador {self.lex} excede el tamaño máximo de caracteres permitido (64)")
-
             # String (cadena) processing
             elif self.car == "\"":
                 self.next()
@@ -377,7 +385,7 @@ class Lexer:
             else:
                 self.error(
                     f"Símbolo: \"{self.car}\" no permitido. \nNo pertence al lenguaje, consulte la documentación para "
-                    f"ver carácteres aceptados") 
+                    f"ver carácteres aceptados")
         return result
 
 
@@ -395,9 +403,9 @@ First = {
     "H": ["int", "boolean", "string"],
     "A": ["int", "boolean", "string"],
     "K": "coma",
-    "E": ["mas", "por", "lambda"],
-    "N": ["equals", "mayor", "lambda"],
-    "Z": ["or", "and", "lambda"],
+    "E": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
+    "N": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
+    "Z": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
     "O1": ["mas", "por", "lambda"],
     "O2": ["equals", "mayor", "lambda"],
     "O3": ["or", "and", "lambda"],
@@ -408,8 +416,8 @@ First = {
 # usamos eof como $ para marcar fin de sentencia admisible
 Follow = {
     "O1": ["puntoComa", "parCerrado", "coma"],
-    "O2": ["mas", "por", "lambda"],
-    "O3": ["equals", "mayor", "lambda"],
+    "O2": ["mas", "por", "lambda", "puntoComa"],
+    "O3": ["equals", "mayor", "lambda", "puntoComa"],
     "X": "puntoComa",
     "C": "llaveAbierto",
     "L": "parCerrado",
@@ -424,36 +432,45 @@ Follow = {
 def createLexer():
     global LEXER
     LEXER = Lexer()
-    print("created lexer")
 
 
 class Syntactic:
-
     def __init__(self) -> None:
         createLexer()
         self.index = 0  # indice que apunta al elemento actual de la lista de tokens
-        self.actualToken = TOKENLIST[self.index]
-        self.token = self.actualToken.code
+        self.actualToken = None
+        self.token = None
 
-    def next(self) -> Token:
+    def next(self) -> str:
+        """
+        Returns code (str) of the next token from the Lexer and stores the actual token in self
+        :return: next Token
+        """
         if self.token != "eof":
-            comp_str = "\nnext: " + self.token
-            self.index += 1
             self.actualToken: Token = LEXER.tokenize()
             self.token = self.actualToken.code
-            print(comp_str + " -> " + self.token)
             return self.token
 
-    def equipara(self, code: str, regla=None) -> bool:
+    def equipara(self, code: str, rule=None) -> bool:
+        """
+        Compares the given code to the actual token, return status based on said comparison.
+        If regla is given means we're checking against a First of current state, rule should be given and if true
+        add to parse list. If not rule then we're inside a production hence we know what tokens to expect and can
+        error if comparison is false
+
+        :param code: code of token expected in current syntactic position
+        :param rule: rule to be added to the parse list
+        :return: True if code == current token, else False
+        """
         print(f"equipara({self.token} , {code} )", end="")
         if self.token == code:
             print("CORRECTO")
-            if regla is not None:
+            if rule is not None:
                 # only add rule when it's first check in a function (has regla), and we're sure it's the correct token
-                self.reglas.append(regla)
+                Syntactic.addParseElement(rule)
             self.next()
             return True
-        if regla is None:  # after first check (means we're in the middle of a state
+        if rule is None:  # after first check (means we're in the middle of a state
             # we expected a certain token but it was not it, now we can say it's an error
             self.error("WrongTokenError", f"Received {code} - Expected another certain token",
                        TOKENLIST[self.index].line)
@@ -461,34 +478,38 @@ class Syntactic:
         return False
 
     def error(self, error_type, msg: string, attr=None):
-        error_string = ger_error_line(self.actualToken.line, self.actualToken.startCol, self.actualToken.endCol)\
-                       + "\n" + msg
-        Error(error_string, error_type,  self.line, attr)
+        error_string = gen_error_line(self.actualToken.line, self.actualToken.startCol,
+                                      self.actualToken.endCol) + "\n" + msg
+        Error(error_string, error_type, self.actualToken.line, attr)
 
     @staticmethod
     def addParseElement(regla: int) -> None:
         """Writes the given parse element int the tokens.txt """
-        if regla == 1 or regla == 2:
-            parsed_str = f"Descendente {regla}, ".replace("None", "")
+        global PARSESTRING
+        if PARSESTRING is None:
+            PARSESTRING = f"Descendente {regla}, ".replace("None", "")
         else:
-            parsed_str = f"{regla} ".replace("None", "")
-        PARSEFILE.write(parsed_str, 'a')
+            PARSESTRING += f"{regla},"
+        print(PARSESTRING)
 
-    def startSyntactic(self):
+    def start(self):
+        """Starts the Syntactic process"""
+        self.next()
         self.P()
-        print("Terminado ")
+        PARSEFILE.write(PARSESTRING)
+        eprint("Terminado")
 
     def P(self) -> None:
         if self.token in First["B"]:
-            self.reglas.append(1)
+            Syntactic.addParseElement(1)
             self.B()
             self.P()
         elif self.token in First['F']:
-            self.reglas.append(2)
+            Syntactic.addParseElement(2)
             self.F()
             self.P()
         elif self.equipara("eof"):
-            self.reglas.append(3)
+            Syntactic.addParseElement(3)
             return
 
     def B(self) -> None:
@@ -502,7 +523,7 @@ class Syntactic:
             if self.equipara("parCerrado"):
                 self.S()
         elif self.token in First["S"]:
-            self.reglas.append(6)
+            Syntactic.addParseElement(6)
             self.S()
         elif self.equipara("do", 7):
             if self.equipara("llaveAbierto"):
@@ -550,28 +571,29 @@ class Syntactic:
 
     def X(self) -> None:
         if self.token in First['E']:
-            self.reglas.append(18)
+            Syntactic.addParseElement(18)
             self.E()
         elif self.token in Follow['X']:
-            self.reglas.append(19)
+            Syntactic.addParseElement(19)
         else:
-            self.error("SentenceNotTerminatedError", f"Esperaba ';' al terminar la sentencia, después de un return vacío")
+            self.error("SentenceNotTerminatedError",
+                       f"Esperaba ';' al terminar la sentencia, después de un return vacío")
 
     def C(self) -> None:
         if self.token in First["B"]:
-            self.reglas.append(20)
+            Syntactic.addParseElement(20)
             self.B()
             self.C()
         elif self.token in Follow['C']:
-            self.reglas.append(21)
+            Syntactic.addParseElement(21)
 
     def L(self) -> None:
         if self.token in First["E"]:
-            self.reglas.append(22)
+            Syntactic.addParseElement(22)
             self.E()
             self.Q()
         elif self.token in Follow['L']:
-            self.reglas.append(23)
+            Syntactic.addParseElement(23)
         else:
             self.error("FunctionCallError", "No se ha cerrado paréntesis en la llamada a la función")
 
@@ -580,7 +602,7 @@ class Syntactic:
             self.E()
             self.Q()
         elif self.token in Follow['Q']:
-            self.reglas.append(25)
+            Syntactic.addParseElement(25)
 
     def F(self) -> None:
         if self.equipara("function", 26) and self.equipara("id"):
@@ -594,22 +616,22 @@ class Syntactic:
 
     def H(self) -> None:
         if self.token in First['T']:
-            self.reglas.append(27)
+            Syntactic.addParseElement(27)
             self.T()
         elif self.token in Follow['H']:
-            self.reglas.append(28)
+            Syntactic.addParseElement(28)
         else:
             self.error("TypeError", f"Tipo de función no aceptado. Debe usar {First['T']} o \"\" (no poner nada para "
                                     f"void)")
 
     def A(self) -> None:
         if self.token in First['T']:
-            self.reglas.append(29)
+            Syntactic.addParseElement(29)
             self.T()
             if self.equipara("id"):
                 self.K()
         elif self.token in Follow['A']:
-            self.reglas.append(30)
+            Syntactic.addParseElement(30)
         else:
             self.error("FunctionCallError", f"No ha cerrado paréntesis en la llamada a la función")
 
@@ -619,26 +641,26 @@ class Syntactic:
             if self.equipara("id"):
                 self.K()
         elif self.token in Follow['K']:
-            self.reglas.append(32)
+            Syntactic.addParseElement(32)
         else:
             self.error("FunctionArgumentDeclarationError", "Los argumentos de las funciones deben estar separados por "
                                                            "','")
 
     def E(self) -> None:
         if self.token in First["N"]:
-            self.reglas.append(33)
+            Syntactic.addParseElement(33)
             self.N()
             self.O1()
 
     def N(self) -> None:
         if self.token in First["Z"]:
-            self.reglas.append(34)
+            Syntactic.addParseElement(34)
             self.Z()
             self.O2()
 
     def Z(self) -> None:
         if self.token in First["R"]:
-            self.reglas.append(35)
+            Syntactic.addParseElement(35)
             self.R()
             self.O3()
 
@@ -650,7 +672,7 @@ class Syntactic:
             self.R()
             self.O1()
         elif self.token in Follow['O1']:
-            self.reglas.append(38)
+            Syntactic.addParseElement(38)
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O1']}")
 
@@ -662,7 +684,7 @@ class Syntactic:
             self.R()
             self.O2()
         elif self.token in Follow['O2']:
-            self.reglas.append(41)
+            Syntactic.addParseElement(41)
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O2']}")
 
@@ -674,7 +696,7 @@ class Syntactic:
             self.R()
             self.O3()
         elif self.token in Follow['O3']:
-            self.reglas.append(44)
+            Syntactic.addParseElement(44)
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O3']}")
 
@@ -700,9 +722,13 @@ class Syntactic:
         elif self.equipara("postIncrem", 52):
             return
         elif self.token in Follow["Rp"]:
-            self.reglas.append(53)
+            Syntactic.addParseElement(53)
 
 
+def createSyntactic():
+    """Creates the Syntactic parser"""
+    global SYNTACTIC
+    SYNTACTIC = Syntactic()
 
 
 class TS:
@@ -711,9 +737,16 @@ class TS:
         self.name = "TSG" if name is None else name
         self.pos = 0
 
+    def writeTS(self):
+        """Writes the given token in the token.txt file \n
+        Format:  < code , [attribute] >
+        """
+        #
+        TSFILE.write(str(self))
+
     def __str__(self):
         size_sep = 50
-        final_string = "\n" + "-"*size_sep + f"\n\t\t\tTABLA DE {self.name}\n" + "-"*size_sep
+        final_string = "\n" + "-" * size_sep + f"\n\t\t\tTABLA DE {self.name}\n" + "-" * size_sep
         for lex, entrada in self.map.items():
             if isinstance(entrada, TS.FunctionElement):
                 final_string += f"\n* Lex:     {lex}"
@@ -723,12 +756,14 @@ class TS:
                 final_string += f"\n* Lex:  {lex}"
                 final_string += f"\n  Tipo: {entrada.tipo}"
                 final_string += f"\n  Desp: {entrada.desp}\n"
-        return final_string + "-"*size_sep
+        return final_string + "-" * size_sep
 
     @staticmethod
     def get_desp(tipo):
         """
-        :type tipo: str
+        Given a type returns its value for size
+        :param tipo: type whose size we want to know
+        :return: size of tipo in Bytes
         """
         res = 0  # function
         if tipo == "boolean":
@@ -739,14 +774,26 @@ class TS:
             res = 128
         return res
 
-    def buscarId(self, given_id):
+    def buscarId(self, given_id :str):
+        """
+        Searches for an id in the table
+        :param given_id: id we want to check
+        :return: True if found, False if not
+        """
         try:
             self.map[given_id]
         except KeyError:
             return False
         return True
 
-    def addId(self, given_id, tipo,  *args):
+    def addId(self, given_id: str, tipo: str, *args):
+        """
+
+        :param given_id:
+        :param tipo:
+        :param args:
+        :return:
+        """
         if not self.buscarId(given_id):
             if len(args) == 0:
                 elem = TS.TSElement(self, given_id, tipo)
@@ -798,8 +845,10 @@ def dictFromTokenList():
 if __name__ == "__main__":
     createProcessor()
     createLexer()
-    while True:
-        token = LEXER.tokenize()
-        if token is not None and token.code == "eof":
-            break
-    close_all_files() #closes all file descriptors
+    createSyntactic()
+    SYNTACTIC.start()
+    # while True:
+    #     token = LEXER.tokenize()
+    #     if token is not None and token.code == "eof":
+    #         break
+    close_all_files()  # closes all file descriptors

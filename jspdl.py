@@ -47,7 +47,7 @@ def createProcessor():
     """
     global FILE, FILENAME, OUTPUTDIR, TOKENLIST, TOKENFILE, PARSEFILE, TSFILE, ERRORFILE, PARSESTRING, LINES
 
-    FILE, FILENAME, OUTPUTDIR, TOKENLIST, PARSESTRING = None, None, None, [], None
+    FILE, FILENAME, OUTPUTDIR, TOKENLIST, PARSESTRING  = None, None, None, [], None
     TOKENFILE, PARSEFILE, TSFILE, ERRORFILE = None, None, None, None
     LINES = None
 
@@ -157,9 +157,6 @@ SYMB_OPS = {
     "}": "llaveCerrado",
     "|": "or"
 }
-
-
-
 
 class Token:
     """A token representation for the processor"""
@@ -451,335 +448,6 @@ def createLexer():
     LEXER = Lexer()
 
 
-class Syntactic:
-    def __init__(self) -> None:
-        createLexer()
-        self.index = 0  # indice que apunta al elemento actual de la lista de tokens
-        self.actualToken = None
-        self.token = None
-        self.lastToken = None
-
-    def next(self) -> str:
-        """
-        Returns code (str) of the next token from the Lexer and stores the actual token in self
-        :return: next Token
-        """
-        if self.token != "eof":
-            self.lastToken = self.actualToken
-            self.actualToken: Token = LEXER.tokenize()
-            self.token = self.actualToken.code
-            return self.token
-
-    def equipara(self, code: str, rule=None) -> bool:
-        """
-        Compares the given code to the actual token, return status based on said comparison.
-        If regla is given means we're checking against a First of current state, rule should be given and if true
-        add to parse list. If not rule then we're inside a production hence we know what tokens to expect and can
-        error if comparison is false
-
-        :param code: code of token expected in current syntactic position
-        :param rule: rule to be added to the parse list
-        :return: True if code == current token, else False
-        """
-        print(f"equipara({self.token} , {code} )", end="")
-        if self.token == code:
-            print("CORRECTO")
-            if rule is not None:
-                # only add rule when it's first check in a function (has regla), and we're sure it's the correct token
-                Syntactic.addParseElement(rule)
-            self.next()
-            return True
-        if rule is None:  # after first check (means we're in the middle of a state
-            # we expected a certain token but it was not it, now we can say it's an error
-            try:
-                symbol = SYMB_OPS_R[code]
-            except KeyError:
-                symbol = code
-            self.error("WrongTokenError", f"Received {symbol} - Expected a different token", True)
-        print("INCORRECTO -> siguiente")
-        return False
-
-    def error(self, error_type, msg: string, attr=None):
-        token = self.actualToken if attr else self.lastToken
-        strings = gen_error_line(token.line, token.startCol, token.endCol)
-        Error(strings[0] + "\n" + msg, error_type, token.line,
-              strings[1] + "\n" + msg, attr)
-
-    @staticmethod
-    def addParseElement(regla: int) -> None:
-        """Writes the given parse element int the tokens.txt """
-        global PARSESTRING
-        if PARSESTRING is None:
-            PARSESTRING = f"Descendente {regla}, ".replace("None", "")
-        else:
-            PARSESTRING += f"{regla},"
-        print(PARSESTRING)
-
-    class ProductionObject:
-        def __init__(self, **kwargs):
-            r"""
-            An object representing a Syntactic production rule which holds values for a Semantic functions
-            :param \**kwargs:
-                    See below
-                :Keyword Arguments:
-                * *tipo* (``str``) --
-                  Extra stuff
-                * *ancho* (``str``) --
-                * *tipoRet* (``str``) --
-
-            """
-            try:
-                self.tipo = kwargs["tipo"]
-            except KeyError:
-                self.tipo = None
-            try:
-                self.ancho = kwargs["ancho"]
-            except KeyError:
-                self.ancho = None
-            try:
-                self.tipoRet = kwargs["tipoRet"]
-            except KeyError:
-                self.tipoRet = None
-
-    def start(self):
-        """Starts the Syntactic process"""
-        self.next()
-        self.P()
-        PARSEFILE.write(PARSESTRING)
-        eprint("Terminado")
-
-    def P(self) -> None:
-        if self.token in First["B"]:
-            Syntactic.addParseElement(1)
-            self.B()
-            self.P()
-        elif self.token in First['F']:
-            Syntactic.addParseElement(2)
-            self.F()
-            self.P()
-        elif self.equipara("eof"):
-            Syntactic.addParseElement(3)
-            return
-
-    def B(self) -> None:
-        if self.equipara("let", 4):
-            self.T()
-            if self.equipara("id"):
-                if self.equipara("puntoComa"):
-                    return
-        elif self.equipara("if", 5) and self.equipara("parAbierto"):
-            self.E()
-            if self.equipara("parCerrado"):
-                self.S()
-        elif self.token in First["S"]:
-            Syntactic.addParseElement(6)
-            self.S()
-        elif self.equipara("do", 7):
-            if self.equipara("llaveAbierto"):
-                self.C()
-                if self.equipara("llaveCerrado") and self.equipara("while") and self.equipara("parAbierto"):
-                    self.E()
-                    if self.equipara("parCerrado") and self.equipara("puntoComa"):
-                        return
-
-    def T(self) -> None:
-        if self.equipara("int", 8):
-            return
-        elif self.equipara("boolean", 9):
-            return
-        elif self.equipara("string", 10):
-            return
-
-    def S(self) -> None:
-        if self.equipara("id", 11):
-            self.Sp()
-        elif self.equipara("return", 12):
-            self.X()
-            if self.equipara("puntoComa"):
-                return
-        elif self.equipara("print", 13):
-            if self.equipara("parAbierto"):
-                self.E()
-                if self.equipara("parCerrado") and self.equipara("puntoComa"):
-                    return
-        elif (self.equipara("input", 14) and self.equipara("parAbierto") and self.equipara(
-                "id") and self.equipara("parCerrado") and self.equipara("puntoComa")):
-            return
-
-    def Sp(self) -> None:
-        if self.equipara("asig", 15):
-            self.E()
-            if self.equipara("puntoComa"):
-                return
-        elif self.equipara("parAbierto", 16):
-            self.L()
-            if self.equipara("parCerrado") and self.equipara("puntoComa"):
-                return
-        elif self.equipara("postIncrem", 17) and self.equipara("puntoComa"):
-            return
-
-    def X(self) -> None:
-        if self.token in First['E']:
-            Syntactic.addParseElement(18)
-            self.E()
-        elif self.token in Follow['X']:
-            Syntactic.addParseElement(19)
-        else:
-            self.error("SentenceNotTerminatedError",
-                       f"Esperaba ';' al terminar la sentencia, después de un return vacío")
-
-    def C(self) -> None:
-        if self.token in First["B"]:
-            Syntactic.addParseElement(20)
-            self.B()
-            self.C()
-        elif self.token in Follow['C']:
-            Syntactic.addParseElement(21)
-
-    def L(self) -> None:
-        if self.token in First["E"]:
-            Syntactic.addParseElement(22)
-            self.E()
-            self.Q()
-        elif self.token in Follow['L']:
-            Syntactic.addParseElement(23)
-        else:
-            self.error("FunctionCallError", "No se ha cerrado paréntesis en la llamada a la función")
-
-    def Q(self) -> None:
-        if self.equipara("coma", 24):
-            self.E()
-            self.Q()
-        elif self.token in Follow['Q']:
-            Syntactic.addParseElement(25)
-
-    def F(self) -> None:
-        if self.equipara("function", 26) and self.equipara("id"):
-            self.H()
-            if self.equipara("parAbierto"):
-                self.A()
-                if self.equipara("parCerrado") and self.equipara("llaveAbierto"):
-                    self.C()
-                    if self.equipara("llaveCerrado"):
-                        return
-
-    def H(self) -> None:
-        if self.token in First['T']:
-            Syntactic.addParseElement(27)
-            self.T()
-        elif self.token in Follow['H']:
-            Syntactic.addParseElement(28)
-        else:
-            self.error("TypeError", f"Tipo de función no aceptado. Debe usar {First['T']} o \"\" (no poner nada para "
-                                    f"void)")
-
-    def A(self) -> None:
-        if self.token in First['T']:
-            Syntactic.addParseElement(29)
-            self.T()
-            if self.equipara("id"):
-                self.K()
-        elif self.token in Follow['A']:
-            Syntactic.addParseElement(30)
-        else:
-            self.error("FunctionCallError", f"No ha cerrado paréntesis en la llamada a la función")
-
-    def K(self) -> None:
-        if self.equipara("coma", 31):
-            self.T()
-            if self.equipara("id"):
-                self.K()
-        elif self.token in Follow['K']:
-            Syntactic.addParseElement(32)
-        else:
-            self.error("FunctionArgumentDeclarationError", "Los argumentos de las funciones deben estar separados por \',\'")
-
-    def E(self) -> None:
-        if self.token in First["N"]:
-            Syntactic.addParseElement(33)
-            self.N()
-            self.O1()
-
-    def N(self) -> None:
-        if self.token in First["Z"]:
-            Syntactic.addParseElement(34)
-            self.Z()
-            self.O2()
-
-    def Z(self) -> None:
-        if self.token in First["R"]:
-            Syntactic.addParseElement(35)
-            self.R()
-            self.O3()
-
-    def O1(self) -> None:
-        if self.equipara("mas", 36):
-            self.R()
-            self.O1()
-        elif self.equipara("por", 37):
-            self.R()
-            self.O1()
-        elif self.token in Follow['O1']:
-            Syntactic.addParseElement(38)
-        else:
-            self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O1']}")
-
-    def O2(self) -> None:
-        if self.equipara("equals", 39):
-            self.R()
-            self.O2()
-        elif self.equipara("mayor", 40):
-            self.R()
-            self.O2()
-        elif self.token in Follow['O2']:
-            Syntactic.addParseElement(41)
-        else:
-            self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O2']}")
-
-    def O3(self) -> None:
-        if self.equipara("or", 42):
-            self.R()
-            self.O3()
-        elif self.equipara("and", 43):
-            self.R()
-            self.O3()
-        elif self.token in Follow['O3']:
-            Syntactic.addParseElement(44)
-        else:
-            self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O3']}")
-
-    def R(self) -> None:
-        if self.equipara("id", 45):
-            self.Rp()
-        elif self.equipara("parAbierto", 46):
-            return
-        elif self.equipara("cteEnt", 47):
-            return
-        elif self.equipara("cadena", 48):
-            return
-        elif self.equipara("true", 49):
-            return
-        elif self.equipara("false", 50):
-            return
-
-    def Rp(self) -> None:
-        if self.equipara("parAbierto", 51):
-            self.L()
-            if self.equipara("parCerrado"):
-                return
-        elif self.equipara("postIncrem", 52):
-            return
-        elif self.token in Follow["Rp"]:
-            Syntactic.addParseElement(53)
-
-
-def createSyntactic():
-    """Creates the Syntactic parser"""
-    global SYNTACTIC
-    SYNTACTIC = Syntactic()
-    SYNTACTIC.start()
-
-
 class TS:
     CREATION_COUNTER = 0
 
@@ -844,7 +512,7 @@ class TS:
             return False
         return True
 
-    def addId(self, given_id: str, tipo: str, *args):
+    def insertarId(self, given_id: str, tipo: str, *args):
         """
 
         :param given_id:
@@ -884,9 +552,15 @@ class TS:
             """
             super().__init__(args[0], args[1], args[2])
             self.tipo_params = [elem for elem in args[3][0]]
-            self.numparam = len(self.tipo_params)
+            self.num_param = len(self.tipo_params)
             self.tipo_dev = self.tipo
-
+    
+    # def insertarTipoDev(self, id, tipo):
+    #     try:
+    #         self.map[id].tipo_dev = tipo
+    #     except KeyError:
+    #         sys.exit(f"No existe el id dado: {id} en la tabla")
+                
 
 def dictFromTokenList():
     d = {}
@@ -899,6 +573,409 @@ def dictFromTokenList():
     for line, tokens in d.items():
         print(f"{line}-> {tokens}")
     return d
+
+class ProductionObject:
+    def __init__(self, **kwargs):
+        r"""
+        An object representing a Syntactic production rule which holds values for a Semantic functions
+        :param \**kwargs:
+                See below
+            :Keyword Arguments:
+            * *tipo* (``str``) --
+              Extra stuff
+            * *ancho* (``str``) --
+            * *tipoRet* (``str``) --
+
+        """
+        try:
+            self.tipo = kwargs["tipo"]
+        except KeyError:
+            self.tipo = None
+        try:
+            self.ancho = kwargs["ancho"]
+        except KeyError:
+            self.ancho = None
+        try:
+            self.tipoRet = kwargs["tipoRet"]
+        except KeyError:
+            self.tipoRet = None
+
+
+class Syntactic:
+    # Tablas de Símbolos class (static vars of shared by all members of the class) variables,
+    # which will be referred to as self.{} inside the methods, but they're not instance class variables
+    TSG: TS = None
+    TSActual: TS = None
+    def __init__(self) -> None:
+        createLexer()
+        self.index = 0  # indice que apunta al elemento actual de la lista de tokens
+        self.actualToken : Token = None
+        self.token = None
+        self.lastToken = None
+
+    def next(self) -> str:
+        """
+        Returns code (str) of the next token from the Lexer and stores the actual token in self
+        :return: next Token
+        """
+        if self.token != "eof":
+            self.lastToken = self.actualToken
+            self.actualToken: Token = LEXER.tokenize()
+            self.token = self.actualToken.code
+            return self.token
+
+    def equipara(self, code: str, rule=None) -> bool:
+        """
+        Compares the given code to the actual token, return status based on said comparison.
+        If regla is given means we're checking against a First of current state, rule should be given and if true
+        add to parse list. If not rule then we're inside a production hence we know what tokens to expect and can
+        error if comparison is false
+
+        :param code: code of token expected in current syntactic position
+        :param rule: rule to be added to the parse list
+        :return: True if code == current token, else False
+        """
+        print(f"equipara({self.token} , {code} )", end="")
+        if self.token == code:
+            print("CORRECTO")
+            if rule is not None:
+                # only add rule when it's first check in a function (has regla), and we're sure it's the correct token
+                Syntactic.addParseElement(rule)
+            self.next()
+            return True
+        if rule is None:  # after first check (means we're in the middle of a state
+            # we expected a certain token but it was not it, now we can say it's an error
+            try:
+                symbol = SYMB_OPS_R[code]
+            except KeyError:
+                symbol = code
+            self.error("WrongTokenError", f"Received {symbol} - Expected a different token", True)
+        print("INCORRECTO -> siguiente")
+        return False
+
+    def error(self, error_type, msg: string, attr=None):
+        token = self.actualToken if attr else self.lastToken
+        strings = gen_error_line(token.line, token.startCol, token.endCol)
+        Error(strings[0] + "\n" + msg, error_type, token.line,
+              strings[1] + "\n" + msg, attr)
+
+    @staticmethod
+    def addParseElement(regla: int) -> None:
+        """Writes the given parse element int the tokens.txt """
+        global PARSESTRING
+        if PARSESTRING is None:
+            PARSESTRING = f"Descendente {regla}, ".replace("None", "")
+        else:
+            PARSESTRING += f"{regla},"
+        print(PARSESTRING)
+
+
+    def start(self):
+        """Starts the Syntactic process"""
+        self.TSG = TS()
+        self.TSActual =self.TSG
+        self.next()
+        self.P()
+        PARSEFILE.write(PARSESTRING)
+        print("Terminado")
+
+    def P(self) -> None:
+        if self.token in First["B"]:
+            Syntactic.addParseElement(1)
+            self.B()
+            self.P()
+        elif self.token in First['F']:
+            Syntactic.addParseElement(2)
+            self.F()
+            self.P()
+        elif self.equipara("eof"):
+            Syntactic.addParseElement(3)
+            return
+
+    def B(self) -> None:
+        if self.equipara("let", 4):
+            T = self.T()
+            if self.equipara("id"):
+                if self.equipara("puntoComa"):
+                    if not self.TSActual.buscarId(self.actualToken.att):
+                       self.TSActual.insertarId(self.actualToken.att, T.tipo)
+                    return
+        elif self.equipara("if", 5) and self.equipara("parAbierto"):
+            E = self.E()
+            if self.equipara("parCerrado"):
+                self.S()
+                if (E.tipo != "boolean"):
+                    self.error("WrongDataTypeError", "El tipo de E tiene que ser boolean ya que nos encontramos en la condición de if")
+        elif self.token in First["S"]:
+            Syntactic.addParseElement(6)
+            self.S()
+        elif self.equipara("do", 7):
+            if self.equipara("llaveAbierto"):
+                self.C()
+                if self.equipara("llaveCerrado") and self.equipara("while") and self.equipara("parAbierto"):
+                    E = self.E()
+                    if self.equipara("parCerrado") and self.equipara("puntoComa"):
+                        if (E.tipo != "boolean"):
+                            self.error("WrongDataTypeError", "La condición del while debe ser de tipo booleano")
+
+    def T(self) -> ProductionObject:
+        if self.equipara("int", 8):
+            return ProductionObject(tipo="int", ancho=1)
+        elif self.equipara("boolean", 9):
+            return ProductionObject(tipo="boolean", ancho=1)
+        elif self.equipara("string", 10):
+            return ProductionObject(tipo="string", ancho=64)
+
+    def S(self) -> None:
+        if self.equipara("id", 11):
+            self.Sp()
+        elif self.equipara("return", 12):
+            X = self.X()
+            if self.equipara("puntoComa"):
+                return ProductionObject(tipo = True, tipoRet = X.tipo)
+        elif self.equipara("print", 13):
+            if self.equipara("parAbierto"):
+                E = self.E()
+                if self.equipara("parCerrado") and self.equipara("puntoComa"):
+                    if E.tipo == "string":
+                        return ProductionObject(tipo = True)  
+                    else: 
+                        self.error("WrongDataTypeError", "La función print solo acepta parámetros de tipo string")
+        elif self.equipara("input", 14) and self.equipara("parAbierto") and self.equipara("id"):
+            id = self.tokenactual
+            if self.equipara("parCerrado") and self.equipara("puntoComa"):
+                if self.TSActual.buscarId():
+                    tipo = self.TSActual.map[id].tipo
+                    if tipo not in {"boolean, string"}: 
+                        self.error("TypeErorr", f"Variable a es de tipo {tipo}, input() debe recibir una variable de tipo string o entero" )
+                if self.TSG.buscarId(): 
+                    tipo = self.TSG.map[id].tipo
+                    if tipo not in {"boolean, string"}: 
+                        self.error("TypeErorr", f"Variable a es de tipo {tipo}, input() debe recibir una variable de tipo string o entero" )
+                else:
+                    self.error("NonDeclaredError", f"Variable {id} no ha sido previamente declarada")
+
+
+            return
+
+    def Sp(self) -> None:
+        if self.equipara("asig", 15):
+            E = self.E()
+            if self.equipara("puntoComa"):
+                return ProductionObject(tipo=E.tipo)
+        elif self.equipara("parAbierto", 16):
+            L = self.L()
+            if self.equipara("parCerrado") and self.equipara("puntoComa"):
+                return ProductionObject(tipo = L.tipo)
+        elif self.equipara("postIncrem", 17) and self.equipara("puntoComa"):
+            return ProductionObject(tipo = "postIncrem")
+
+    def X(self) -> None:
+        if self.token in First['E']:
+            Syntactic.addParseElement(18)
+            self.E()
+        elif self.token in Follow['X']:
+            Syntactic.addParseElement(19)
+        else:
+            self.error("SentenceNotTerminatedError",
+                       f"Esperaba ';' al terminar la sentencia, después de un return vacío")
+
+    def C(self) -> None:
+        if self.token in First["B"]:
+            Syntactic.addParseElement(20)
+            self.B()
+            self.C()
+        elif self.token in Follow['C']:
+            Syntactic.addParseElement(21)
+
+    def L(self) -> None:
+        if self.token in First["E"]:
+            Syntactic.addParseElement(22)
+            E = self.E()
+            return ProductionObject(tipo = self.Q().insert(0, E.tipo))
+        elif self.token in Follow['L']:
+            Syntactic.addParseElement(23)
+        else:
+            self.error("FunctionCallError", "No se ha cerrado paréntesis en la llamada a la función")
+
+    def Q(self, lista = None) -> None:
+        if self.equipara("coma", 24):
+            Q = lista if not lista else []
+            E = self.E()
+            if E:
+                Q.append(tipo = E.tipo)
+                return self.Q(lista)
+        elif self.token in Follow['Q']:
+            Syntactic.addParseElement(25)
+            return lista if not lista else None
+
+    def F(self) -> None:
+        if self.equipara("function", 26) and self.equipara("id"):
+            id = self.actualToken.att
+            tipo_ret = self.H()
+            self.TSActual = TS(id)  # tabla de funcion
+            if self.equipara("parAbierto"):
+                tipo_params = self.A()
+                if self.equipara("parCerrado") and self.equipara("llaveAbierto"):
+                    self.C()
+                    if self.equipara("llaveCerrado"):
+                        self.TSG.insertarId(id, "funcion", tipo_params, len(tipo_params), tipo_ret )  # insertar funcion en TSG de una 
+                        self.TSActual = self.TSG  # ~= destruir tabla de la funcion
+                        return
+
+    def H(self) -> None:
+        if self.token in First['T']:
+            Syntactic.addParseElement(27)
+            T = self.T()
+            return ProductionObject(tipo=T.tipo)
+        elif self.token in Follow['H']:
+            Syntactic.addParseElement(28)
+        else:
+            self.error("TypeError", f"Tipo de función no aceptado. Debe usar {First['T']} o \"\" (no poner nada para "
+                                    f"void)")
+
+    def A(self, lista = None) -> None:
+        if self.token in First['T']:
+            Syntactic.addParseElement(29)
+            T = self.T()
+            if self.equipara("id"):
+                K = self.K()
+                if K.tipo:
+                    return ProductionObject(tipo=K.insert(0, T.Tipo))
+        elif self.token in Follow['A']:
+            Syntactic.addParseElement(30)
+        else:
+            self.error("FunctionCallError", f"No ha cerrado paréntesis en la llamada a la función")
+
+    def K(self, lista = None) -> None: 
+        if self.equipara("coma", 31):
+            K = lista if not lista else []
+            T = self.T()
+            K.append(T.tipo)
+            if self.equipara("id"):
+                return self.K(lista)
+        elif self.token in Follow['K']:
+            Syntactic.addParseElement(32)
+            return lista if not lista else None
+        else:
+            self.error("FunctionArgumentDeclarationError", "Los argumentos de las funciones deben estar separados por \',\'")
+
+    def E(self) -> None:
+        if self.token in First["N"]:
+            Syntactic.addParseElement(33)
+            N = self.N()
+            self.O1()
+            return ProductionObject(tipo = N.tipo)
+
+    def N(self) -> None:
+        if self.token in First["Z"]:
+            Syntactic.addParseElement(34)
+            Z = self.Z()
+            self.O2()
+            return ProductionObject(tipo = Z.tipo)
+
+    def Z(self) -> None:
+        if self.token in First["R"]:
+            Syntactic.addParseElement(35)
+            R = self.R()
+            self.O3()
+            return ProductionObject(tipo = R.tipo) 
+
+    def O1(self) -> None:
+        if self.equipara("mas", 36):
+            R = self.R()
+            if (R.tipo != "boolean"):
+                self.error("WrongDataTypeError","Operador + solo acepta datos lógicos")
+            return ProductionObject(tipo = True)
+        elif self.equipara("por", 37):
+            R = self.R()
+            if (R.tipo != "boolean"):
+                self.error("WrongDataTypeError","Operador * solo acepta datos lógicos")
+            return ProductionObject(tipo = True)
+        elif self.token in Follow['O1']:
+            Syntactic.addParseElement(38)
+            return ProductionObject(tipo = True)
+        else:
+            self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O1']}")
+
+    def O2(self) -> None:
+        if self.equipara("equals", 39):
+            R = self.R()
+            if (R.tipo != "boolean"):
+                self.error("WrongDataTypeError","Operador > solo acepta datos lógicos")
+                return ProductionObject(tipo = True)
+        elif self.equipara("mayor", 40):
+            R = self.R()
+            if (R.tipo != "boolean"):
+                self.error("WrongDataTypeError","Operador > solo acepta datos lógicos")
+            return ProductionObject(tipo = True)
+        elif self.token in Follow['O2']:
+            Syntactic.addParseElement(41)
+            return ProductionObject(tipo = True)
+        else:
+            self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O2']}")
+
+    def O3(self) -> None:
+        if self.equipara("or", 42):
+            R = self.R()
+            if (R.tipo != "boolean"):
+                self.error("WrongDataTypeError","Operador || solo acepta datos lógicos")
+            return ProductionObject(tipo = True)
+        elif self.equipara("and", 43):
+            R = self.R()
+            if (R.tipo != "boolean"):
+                self.error("WrongDataTypeError","Operador || solo acepta datos lógicos")
+            return ProductionObject(tipo = True)
+        elif self.token in Follow['O3']:
+            Syntactic.addParseElement(44)
+            return ProductionObject(tipo = True)
+        else:
+            self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O3']}")
+
+    def R(self) -> None:
+        if self.equipara("id", 45):
+            id = self.actualToken.code
+            Rp = self.Rp()
+            if Rp.tipo == "postIcrem" and id != "cteEnt":
+                self.error("WrongDataTypeError", "El operador post incremento solo es aplicable a variables del tipo entero")
+            elif Rp:
+                if self.TSG.buscarId(id):
+                    self.error("NonDeclaredError", "Errror la función no ha sido declarada previamente")
+                elif (Rp.tipo != self.TSG.map[id].tipo_params):
+                    self.error("WrongArguemensError", "Tipos de los atributos incorrectos en llamada a función")                
+                else:              
+                    return ProductionObject(tipo= self.TSG.map[id].tipo_dev)
+        if self.equipara("parAbierto", 46):
+            E = self.E()
+            if self.equipara("parCerrado"):
+                return ProductionObject(tipo=E.tipo)
+        elif self.equipara("cteEnt", 47):
+            return ProductionObject(tipo="int", ancho=1)
+        elif self.equipara("cadena", 48):
+            return ProductionObject(tipo="string", ancho = 1 )
+        elif self.equipara("true", 49):
+            return ProductionObject(tipo="boolean", ancho = 1)
+        elif self.equipara("false", 50):
+            return ProductionObject(tipo="boolean", ancho = 1 )
+
+    def Rp(self) -> None:
+        if self.equipara("parAbierto", 51):
+            L = self.L()
+            if self.equipara("parCerrado"):
+                return ProductionObject(tipo=L.tipo)
+        elif self.equipara("postIncrem", 52):
+            return ProductionObject(tipo="postIncrem")
+        elif self.token in Follow["Rp"]:
+            Syntactic.addParseElement(53)
+              
+
+def createSyntactic():
+    """Creates the Syntactic parser"""
+    global SYNTACTIC
+    SYNTACTIC = Syntactic()
+    SYNTACTIC.start()
+
+
 
 
 if __name__ == "__main__":

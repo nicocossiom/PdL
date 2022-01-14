@@ -1,6 +1,7 @@
 import os
 import string
 import sys
+from typing import List
 
 
 class Colors:
@@ -47,7 +48,7 @@ def createProcessor():
     """
     global FILE, FILENAME, OUTPUTDIR, TOKENLIST, TOKENFILE, PARSEFILE, TSFILE, ERRORFILE, PARSESTRING, LINES
 
-    FILE, FILENAME, OUTPUTDIR, TOKENLIST, PARSESTRING  = None, None, None, [], None
+    FILE, FILENAME, OUTPUTDIR, TOKENLIST, PARSESTRING = None, None, None, [], None
     TOKENFILE, PARSEFILE, TSFILE, ERRORFILE = None, None, None, None
     LINES = None
 
@@ -157,6 +158,7 @@ SYMB_OPS = {
     "}": "llaveCerrado",
     "|": "or"
 }
+
 
 class Token:
     """A token representation for the processor"""
@@ -554,13 +556,13 @@ class TS:
             self.tipo_params = [elem for elem in args[3][0]]
             self.num_param = len(self.tipo_params)
             self.tipo_dev = self.tipo
-    
+
     # def insertarTipoDev(self, id, tipo):
     #     try:
     #         self.map[id].tipo_dev = tipo
     #     except KeyError:
     #         sys.exit(f"No existe el id dado: {id} en la tabla")
-                
+
 
 def dictFromTokenList():
     d = {}
@@ -573,6 +575,7 @@ def dictFromTokenList():
     for line, tokens in d.items():
         print(f"{line}-> {tokens}")
     return d
+
 
 class ProductionObject:
     def __init__(self, **kwargs):
@@ -606,10 +609,11 @@ class Syntactic:
     # which will be referred to as self.{} inside the methods, but they're not instance class variables
     TSG: TS = None
     TSActual: TS = None
+
     def __init__(self) -> None:
         createLexer()
         self.index = 0  # indice que apunta al elemento actual de la lista de tokens
-        self.actualToken : Token = None
+        self.actualToken: Token = None
         self.token = None
         self.lastToken = None
 
@@ -669,11 +673,10 @@ class Syntactic:
             PARSESTRING += f"{regla},"
         print(PARSESTRING)
 
-
     def start(self):
         """Starts the Syntactic process"""
         self.TSG = TS()
-        self.TSActual =self.TSG
+        self.TSActual = self.TSG
         self.next()
         self.P()
         PARSEFILE.write(PARSESTRING)
@@ -692,20 +695,21 @@ class Syntactic:
             Syntactic.addParseElement(3)
             return
 
-    def B(self) -> None:
+    def B(self) -> ProductionObject(tipo=True):
         if self.equipara("let", 4):
             T = self.T()
             if self.equipara("id"):
                 if self.equipara("puntoComa"):
                     if not self.TSActual.buscarId(self.actualToken.att):
-                       self.TSActual.insertarId(self.actualToken.att, T.tipo)
+                        self.TSActual.insertarId(self.actualToken.att, T.tipo)
                     return
         elif self.equipara("if", 5) and self.equipara("parAbierto"):
             E = self.E()
             if self.equipara("parCerrado"):
                 self.S()
-                if (E.tipo != "boolean"):
-                    self.error("WrongDataTypeError", "El tipo de E tiene que ser boolean ya que nos encontramos en la condición de if")
+                if E.tipo != "boolean":
+                    self.error("WrongDataTypeError",
+                               "El tipo de E tiene que ser boolean ya que nos encontramos en la condición de if")
         elif self.token in First["S"]:
             Syntactic.addParseElement(6)
             self.S()
@@ -715,7 +719,7 @@ class Syntactic:
                 if self.equipara("llaveCerrado") and self.equipara("while") and self.equipara("parAbierto"):
                     E = self.E()
                     if self.equipara("parCerrado") and self.equipara("puntoComa"):
-                        if (E.tipo != "boolean"):
+                        if E.tipo != "boolean":
                             self.error("WrongDataTypeError", "La condición del while debe ser de tipo booleano")
 
     def T(self) -> ProductionObject:
@@ -726,39 +730,55 @@ class Syntactic:
         elif self.equipara("string", 10):
             return ProductionObject(tipo="string", ancho=64)
 
-    def S(self) -> None:
+    def S(self) -> ProductionObject:
         if self.equipara("id", 11):
-            self.Sp()
+            id = self.token
+            Sp = self.Sp()
+            if not self.TSActual.buscarId(id):
+                if self.TSG.buscarId(id):
+                    id = self.TSG.map[id]
+                    if id.tipo == "function" and Sp.tipo != id.tipo_params:  # funcion con parametros incorrectos
+                        self.error("ArgumentTypeError", f"Argumentos no coinciden con los de la función")
+                    if id.tipo != Sp.tipo:  # es una asignacion
+                        self.error("TypeError", f"Tipo de la variable{id.lex} no coincide con tipo de la asignación")
+                else:  # declaracion e inicialización de una variable global i.e (a = 5)
+                    self.TSG.insertarId("id", Sp.tipo)
+            #  variable en Tabla Local
+            id = self.TSActual.map[id]
+            if Sp.tipo == "postIncrem" and id.tipo != "cteEnt":
+                self.error("WrongDataTypeError",
+                           "El operador post incremento solo es aplicable a variables del tipo entero")
+            if id.tipo != Sp.tipo:  # es una asignacion
+                self.error("TypeError", f"Tipo de la variable{id.lex} no coincide con tipo de la asignación")
+            return ProductionObject(tipo=True)
         elif self.equipara("return", 12):
             X = self.X()
             if self.equipara("puntoComa"):
-                return ProductionObject(tipo = True, tipoRet = X.tipo)
+                return ProductionObject(tipo=True, tipoRet=X.tipo)
         elif self.equipara("print", 13):
             if self.equipara("parAbierto"):
                 E = self.E()
                 if self.equipara("parCerrado") and self.equipara("puntoComa"):
                     if E.tipo == "string":
-                        return ProductionObject(tipo = True)  
-                    else: 
+                        return ProductionObject(tipo=True)
+                    else:
                         self.error("WrongDataTypeError", "La función print solo acepta parámetros de tipo string")
         elif self.equipara("input", 14) and self.equipara("parAbierto") and self.equipara("id"):
-            id = self.tokenactual
+            id, tipo = self.actualToken, ""
             if self.equipara("parCerrado") and self.equipara("puntoComa"):
                 if self.TSActual.buscarId():
                     tipo = self.TSActual.map[id].tipo
-                    if tipo not in {"boolean, string"}: 
-                        self.error("TypeErorr", f"Variable a es de tipo {tipo}, input() debe recibir una variable de tipo string o entero" )
-                if self.TSG.buscarId(): 
-                    tipo = self.TSG.map[id].tipo
-                    if tipo not in {"boolean, string"}: 
-                        self.error("TypeErorr", f"Variable a es de tipo {tipo}, input() debe recibir una variable de tipo string o entero" )
+                    if self.TSG.buscarId():
+                        tipo = self.TSG.map[id].tipo
+                    if tipo not in {"boolean, string"}:
+                        self.error("TypeError", f"Variable a es de tipo {tipo}, input() debe recibir una variable de "
+                                                f"tipo string o entero")
+                    else:
+                        return ProductionObject(tipo=True)
                 else:
                     self.error("NonDeclaredError", f"Variable {id} no ha sido previamente declarada")
 
-
-            return
-
-    def Sp(self) -> None:
+    def Sp(self) -> ProductionObject:
         if self.equipara("asig", 15):
             E = self.E()
             if self.equipara("puntoComa"):
@@ -766,16 +786,18 @@ class Syntactic:
         elif self.equipara("parAbierto", 16):
             L = self.L()
             if self.equipara("parCerrado") and self.equipara("puntoComa"):
-                return ProductionObject(tipo = L.tipo)
+                return ProductionObject(tipo=L.tipo)
         elif self.equipara("postIncrem", 17) and self.equipara("puntoComa"):
-            return ProductionObject(tipo = "postIncrem")
+            return ProductionObject(tipo="postIncrem")
 
-    def X(self) -> None:
+    def X(self) -> ProductionObject:
         if self.token in First['E']:
             Syntactic.addParseElement(18)
             self.E()
+            return ProductionObject(tipo=True)
         elif self.token in Follow['X']:
             Syntactic.addParseElement(19)
+            return ProductionObject(tipo=True)
         else:
             self.error("SentenceNotTerminatedError",
                        f"Esperaba ';' al terminar la sentencia, después de un return vacío")
@@ -788,28 +810,28 @@ class Syntactic:
         elif self.token in Follow['C']:
             Syntactic.addParseElement(21)
 
-    def L(self) -> None:
+    def L(self) -> ProductionObject:
         if self.token in First["E"]:
             Syntactic.addParseElement(22)
             E = self.E()
-            return ProductionObject(tipo = self.Q().insert(0, E.tipo))
+            return ProductionObject(tipo=self.Q().insert(0, E.tipo))
         elif self.token in Follow['L']:
             Syntactic.addParseElement(23)
         else:
             self.error("FunctionCallError", "No se ha cerrado paréntesis en la llamada a la función")
 
-    def Q(self, lista = None) -> None:
+    def Q(self, lista=None) -> List[str]:
         if self.equipara("coma", 24):
             Q = lista if not lista else []
             E = self.E()
             if E:
-                Q.append(tipo = E.tipo)
+                Q.append(E.tipo)
                 return self.Q(lista)
         elif self.token in Follow['Q']:
             Syntactic.addParseElement(25)
             return lista if not lista else None
 
-    def F(self) -> None:
+    def F(self) -> ProductionObject:
         if self.equipara("function", 26) and self.equipara("id"):
             id = self.actualToken.att
             tipo_ret = self.H()
@@ -819,11 +841,12 @@ class Syntactic:
                 if self.equipara("parCerrado") and self.equipara("llaveAbierto"):
                     self.C()
                     if self.equipara("llaveCerrado"):
-                        self.TSG.insertarId(id, "funcion", tipo_params, len(tipo_params), tipo_ret )  # insertar funcion en TSG de una 
+                        self.TSG.insertarId(id, "funcion", tipo_params, len(tipo_params),
+                                            tipo_ret)  # insertar funcion en TSG de una
                         self.TSActual = self.TSG  # ~= destruir tabla de la funcion
-                        return
+                        return ProductionObject(tipo=True)
 
-    def H(self) -> None:
+    def H(self) -> ProductionObject:
         if self.token in First['T']:
             Syntactic.addParseElement(27)
             T = self.T()
@@ -834,7 +857,7 @@ class Syntactic:
             self.error("TypeError", f"Tipo de función no aceptado. Debe usar {First['T']} o \"\" (no poner nada para "
                                     f"void)")
 
-    def A(self, lista = None) -> None:
+    def A(self, lista=None) -> ProductionObject:
         if self.token in First['T']:
             Syntactic.addParseElement(29)
             T = self.T()
@@ -847,7 +870,7 @@ class Syntactic:
         else:
             self.error("FunctionCallError", f"No ha cerrado paréntesis en la llamada a la función")
 
-    def K(self, lista = None) -> None: 
+    def K(self, lista=None) -> List[str]:
         if self.equipara("coma", 31):
             K = lista if not lista else []
             T = self.T()
@@ -858,93 +881,99 @@ class Syntactic:
             Syntactic.addParseElement(32)
             return lista if not lista else None
         else:
-            self.error("FunctionArgumentDeclarationError", "Los argumentos de las funciones deben estar separados por \',\'")
+            self.error("ArgumentDeclarationError",
+                       "Los argumentos de las funciones deben estar separados por \',\'")
 
-    def E(self) -> None:
+    def E(self) -> ProductionObject:
         if self.token in First["N"]:
             Syntactic.addParseElement(33)
             N = self.N()
-            self.O1()
-            return ProductionObject(tipo = N.tipo)
+            O1 = self.O1()
+            self.E()
 
-    def N(self) -> None:
+            return ProductionObject(tipo=N.tipo)
+
+    def N(self) -> ProductionObject:
         if self.token in First["Z"]:
             Syntactic.addParseElement(34)
             Z = self.Z()
-            self.O2()
-            return ProductionObject(tipo = Z.tipo)
+            O2 = self.O2()
+            if Z.tipo != O2.tipo:
+                self.error("OperandTypeError", f"Operación entre operandos con tipos incompatibles({Z.tipo}, {O2.tipo}")
+            return ProductionObject(tipo=Z.tipo)
 
-    def Z(self) -> None:
+    def Z(self) -> ProductionObject:
         if self.token in First["R"]:
             Syntactic.addParseElement(35)
             R = self.R()
-            self.O3()
-            return ProductionObject(tipo = R.tipo) 
+            O3 = self.O3()
+            return ProductionObject(tipo=R.tipo)  # devolvera boolean
 
-    def O1(self) -> None:
+    def O1(self) -> ProductionObject:
         if self.equipara("mas", 36):
-            R = self.R()
-            if (R.tipo != "boolean"):
-                self.error("WrongDataTypeError","Operador + solo acepta datos lógicos")
-            return ProductionObject(tipo = True)
+            N = self.N()
+            if N.tipo != "cteEnt":
+                self.error("OperandTypeError", "Operador + solo acepta datos enteros")
+            return self.O1()
         elif self.equipara("por", 37):
-            R = self.R()
-            if (R.tipo != "boolean"):
-                self.error("WrongDataTypeError","Operador * solo acepta datos lógicos")
-            return ProductionObject(tipo = True)
+            N = self.N()
+            if N.tipo != "cteEnt":
+                self.error("OperandTypeError", "Operador * solo acepta datos enteros")
+            return self.O1()
         elif self.token in Follow['O1']:
             Syntactic.addParseElement(38)
-            return ProductionObject(tipo = True)
+            return ProductionObject(tipo=True)
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O1']}")
 
-    def O2(self) -> None:
+    def O2(self) -> ProductionObject:
         if self.equipara("equals", 39):
-            R = self.R()
-            if (R.tipo != "boolean"):
-                self.error("WrongDataTypeError","Operador > solo acepta datos lógicos")
-                return ProductionObject(tipo = True)
+            Z = self.Z()
+            if Z.tipo != "boolean":
+                self.error("OperandTypeError", "Operador > solo acepta datos lógicos")
+                return self.O2()
         elif self.equipara("mayor", 40):
-            R = self.R()
-            if (R.tipo != "boolean"):
-                self.error("WrongDataTypeError","Operador > solo acepta datos lógicos")
-            return ProductionObject(tipo = True)
+            Z = self.Z()
+            if Z.tipo != "boolean":
+                self.error("OperandTypeError", "Operador > solo acepta datos lógicos")
+            return self.O2()
         elif self.token in Follow['O2']:
             Syntactic.addParseElement(41)
-            return ProductionObject(tipo = True)
+            return ProductionObject(tipo="boolean")
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O2']}")
 
-    def O3(self) -> None:
+    def O3(self) -> ProductionObject:
         if self.equipara("or", 42):
             R = self.R()
-            if (R.tipo != "boolean"):
-                self.error("WrongDataTypeError","Operador || solo acepta datos lógicos")
-            return ProductionObject(tipo = True)
+            if R.tipo != "boolean":
+                self.error("WrongDataTypeError", "Operador || solo acepta datos lógicos")
+            return self.O3()
         elif self.equipara("and", 43):
             R = self.R()
-            if (R.tipo != "boolean"):
-                self.error("WrongDataTypeError","Operador || solo acepta datos lógicos")
-            return ProductionObject(tipo = True)
+            if R.tipo != "boolean":
+                self.error("OperandTypeError", "Operador || solo acepta datos lógicos")
+            return self.O3()
         elif self.token in Follow['O3']:
             Syntactic.addParseElement(44)
-            return ProductionObject(tipo = True)
+            return ProductionObject(tipo=True)
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O3']}")
 
-    def R(self) -> None:
+    def R(self) -> ProductionObject:
         if self.equipara("id", 45):
-            id = self.actualToken.code
+            id = self.token
             Rp = self.Rp()
             if Rp.tipo == "postIcrem" and id != "cteEnt":
-                self.error("WrongDataTypeError", "El operador post incremento solo es aplicable a variables del tipo entero")
+                self.error("OperandTypeError",
+                           "El operador post incremento solo es aplicable a variables del tipo entero")
             elif Rp:
                 if self.TSG.buscarId(id):
                     self.error("NonDeclaredError", "Errror la función no ha sido declarada previamente")
-                elif (Rp.tipo != self.TSG.map[id].tipo_params):
-                    self.error("WrongArguemensError", "Tipos de los atributos incorrectos en llamada a función")                
-                else:              
-                    return ProductionObject(tipo= self.TSG.map[id].tipo_dev)
+                elif Rp.tipo != self.TSG.map[id].tipo_params:
+                    self.error("WrongArguemensError", "Tipos de los atributos incorrectos en llamada a función")
+                else:
+                    return ProductionObject(tipo=self.TSG.map[id].tipo_dev)
         if self.equipara("parAbierto", 46):
             E = self.E()
             if self.equipara("parCerrado"):
@@ -952,13 +981,13 @@ class Syntactic:
         elif self.equipara("cteEnt", 47):
             return ProductionObject(tipo="int", ancho=1)
         elif self.equipara("cadena", 48):
-            return ProductionObject(tipo="string", ancho = 1 )
+            return ProductionObject(tipo="string", ancho=1)
         elif self.equipara("true", 49):
-            return ProductionObject(tipo="boolean", ancho = 1)
+            return ProductionObject(tipo="boolean", ancho=1)
         elif self.equipara("false", 50):
-            return ProductionObject(tipo="boolean", ancho = 1 )
+            return ProductionObject(tipo="boolean", ancho=1)
 
-    def Rp(self) -> None:
+    def Rp(self) -> ProductionObject:
         if self.equipara("parAbierto", 51):
             L = self.L()
             if self.equipara("parCerrado"):
@@ -967,15 +996,13 @@ class Syntactic:
             return ProductionObject(tipo="postIncrem")
         elif self.token in Follow["Rp"]:
             Syntactic.addParseElement(53)
-              
+
 
 def createSyntactic():
     """Creates the Syntactic parser"""
     global SYNTACTIC
     SYNTACTIC = Syntactic()
     SYNTACTIC.start()
-
-
 
 
 if __name__ == "__main__":

@@ -417,9 +417,9 @@ First = {
 
 # usamos eof como $ para marcar fin de sentencia admisible
 Follow = {
-    "O1": ["puntoComa", "parCerrado", "coma"],
+    "O3": ["puntoComa", "parCerrado", "coma"],
     "O2": ["mas", "por", "coma", "parCerrado", "puntoComa"],
-    "O3": ["equals", "mayor", "mas", "por", "coma", "parCerrado", "puntoComa"],
+    "O1": ["equals", "mayor", "mas", "por", "coma", "parCerrado", "puntoComa"],
     "X": "puntoComa",
     "C": "llaveAbierto",
     "L": "parCerrado",
@@ -617,7 +617,7 @@ class Syntactic:
         self.token = None
         self.lastToken = None
 
-    def next(self) -> str:
+    def next(self) -> Token:
         """
         Returns code (str) of the next token from the Lexer and stores the actual token in self
         :return: next Token
@@ -626,13 +626,10 @@ class Syntactic:
             self.lastToken = self.actualToken
             self.actualToken: Token = LEXER.tokenize()
             if not self.actualToken:
-                self.actualToken: Token = LEXER.tokenize()
-                self.token = self.actualToken.code
-                return self.token
+                return self.next()
             else:
-
                 self.token = self.actualToken.code
-                return self.token
+                return self.actualToken
 
 
     def equipara(self, code: str, rule=None) -> bool:
@@ -669,6 +666,7 @@ class Syntactic:
         strings = gen_error_line(token.line, token.startCol, token.endCol)
         Error(strings[0] + "\n" + msg, error_type, token.line,
               strings[1] + "\n" + msg, attr)
+        sys.exit("Error fatal, saliendo ...")
 
     @staticmethod
     def addParseElement(regla: int) -> None:
@@ -705,10 +703,11 @@ class Syntactic:
     def B(self) -> ProductionObject(tipo=True):
         if self.equipara("let", 4):
             T = self.T()
+            id = self.actualToken.att
             if self.equipara("id"):
                 if self.equipara("puntoComa"):
-                    if not self.TSActual.buscarId(self.token):
-                        self.TSActual.insertarId(self.actualToken.att, T.tipo)
+                    if not self.TSActual.buscarId(id):
+                        self.TSActual.insertarId(id, T.tipo)
                     return
         elif self.equipara("if", 5) and self.equipara("parAbierto"):
             E = self.E()
@@ -935,91 +934,94 @@ Estructura de producciones de operaciones
         if self.token in First["N"]:
             Syntactic.addParseElement(33)
             N = self.N()  # primer argumento
-            O1 = self.O1()
-            # if N.tipo != "int":
-            #     self.error("OperandTypeError", f"El primer operando debe ser de tipo int, pero es {N.tipo}")
             # si llega aqui no ha habido errores entonces devolvemos tipo_ok
-            return N
+            return self.O3(N)
 
     def N(self) -> ProductionObject:
         if self.token in First["Z"]:
             Syntactic.addParseElement(34)
             Z = self.Z()
-            O2 = self.O2()
-            # if Z.tipo != "int":
-            #     self.error("OperandTypeError", f"El primer operando debe ser de tipo int, pero es {Z.tipo}")
             # si llega aqui no ha habido errores entonces devolvemos el tipo que espera O2 por si ha llamado a Z
-            return Z
+            return self.O2(Z)
 
     def Z(self) -> ProductionObject:
         if self.token in First["R"]:
             Syntactic.addParseElement(35)
             R = self.R()
-            O3 = self.O3()
-            if not R:
-                self.error("OperandTypeError", f"El primer operando debe ser de tipo boolean, pero es {R.tipo}")
             # si llega aqui no ha habido errores entonces devolvemos el tipo que espera O3 por si ha llamado a R
-            return R
+            return self.O1(R)
 
-    def O1(self) -> ProductionObject:
+    def O1(self, prev) -> ProductionObject:
         if self.equipara("mas", 36):
             N = self.N()
-            if N.tipo != "int":
+            if prev.tipo != "int":
+                self.error("OperandTypeError", f"Operador + solo acepta datos enteros, tipo dado {prev.tipo}")
+            elif N.tipo != "int":
                 self.error("OperandTypeError", f"Operador + solo acepta datos enteros, tipo dado {N.tipo}")
-            return self.O1()
+            else:
+                return self.O1(N)
         elif self.equipara("por", 37):
             N = self.N()
-            if N.tipo != "int":
+            if prev.tipo != "int" or N.tipo != "int":
                 self.error("OperandTypeError", f"Operador * solo acepta datos enteros, tipo dado {N.tipo}")
-            return self.O1()
+            return self.O1(N)
         elif self.token in Follow['O1']:
             Syntactic.addParseElement(38)
-            return ProductionObject(tipo="int")
+            if prev.tipo == "int":
+                return ProductionObject(tipo="int")
+            else:
+                return prev
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O1']}")
 
-    def O2(self) -> ProductionObject:
+    def O2(self, prev) -> ProductionObject:
         if self.equipara("equals", 39):
             Z = self.Z()
-            if Z.tipo != "int":
+            if prev.tipo != "int" or Z.tipo != "int":
                 self.error("OperandTypeError", f"Operador == solo acepta datos de tipo entero, tipo dado {Z.tipo}")
-            return self.O2()
+            return self.O2(Z)
         elif self.equipara("mayor", 40):
             Z = self.Z()
-            if Z.tipo != "int":
-                self.error("OperandTypeError", f"Operador == solo acepta datos de tipo entero, tipo dado {Z.tipo}")
-            return self.O2()
+            if prev.tipo != "int" or Z.tipo != "int":
+                self.error("OperandTypeError", f"Operador > solo acepta datos de tipo entero, tipo dado {Z.tipo}")
+            return self.O2(Z)
         elif self.token in Follow['O2']:
             Syntactic.addParseElement(41)
-            return ProductionObject(tipo="boolean")
+            if prev.tipo == "int":
+                return ProductionObject(tipo="boolean")
+            else:
+                return prev
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O2']}")
 
-    def O3(self) -> ProductionObject:
+    def O3(self, prev) -> ProductionObject:
         if self.equipara("or", 42):
             R = self.R()
             if R.tipo != "boolean":
-                self.error("WrongDataTypeError", f"Operador || solo acepta datos lógicos, tipo dado {R.tipo}")
-            return self.O3()
+                self.error("WrongDataTypeError", f"Operador || solo acepta datos lógicos, tipo dado { R.tipo }")
+            return self.O3(R)
         elif self.equipara("and", 43):
             R = self.R()
             if R.tipo != "boolean":
-                self.error("OperandTypeError", f"Operador && solo acepta datos lógicos, tipo dado {R.tipo}")
-            return self.O3()
+                self.error("OperandTypeError", f"Operador && solo acepta datos lógicos, tipo dado { R.tipo }")
+            return self.O3(R)
         elif self.token in Follow['O3']:
             Syntactic.addParseElement(44)
-            return ProductionObject(tipo="boolean")
+            if prev.tipo == "boolean":
+                return ProductionObject(tipo="boolean")
+            else:
+                return prev
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O3']}")
 
     def R(self) -> ProductionObject:
+        id = self.actualToken.att
         if self.equipara("id", 45):
-            id = self.token
             Rp = self.Rp()
-            if Rp.tipo == "postIcrem" and id != "int":
-                self.error("OperandTypeError",
-                           "El operador post incremento solo es aplicable a variables del tipo entero")
-            elif Rp:
+            if Rp:
+                if Rp.tipo == "postIcrem" and id != "int":
+                    self.error("OperandTypeError",
+                               "El operador post incremento solo es aplicable a variables del tipo entero")
                 if not self.TSG.buscarId(id):
                     self.error("NonDeclaredError", f"Error la función {id} no ha sido declarada previamente")
                 elif Rp.tipo != self.TSG.map[id].tipo_params:

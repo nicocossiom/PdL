@@ -476,7 +476,7 @@ class TS:
                             f"\n   ATRIBUTOS : \n\t\t" \
                             f"+Tipo: {entrada.tipo}\n"
             if isinstance(entrada, TS.FunctionElement):
-                final_string += f"\t\t+numParam: {entrada.numparam}\n\t\t\t"
+                final_string += f"\t\t+numParam: {entrada.num_param}\n\t\t\t"
 
                 for i in range(len(entrada.tipo_params)):
                     final_string += f"+TipoParam{i}: {entrada.tipo_params[i]}\n\t\t\t"
@@ -764,9 +764,9 @@ class Syntactic:
                     else:
                         self.error("WrongDataTypeError", "La función print solo acepta parámetros de tipo string")
         elif self.equipara("input", 14) and self.equipara("parAbierto") and self.equipara("id"):
-            id, tipo = self.actualToken, ""
+            id, tipo = self.token, ""
             if self.equipara("parCerrado") and self.equipara("puntoComa"):
-                if self.TSActual.buscarId():
+                if self.TSActual.buscarId(id):
                     tipo = self.TSActual.map[id].tipo
                     if self.TSG.buscarId():
                         tipo = self.TSG.map[id].tipo
@@ -836,7 +836,7 @@ class Syntactic:
             tipo_ret = self.H()
             self.TSActual = TS(id)  # tabla de funcion
             if self.equipara("parAbierto"):
-                tipo_params = self.A()
+                tipo_params = self.A().tipo
                 if self.equipara("parCerrado") and self.equipara("llaveAbierto"):
                     self.C()
                     if self.equipara("llaveCerrado"):
@@ -856,14 +856,14 @@ class Syntactic:
             self.error("TypeError", f"Tipo de función no aceptado. Debe usar {First['T']} o \"\" (no poner nada para "
                                     f"void)")
 
-    def A(self, lista=None) -> ProductionObject:
+    def A(self) -> ProductionObject:
         if self.token in First['T']:
             Syntactic.addParseElement(29)
             T = self.T()
             if self.equipara("id"):
                 K = self.K()
-                if K.tipo:
-                    return ProductionObject(tipo=K.insert(0, T.Tipo))
+                if K:
+                    return ProductionObject(tipo=K.insert(0, T.tipo))
         elif self.token in Follow['A']:
             Syntactic.addParseElement(30)
         else:
@@ -896,11 +896,17 @@ Estructura de producciones de operaciones
     R  ->  id R'   | ( E )  | entero | cadena | true | false 
     R' ->  ( L )   |   ++    | λ
     La forma basica es: E O1 -> N O2 -> Z O3 -> R para los ids/valores. Se hace return y se ejecutan las Ox que se han
-    quedado atras, esto es lo que da el orden de precedencia en operadores. Se hace hasta que se encuentra un 
-    token de operacion en alguna de las Ox (si no sucede se dara error en los else finales). 
-    Cuando se encuentra se llama a la funcion superior respectiva  ( O1 a N , O2 a Z , O3 a R ) que repite el proceso entero.
+    quedado a la espera, esto es lo que da el orden de precedencia en operadores. Se hace hasta que se encuentra un 
+    token de operacion en alguna de las Ox (si no sucede se dara error en los else finales). Cuando se encuentra 
+    se llama a la funcion superior respectiva  ( O1 -> N , O2 -> Z , O3 -> R ), cuando vuelva de esta
+    es el momento en el que se hace la comprobacion de tipos. Despues Ox se llama a si misma de forma recursiva 
+    devolviendo el resultado de dicha llamada recursiva. Esta recursion se rompe cuando se llega al follow de la 
+    produccion indicando que la operacion que prosigue es de otra precedencia  o se ha terminado la expresion.
+  
+    Se devuelve tipo_ok que emerge de las llamadas recursivas hasta E.
     Por lo que se forma un arbol recursivo donde se procesan los tokens respetando la precedencia de 
-    operadores mediante las llamas recursivas a las funciones superiores. 
+    operadores mediante las llamas recursivas a las funciones superiores y las funciones recursivas de los operadores 
+    para mantener la precedencia entre los que tiene la misma. 
 
     Ejemplo: a > b && c+d == 20 -> ¿ se cumple que a sea mayor que b y que c + d son 20 ? 
     E O1-> N O2-> Z O3 -> R -> id (a)
@@ -923,9 +929,8 @@ Estructura de producciones de operaciones
             Syntactic.addParseElement(33)
             N = self.N()
             O1 = self.O1()
-            self.E()
-
-            return ProductionObject(tipo=N.tipo)
+            if O1.tipo:
+                return ProductionObject(tipo="cteEnt")
 
     def N(self) -> ProductionObject:
         if self.token in First["Z"]:
@@ -934,29 +939,31 @@ Estructura de producciones de operaciones
             O2 = self.O2()
             if Z.tipo != O2.tipo:
                 self.error("OperandTypeError", f"Operación entre operandos con tipos incompatibles({Z.tipo}, {O2.tipo}")
-            return ProductionObject(tipo=Z.tipo)
+            # si llega aqui no ha habido errores entonces devolvemos el tipo que espera O2 por si ha llamado a Z
+            return ProductionObject(tipo="cteEnt")
 
     def Z(self) -> ProductionObject:
         if self.token in First["R"]:
             Syntactic.addParseElement(35)
             R = self.R()
             O3 = self.O3()
-            return ProductionObject(tipo=R.tipo)  # devolvera boolean
+            # si llega aqui no ha habido errores entonces devolvemos el tipo que espera O3 por si ha llamado a Z
+            return ProductionObject(tipo="boolean")
 
     def O1(self) -> ProductionObject:
         if self.equipara("mas", 36):
             N = self.N()
             if N.tipo != "cteEnt":
-                self.error("OperandTypeError", "Operador + solo acepta datos enteros")
+                self.error("OperandTypeError", f"Operador + solo acepta datos enteros, tipo dado {N.tipo}")
             return self.O1()
         elif self.equipara("por", 37):
             N = self.N()
             if N.tipo != "cteEnt":
-                self.error("OperandTypeError", "Operador * solo acepta datos enteros")
+                self.error("OperandTypeError", f"Operador * solo acepta datos enteros, tipo dado {N.tipo}")
             return self.O1()
         elif self.token in Follow['O1']:
             Syntactic.addParseElement(38)
-            return ProductionObject(tipo="cteEnt")
+            return ProductionObject(tipo=True)
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O1']}")
 
@@ -973,7 +980,7 @@ Estructura de producciones de operaciones
             return self.O2()
         elif self.token in Follow['O2']:
             Syntactic.addParseElement(41)
-            return ProductionObject(tipo="boolean")
+            return ProductionObject(tipo=True)
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O2']}")
 
@@ -981,16 +988,16 @@ Estructura de producciones de operaciones
         if self.equipara("or", 42):
             R = self.R()
             if R.tipo != "boolean":
-                self.error("WrongDataTypeError", "Operador || solo acepta datos lógicos")
+                self.error("WrongDataTypeError", f"Operador || solo acepta datos lógicos, tipo dado {R.tipo}")
             return self.O3()
         elif self.equipara("and", 43):
             R = self.R()
             if R.tipo != "boolean":
-                self.error("OperandTypeError", "Operador || solo acepta datos lógicos")
+                self.error("OperandTypeError", f"Operador && solo acepta datos lógicos, tipo dado {R.tipo}")
             return self.O3()
         elif self.token in Follow['O3']:
             Syntactic.addParseElement(44)
-            return ProductionObject(tipo="boolean")
+            return ProductionObject(tipo=True)
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O3']}")
 

@@ -578,7 +578,7 @@ def dictFromTokenList():
 
 
 class ProductionObject:
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: object) -> None:
         r"""
         An object representing a Syntactic production rule which holds values for a Semantic functions
         :param \**kwargs:
@@ -653,7 +653,7 @@ class Syntactic:
                 symbol = SYMB_OPS_R[code]
             except KeyError:
                 symbol = code
-            self.error("WrongTokenError", f"Received {symbol} - Expected a different token", True)
+            self.error("WrongTokenError", f"Recibido {symbol} - Esperaba el token {self.token}", True)
         print("INCORRECTO -> siguiente")
         return False
 
@@ -793,8 +793,7 @@ class Syntactic:
     def X(self) -> ProductionObject:
         if self.token in First['E']:
             Syntactic.addParseElement(18)
-            self.E()
-            return ProductionObject(tipo=True)
+            return self.E()
         elif self.token in Follow['X']:
             Syntactic.addParseElement(19)
             return ProductionObject(tipo=True)
@@ -884,6 +883,41 @@ class Syntactic:
             self.error("ArgumentDeclarationError",
                        "Los argumentos de las funciones deben estar separados por \',\'")
 
+    """
+Estructura de producciones de operaciones
+    Gramatica
+    # precedencia menos a más:  {||} -> {&&} -> {==} -> {>} -> {+} -> {*} -> {++}
+    E  ->  N O1  #operadores aritméticos 
+    N  ->  Z O2  #operadores relacionales
+    Z  ->  R O3  #operadores lógicos
+    O1 ->  + Z O1  | * Z O1  | λ
+    O2 ->  == N O2 | > N O2  | λ
+    O3 ->  || R O3 | && R O3 | λ
+    R  ->  id R'   | ( E )  | entero | cadena | true | false 
+    R' ->  ( L )   |   ++    | λ
+    La forma basica es: E O1 -> N O2 -> Z O3 -> R para los ids/valores. Se hace return y se ejecutan las Ox que se han
+    quedado atras, esto es lo que da el orden de precedencia en operadores. Se hace hasta que se encuentra un 
+    token de operacion en alguna de las Ox (si no sucede se dara error en los else finales). 
+    Cuando se encuentra se llama a la funcion superior respectiva  ( O1 a N , O2 a Z , O3 a R ) que repite el proceso entero.
+    Por lo que se forma un arbol recursivo donde se procesan los tokens respetando la precedencia de 
+    operadores mediante las llamas recursivas a las funciones superiores. 
+
+    Ejemplo: a > b && c+d == 20 -> ¿ se cumple que a sea mayor que b y que c + d son 20 ? 
+    E O1-> N O2-> Z O3 -> R -> id (a)
+                    O3 R -> return por el follow
+             O2 Z O2 -> mayor (>) y return por el follow en el segundo O2
+                Z O3 -> R -> id (b)
+                  O3 R O3-> && (and) 
+                     R -> id (c)
+                        O3 -> return por el follow
+      O1 N O1 -> + (mas)
+         N O2 -> Z O3 R -> id (d) y return por el follow en O3
+           O2 Z O2 -> equals (==)
+              Z O3 -> R -> cteEnt (20) 
+                O3 R -> return por follow en O3
+    E -> da el ok sintactico y semantico    
+    """
+
     def E(self) -> ProductionObject:
         if self.token in First["N"]:
             Syntactic.addParseElement(33)
@@ -922,20 +956,20 @@ class Syntactic:
             return self.O1()
         elif self.token in Follow['O1']:
             Syntactic.addParseElement(38)
-            return ProductionObject(tipo=True)
+            return ProductionObject(tipo="cteEnt")
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O1']}")
 
     def O2(self) -> ProductionObject:
         if self.equipara("equals", 39):
             Z = self.Z()
-            if Z.tipo != "boolean":
-                self.error("OperandTypeError", "Operador > solo acepta datos lógicos")
-                return self.O2()
+            if Z.tipo != "cteEnt":
+                self.error("OperandTypeError", f"Operador == solo acepta datos de tipo entero, tipo dado {Z.tipo}" )
+            return self.O2()
         elif self.equipara("mayor", 40):
             Z = self.Z()
-            if Z.tipo != "boolean":
-                self.error("OperandTypeError", "Operador > solo acepta datos lógicos")
+            if Z.tipo != "cteEnt":
+                self.error("OperandTypeError", f"Operador == solo acepta datos de tipo entero, tipo dado {Z.tipo}")
             return self.O2()
         elif self.token in Follow['O2']:
             Syntactic.addParseElement(41)
@@ -956,7 +990,7 @@ class Syntactic:
             return self.O3()
         elif self.token in Follow['O3']:
             Syntactic.addParseElement(44)
-            return ProductionObject(tipo=True)
+            return ProductionObject(tipo="boolean")
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O3']}")
 

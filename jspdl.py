@@ -316,12 +316,14 @@ class Lexer:
             result = self.genToken("eof")  # llega al final de archivo -> eof
         while self.tokenizing:
             self.next()
+            if self.car == "": break
             self.startCol = self.col
             # Integer being formed
             if self.car.isdigit() and self.lex == "":
                 self.generateNumber()
                 if not Lexer.peekNextCar().isdigit():
                     if self.num < 32768:
+                        self.num = 0
                         result = self.genToken("cteEnt", self.num)
                     else:
                         self.error("Digito con valor mayor al permitido (32768) en el sistema")
@@ -441,7 +443,8 @@ SYMB_OPS_R = {
     "parCerrado": ")",
     "llaveAbierto": "{",
     "llaveCerrado": "}",
-    "or": "||"
+    "or": "||",
+    "postIncrem": "++"
 }
 
 
@@ -528,6 +531,7 @@ class TS:
             else:
                 elem = TS.FunctionElement(self, given_id, tipo, args)
             self.map[given_id] = elem
+            return elem
         else:
             raise Exception("Identificador ya existe en la TS actual")
 
@@ -554,8 +558,8 @@ class TS:
             """
             super().__init__(args[0], args[1], args[2])
             self.tipo_params = [elem for elem in args[3][0]]
-            self.num_param = len(self.tipo_params)
-            self.tipo_dev = self.tipo
+            self.num_param = args[3][1]
+            self.tipo_dev = args[3][2]
 
     # def insertarTipoDev(self, id, tipo):
     #     try:
@@ -622,14 +626,13 @@ class Syntactic:
         Returns code (str) of the next token from the Lexer and stores the actual token in self
         :return: next Token
         """
-        if self.token != "eof":
-            self.lastToken = self.actualToken
-            self.actualToken: Token = LEXER.tokenize()
-            if not self.actualToken:
-                return self.next()
-            else:
-                self.token = self.actualToken.code
-                return self.actualToken
+        self.lastToken = self.actualToken
+        self.actualToken: Token = LEXER.tokenize()
+        if not self.actualToken:
+            return self.next()
+        else:
+            self.token = self.actualToken.code
+            return self.actualToken
 
     def equipara(self, code: str, rule=None) -> bool:
         """
@@ -659,6 +662,20 @@ class Syntactic:
             self.error("WrongTokenError", f"Recibido {symbol} - Esperaba el token {self.token}", True)
         print("INCORRECTO -> siguiente")
         return False
+
+    def equierror(self, expected):
+        expected_with_symbol = []
+        try:
+            symbol = SYMB_OPS_R[self.token]
+            for elem in expected:
+                try:
+                    expected_with_symbol.append(SYMB_OPS_R[elem])
+                except KeyError:
+                    expected_with_symbol.append(elem)
+
+        except KeyError:
+            symbol = self.token
+        self.error("WrongTokenError", f"Recibido \"{symbol}\" - Esperaba uno de los siguientes tokens {expected_with_symbol}", True)
 
     def error(self, error_type, msg: string, attr=None):
         token = self.actualToken if attr else self.lastToken
@@ -726,6 +743,9 @@ class Syntactic:
                     if self.equipara("parCerrado") and self.equipara("puntoComa"):
                         if E.tipo != "boolean":
                             self.error("WrongDataTypeError", "La condición del while debe ser de tipo booleano")
+        else:
+            self.equierror(First["B"])
+
 
     def T(self) -> ProductionObject:
         if self.equipara("int", 8):
@@ -734,54 +754,68 @@ class Syntactic:
             return ProductionObject(tipo="boolean", ancho=1)
         elif self.equipara("string", 10):
             return ProductionObject(tipo="string", ancho=64)
+        self.error("TypeError", f"Tipo {self.token} no reconocido, tipos disponibles {First['T']}", True)
 
     def S(self) -> ProductionObject:
         id = self.actualToken.att
         if self.equipara("id", 11):
             Sp = self.Sp()
-            if not self.TSActual.buscarId(id):
+            if not Sp or isinstance(Sp.tipo, list):  # es una llamada a funcion
                 if self.TSG.buscarId(id):
-                    id = self.TSG.map[id]
-                    if id.tipo == "function" and Sp.tipo != id.tipo_params:  # funcion con parametros incorrectos
-                        self.error("ArgumentTypeError", f"Argumentos no coinciden con los de la función")
-                    if id.tipo != Sp.tipo:  # es una asignacion
-                        self.error("TypeError", f"Tipo de la variable{id.lex} no coincide con tipo de la asignación")
-                else:  # declaracion e inicialización de una variable global i.e (a = 5)
-                    self.TSG.insertarId("id", Sp.tipo)
-            #  variable en Tabla Local
-            id: TS.TSElement = self.TSActual.map[id]
+                    id: TS.FunctionElement = self.TSG.map[id]
+                    params = id.tipo_params
+                    params_dados = Sp.tipo
+                    if id.tipo == "function" and params != params_dados:  # funcion con parametros incorrectos
+                        self.error("ArgumentTypeError", f"La funcion {id} recibe los argumentos de tipo {params}, "
+                                                        f"tipos recibidos {params_dados}")
             if Sp.tipo == "postIncrem" and id.tipo != "int":
                 self.error("WrongDataTypeError",
                            "El operador post incremento solo es aplicable a variables del tipo entero")
-            if Sp.tipo != "postIncrem" and id.tipo != Sp.tipo:  # es una asignacion
-                self.error("TypeError", f"Tipo de la variable{id.lex} no coincide con tipo de la asignación")
-            return ProductionObject(tipo=True)
+            else:  # es una asignacion
+                glob_var = None
+                if self.TSActual.buscarId(id):
+                    glob_var = self.TSActual.map[id]
+                elif self.TSG.buscarId(id):
+                    glob_var = self.TSG.map[id]
+                if not glob_var:  # declaracion e inicialización de una variable global i.e (a = 5)
+                    id: TS.TSElement = self.TSG.insertarId(id, Sp.tipo)
+                    if Sp.tipo != "postIncrem" and id.tipo != Sp.tipo:  # es una asignacion
+                        self.error("TypeError",
+                                   f"Tipo de la variable: \"{id.lex}\" no coincide con tipo de la asignación")
+                    return ProductionObject(tipo=True)
+                if glob_var.tipo != Sp.tipo:  # es una asignacion normal
+                    self.error("TypeError", f"Tipo de la variable: \"{id.lex}\" no coincide con tipo de la asignación")
+
         elif self.equipara("return", 12):
             X = self.X()
             if self.equipara("puntoComa"):
                 return ProductionObject(tipo=True, tipoRet=X.tipo)
+
         elif self.equipara("print", 13):
             if self.equipara("parAbierto"):
                 E = self.E()
                 if self.equipara("parCerrado") and self.equipara("puntoComa"):
-                    if E.tipo == "string":
+                    if E.tipo in {"string", "int"}:
                         return ProductionObject(tipo=True)
                     else:
                         self.error("WrongDataTypeError", "La función print solo acepta parámetros de tipo string")
-        elif self.equipara("input", 14) and self.equipara("parAbierto") and self.equipara("id"):
-            id, tipo = self.token, ""
-            if self.equipara("parCerrado") and self.equipara("puntoComa"):
+
+        elif self.equipara("input", 14) and self.equipara("parAbierto"):
+            id = self.actualToken.att
+            if self.equipara("id") and self.equipara("parCerrado") and self.equipara("puntoComa"):
                 if self.TSActual.buscarId(id):
                     tipo = self.TSActual.map[id].tipo
-                    if self.TSG.buscarId():
-                        tipo = self.TSG.map[id].tipo
-                    if tipo not in {"boolean, string"}:
+                elif self.TSG.buscarId(id):
+                    tipo = self.TSG.map[id].tipo
+                    if tipo not in {"boolean", "string"}:
                         self.error("TypeError", f"Variable a es de tipo {tipo}, input() debe recibir una variable de "
                                                 f"tipo string o entero")
                     else:
                         return ProductionObject(tipo=True)
                 else:
-                    self.error("NonDeclaredError", f"Variable {id} no ha sido previamente declarada")
+                    self.TSG.insertarId(id, "int")
+        else:
+            self.equierror(First["S"])
 
     def Sp(self) -> ProductionObject:
         if self.equipara("asig", 15):
@@ -791,9 +825,10 @@ class Syntactic:
         elif self.equipara("parAbierto", 16):
             L = self.L()
             if self.equipara("parCerrado") and self.equipara("puntoComa"):
-                return ProductionObject(tipo=L.tipo)
+                if L: return ProductionObject(tipo=L.tipo)
         elif self.equipara("postIncrem", 17) and self.equipara("puntoComa"):
             return ProductionObject(tipo="postIncrem")
+        self.equierror(First["Sp"])
 
     def X(self) -> ProductionObject:
         if self.token in First['E']:
@@ -818,7 +853,9 @@ class Syntactic:
         if self.token in First["E"]:
             Syntactic.addParseElement(22)
             E = self.E()
-            return ProductionObject(tipo=self.Q().insert(0, E.tipo))
+            if E:
+                return ProductionObject(tipo=self.Q([E.tipo]))
+            return ProductionObject(tipo=[])
         elif self.token in Follow['L']:
             Syntactic.addParseElement(23)
         else:
@@ -833,22 +870,29 @@ class Syntactic:
                 return self.Q(lista)
         elif self.token in Follow['Q']:
             Syntactic.addParseElement(25)
-            return lista if not lista else None
+            return lista if lista else None
+        self.equierror(First["Q"])
 
     def F(self) -> ProductionObject:
-        if self.equipara("function", 26) and self.equipara("id"):
+        if self.equipara("function", 26):
             id = self.actualToken.att
-            tipo_ret = self.H()
-            self.TSActual = TS(id)  # tabla de funcion
-            if self.equipara("parAbierto"):
-                tipo_params = self.A().tipo
-                if self.equipara("parCerrado") and self.equipara("llaveAbierto"):
-                    self.C()
-                    if self.equipara("llaveCerrado"):
-                        self.TSG.insertarId(id, "funcion", tipo_params, len(tipo_params),
-                                            tipo_ret)  # insertar funcion en TSG de una
-                        self.TSActual = self.TSG  # ~= destruir tabla de la funcion
-                        return ProductionObject(tipo=True)
+            if self.equipara("id"):
+                tipo_ret = self.H().tipo
+                self.TSActual = TS(id)  # tabla de funcion
+                if self.equipara("parAbierto"):
+                    A = self.A()
+                    if A:
+                        tipo_params = A.tipo
+                    else:
+                        tipo_params = ""
+                    if self.equipara("parCerrado") and self.equipara("llaveAbierto"):
+                        self.TSG.insertarId(id, "funcion", tipo_params, len(tipo_params), tipo_ret)
+                        self.C()
+                        if self.equipara("llaveCerrado"):
+                            # insertar funcion en TSG de una
+                            self.TSActual = self.TSG  # ~= destruir tabla de la funcion
+                            return ProductionObject(tipo=True)
+        self.equierror(First["F"])
 
     def H(self) -> ProductionObject:
         if self.token in First['T']:
@@ -858,17 +902,19 @@ class Syntactic:
         elif self.token in Follow['H']:
             Syntactic.addParseElement(28)
         else:
-            self.error("TypeError", f"Tipo de función no aceptado. Debe usar {First['T']} o \"\" (no poner nada para "
-                                    f"void)")
+            self.error("TypeError", f"Tipo de función no aceptado. Debe usar {First['T']} o \"\" (no poner nada para void)")
 
     def A(self) -> ProductionObject:
         if self.token in First['T']:
             Syntactic.addParseElement(29)
             T = self.T()
+            id = self.actualToken.att
             if self.equipara("id"):
-                K = self.K()
+                K = self.K([T.tipo])
+                self.TSActual.insertarId(id, T.tipo)
+
                 if K:
-                    return ProductionObject(tipo=K.insert(0, T.tipo))
+                    return ProductionObject(tipo=K)
         elif self.token in Follow['A']:
             Syntactic.addParseElement(30)
         else:
@@ -879,11 +925,13 @@ class Syntactic:
             K = lista if not lista else []
             T = self.T()
             K.append(T.tipo)
+            id = self.actualToken.att
             if self.equipara("id"):
+                self.TSActual.insertarId(id, T.tipo)
                 return self.K(lista)
         elif self.token in Follow['K']:
             Syntactic.addParseElement(32)
-            return lista if not lista else None
+            return lista if lista else None
         else:
             self.error("ArgumentDeclarationError",
                        "Los argumentos de las funciones deben estar separados por \',\'")
@@ -1011,7 +1059,7 @@ Estructura de producciones de operaciones
         id = self.actualToken.att
         if self.equipara("id", 45):
             Rp = self.Rp()
-            if Rp:
+            if Rp:  # es una llamada a una funcion o post incremento
                 if Rp.tipo == "postIcrem" and id != "int":
                     self.error("OperandTypeError",
                                "El operador post incremento solo es aplicable a variables del tipo entero")

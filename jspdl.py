@@ -405,21 +405,21 @@ First = {
     "H": ["int", "boolean", "string"],
     "A": ["int", "boolean", "string"],
     "K": "coma",
-    "E": ["id", "parAbierto", "int", "cteEnt", "cadena", "true", "false"],
-    "N": ["id", "parAbierto", "int", "cteEnt", "cadena", "true", "false"],
-    "Z": ["id", "parAbierto", "int", "cteEnt", "cadena", "true", "false"],
-    "O1": ["mas", "por", "lambda"],
+    "E": ["id", "parAbierto", "int", "cteEnt", "cadena", "true", "false", "and", "or", "lambda", "mayor", "equals"],
+    "N": ["id", "parAbierto", "int", "cteEnt", "cadena", "true", "false", "and", "or", "lambda", "mayor", "equals"],
+    "Z": ["id", "parAbierto", "int", "cteEnt", "cadena", "true", "false", "mas", "por", "lambda"],
+    "O1": ["and", "or", "lambda"],
     "O2": ["equals", "mayor", "lambda"],
-    "O3": ["or", "and", "lambda"],
+    "O3": ["por", "mas", "lambda"],
     "R": ["id", "parAbierto", "cteEnt", "cadena", "true", "false"],
     "Rp": ["parAbierto", "postIncrem", "lambda"],
 }
 
 # usamos eof como $ para marcar fin de sentencia admisible
 Follow = {
-    "O3": ["puntoComa", "parCerrado", "coma"],
-    "O2": ["mas", "por", "coma", "parCerrado", "puntoComa"],
-    "O1": ["equals", "mayor", "mas", "por", "coma", "parCerrado", "puntoComa"],
+    "O1": ["puntoComa", "parCerrado", "coma"],
+    "O2": ["mayor", "equals", "parCerrado", "puntoComa", "coma", "and", "or", "lambda"],
+    "O3": ["mayor", "equals", "parCerrado", "coma", "and", "or", "puntoComa", "lambda"],
     "X": "puntoComa",
     "C": "llaveAbierto",
     "L": "parCerrado",
@@ -631,7 +631,6 @@ class Syntactic:
                 self.token = self.actualToken.code
                 return self.actualToken
 
-
     def equipara(self, code: str, rule=None) -> bool:
         """
         Compares the given code to the actual token, return status based on said comparison.
@@ -754,7 +753,7 @@ class Syntactic:
             if Sp.tipo == "postIncrem" and id.tipo != "int":
                 self.error("WrongDataTypeError",
                            "El operador post incremento solo es aplicable a variables del tipo entero")
-            if id.tipo != Sp.tipo:  # es una asignacion
+            if Sp.tipo != "postIncrem" and id.tipo != Sp.tipo:  # es una asignacion
                 self.error("TypeError", f"Tipo de la variable{id.lex} no coincide con tipo de la asignación")
             return ProductionObject(tipo=True)
         elif self.equipara("return", 12):
@@ -934,8 +933,7 @@ Estructura de producciones de operaciones
         if self.token in First["N"]:
             Syntactic.addParseElement(33)
             N = self.N()  # primer argumento
-            # si llega aqui no ha habido errores entonces devolvemos tipo_ok
-            return self.O3(N)
+            return self.O1(N)
 
     def N(self) -> ProductionObject:
         if self.token in First["Z"]:
@@ -949,68 +947,63 @@ Estructura de producciones de operaciones
             Syntactic.addParseElement(35)
             R = self.R()
             # si llega aqui no ha habido errores entonces devolvemos el tipo que espera O3 por si ha llamado a R
-            return self.O1(R)
+            return self.O3(R)
 
-    def O1(self, prev) -> ProductionObject:
-        if self.equipara("mas", 36):
+    def O1(self, prev=None) -> ProductionObject:
+        if self.equipara("or", 42):
             N = self.N()
-            if prev.tipo != "int":
-                self.error("OperandTypeError", f"Operador + solo acepta datos enteros, tipo dado {prev.tipo}")
-            elif N.tipo != "int":
-                self.error("OperandTypeError", f"Operador + solo acepta datos enteros, tipo dado {N.tipo}")
-            else:
-                return self.O1(N)
-        elif self.equipara("por", 37):
+            if N.tipo != "boolean":
+                self.error("WrongDataTypeError", f"Operador || solo acepta datos lógicos, tipo dado {N.tipo}")
+            return self.O1()
+        elif self.equipara("and", 43):
             N = self.N()
-            if prev.tipo != "int" or N.tipo != "int":
-                self.error("OperandTypeError", f"Operador * solo acepta datos enteros, tipo dado {N.tipo}")
-            return self.O1(N)
-        elif self.token in Follow['O1']:
-            Syntactic.addParseElement(38)
-            if prev.tipo == "int":
-                return ProductionObject(tipo="int")
-            else:
+            if N.tipo != "boolean":
+                self.error("OperandTypeError", f"Operador && solo acepta datos lógicos, tipo dado {N.tipo}")
+            return self.O1()
+        elif self.token in Follow['O3']:
+            Syntactic.addParseElement(44)
+            if prev:
                 return prev
+            return ProductionObject(tipo="boolean")
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O1']}")
 
-    def O2(self, prev) -> ProductionObject:
+    def O2(self, prev=None) -> ProductionObject:
         if self.equipara("equals", 39):
-            Z = self.Z()
-            if prev.tipo != "int" or Z.tipo != "int":
-                self.error("OperandTypeError", f"Operador == solo acepta datos de tipo entero, tipo dado {Z.tipo}")
-            return self.O2(Z)
+            N = self.N()
+            if N.tipo != "int":
+                self.error("OperandTypeError", f"Operador == solo acepta datos de tipo entero, tipo dado {N.tipo}")
+            return self.O2()
         elif self.equipara("mayor", 40):
-            Z = self.Z()
-            if prev.tipo != "int" or Z.tipo != "int":
-                self.error("OperandTypeError", f"Operador > solo acepta datos de tipo entero, tipo dado {Z.tipo}")
-            return self.O2(Z)
+            N = self.N()
+            if N.tipo != "int":
+                self.error("OperandTypeError", f"Operador > solo acepta datos de tipo entero, tipo dado {N.tipo}")
+            return self.O2()
         elif self.token in Follow['O2']:
             Syntactic.addParseElement(41)
-            if prev.tipo == "int":
-                return ProductionObject(tipo="boolean")
-            else:
+            if prev:
                 return prev
+            return ProductionObject(tipo="boolean")
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O2']}")
 
-    def O3(self, prev) -> ProductionObject:
-        if self.equipara("or", 42):
+    def O3(self, prev=None) -> ProductionObject:
+        if self.equipara("mas", 36):
             R = self.R()
-            if R.tipo != "boolean":
-                self.error("WrongDataTypeError", f"Operador || solo acepta datos lógicos, tipo dado { R.tipo }")
-            return self.O3(R)
-        elif self.equipara("and", 43):
-            R = self.R()
-            if R.tipo != "boolean":
-                self.error("OperandTypeError", f"Operador && solo acepta datos lógicos, tipo dado { R.tipo }")
-            return self.O3(R)
-        elif self.token in Follow['O3']:
-            Syntactic.addParseElement(44)
-            if prev.tipo == "boolean":
-                return ProductionObject(tipo="boolean")
+            if R.tipo != "int":
+                self.error("OperandTypeError", f"Operador + solo acepta datos enteros, tipo dado {R.tipo}")
             else:
+                return self.O3()
+        elif self.equipara("por", 37):
+            R = self.R()
+            if R.tipo != "int":
+                self.error("OperandTypeError", f"Operador * solo acepta datos enteros, tipo dado {R.tipo}")
+            return self.O3()
+        elif self.token in Follow['O3']:
+            Syntactic.addParseElement(38)
+            if prev:
                 return prev
+            return ProductionObject(tipo="int")
         else:
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O3']}")
 

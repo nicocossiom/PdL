@@ -785,6 +785,8 @@ class Syntactic:
                         if id.tipo == "function" and params != params_dados:  # funcion con parametros incorrectos
                             self.error("ArgumentTypeError", f"La funcion {id} recibe los argumentos de tipo "
                                                             f"{params}, tipos recibidos {params_dados}")
+                else:
+                    self.error("NonDeclaredError", f"Error la función {id} no ha sido declarada previamente")
             else:  # es una asignacion
                 var_tabla = None
                 if self.TSActual.buscarId(id):

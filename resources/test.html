@@ -75,36 +75,17 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  % Contents of listings-setup.tex
-  \usepackage{xcolor}
-  
-  \lstset{
-      basicstyle=\ttfamily,
-      numbers=left,
-      numberstyle=\footnotesize,
-      stepnumber=1,
-      numbersep=5pt,
-      backgroundcolor=\color{black!10},
-      showspaces=false,
-      showstringspaces=false,
-      showtabs=false,
-      tabsize=2,
-      captionpos=b,
-      breaklines=true,
-      breakatwhitespace=true,
-      breakautoindent=true,
-      linewidth=\textwidth
-  }
+
 </head>
 <body>
 <header id="title-block-header">
 <h1 class="title">Javascript PdL</h1>
 <p class="author">Nicolás Cossío Miravalles, Bárbara Rodríguez Ruiz, Huangjue He</p>
-<p class="date">January 20220</p>
+<p class="date">Enero 2022</p>
 </header>
 <nav id="TOC">
 <ul>
-<li><a href="#grupo-127-integrantes"><span class="toc-section-number">1</span> Grupo 127, integrantes:</a></li>
+<li><a href="#grupo-127-integrantes"><span class="toc-section-number">1</span> Grupo 127, integrantes</a></li>
 <li><a href="#código-fuente-e-instrucciones-de-instalación"><span class="toc-section-number">2</span> Código fuente e instrucciones de instalación</a></li>
 <li><a href="#carácterísticas-específicas-del-lenguaje"><span class="toc-section-number">3</span> Carácterísticas específicas del lenguaje</a><ul>
 <li><a href="#analizador-léxico"><span class="toc-section-number">3.1</span> Analizador Léxico</a><ul>
@@ -117,7 +98,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li><a href="#analizador-sintáctico"><span class="toc-section-number">3.2</span> Analizador Sintáctico</a><ul>
 <li><a href="#gcl-del-lenguaje"><span class="toc-section-number">3.2.1</span> GCL del lenguaje</a></li>
-<li><a href="#grámatica-incial-dada"><span class="toc-section-number">3.2.2</span> Grámatica incial dada:</a></li>
+<li><a href="#grámatica-incial-dada"><span class="toc-section-number">3.2.2</span> Grámatica incial dada</a></li>
 <li><a href="#gramática-transformada"><span class="toc-section-number">3.2.3</span> Gramática transformada</a></li>
 <li><a href="#reglas"><span class="toc-section-number">3.2.4</span> Reglas</a></li>
 <li><a href="#gramática-para-el-árbol-sintáctico"><span class="toc-section-number">3.2.5</span> Gramática para el árbol sintáctico</a></li>
@@ -130,7 +111,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#gestor-de-errores"><span class="toc-section-number">3.5</span> Gestor de Errores</a></li>
 </ul></li>
 <li><a href="#anexo---casos-de-prueba"><span class="toc-section-number">4</span> Anexo - Casos de prueba</a><ul>
-<li><a href="#correctos"><span class="toc-section-number">4.1</span> Correctos:</a><ul>
+<li><a href="#correctos"><span class="toc-section-number">4.1</span> Correctos</a><ul>
 <li><a href="#caso-1"><span class="toc-section-number">4.1.1</span> Caso 1</a></li>
 <li><a href="#caso-2"><span class="toc-section-number">4.1.2</span> Caso 2</a></li>
 <li><a href="#caso-3"><span class="toc-section-number">4.1.3</span> Caso 3</a></li>
@@ -147,8 +128,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul>
 </nav>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
-<h1 id="grupo-127-integrantes"><span class="header-section-number">1</span> Grupo 127, integrantes:</h1>
+
+<h1 id="grupo-127-integrantes"><span class="header-section-number">1</span> Grupo 127, integrantes</h1>
 <ul>
 <li>Nicolás Cossío Miravalles - <a href="mailto:n.cossio@alumnos.upm.es">n.cossio@alumnos.upm.es</a> - b190082</li>
 <li>Bárbara Rodríguez Ruiz - <a href="mailto:barbara.rodriguez.ruiz@alumnos.upm.es">barbara.rodriguez.ruiz@alumnos.upm.es</a> - b190110</li>
@@ -163,13 +158,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li><strong>Sentencias</strong>: do-while</li>
 <li><strong>Operadores especiales:</strong> Post-auto-incremento ( ++ como sufijo)</li>
-<li><strong>Comentarios:</strong> de bloque ( /* coment */ )</li>
+<li><strong>Comentarios:</strong> de bloque ( /<em>coment</em>/ )</li>
 <li><strong>Cadenas</strong>: con comillas dobles ( “cadenas” )</li>
 <li><strong>Técnicas de Análisis Sintáctico</strong>: Descendente recursivo</li>
 </ul>
 <p>Opcionales:</p>
 <ul>
-<li>No aceptamos carácteres de escape en cadenas</li>
+<li>Sí aceptamos carácteres de escape en cadenas</li>
 <li>No aceptamos declaración e inicialización en la misma sentencia</li>
 <li>Sí se aceptan las constantes lógicas true y false</li>
 <li>No aceptamos operadores unarios</li>
@@ -200,13 +195,13 @@ boolean :  &lt; boolean, - &gt;
 string :   &lt; string, - &gt;</code></pre>
 <h4 id="operadores"><span class="header-section-number">3.1.1.2</span> Operadores</h4>
 <pre class="text"><code>Operadores Aritméticos:
-    + : &lt; mas, - &gt;
-    * : &lt; por, - &gt;
-    
+ + : &lt; mas, - &gt;
+ * : &lt; por, - &gt;
+ 
 Operadores Lógicos:
-    &amp;&amp; : &lt; and, - &gt;
-    || : &lt; or, - &gt;
-    
+ &amp;&amp; : &lt; and, - &gt;
+ || : &lt; or, - &gt;
+ 
 Operadores relacionales:
   == : &lt; equals, - &gt;
   &gt;  : &lt; mayor, - &gt;</code></pre>
@@ -237,26 +232,34 @@ I -&gt; /S
 J -&gt; λJ | ”K
 K -&gt; λ
 otro indica cualquier otro carácter distinto de *</code></pre>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+
+
 <h3 id="automata-finito-determinista"><span class="header-section-number">3.1.3</span> Automata Finito Determinista</h3>
 <hr />
-<figure>
-<img src="images/afd.jpeg" alt="Automata Finito Determinista" /><figcaption>Automata Finito Determinista</figcaption>
-</figure>
+<p><img src="images/afd.jpeg" alt="Automata Finito Determinista" style="width:60%"></p>
 <ul>
 <li>OC: cualquier carácter distinto de los ya especificados para ese estado</li>
 </ul>
 <h3 id="acciones-semánticas"><span class="header-section-number">3.1.4</span> Acciones Semánticas</h3>
 <hr />
 <pre class="text"><code>- LEER: lee el siguiente carácter del fichero fuente. car := leer()
-                En todas las transiciones menos en las transiciones etiquetadas con O.C, excepto en 25-&gt;25
+    En todas las transiciones menos en las transiciones etiquetadas con O.C, excepto en 25-&gt;25
 - CONC: forma una cadena (lexema). Siempre después de leer(), lex:=lex⨁car 
-                En las transiciones: 13-&gt;14, 14-&gt;15 | 0-&gt;1, 1-&gt;1, x-&gt;x //por hacer, cadenas
+    En las transiciones: 13-&gt;14, 14-&gt;15 | 0-&gt;1, 1-&gt;1, x-&gt;x //por hacer, cadenas
 - VALOR: convierte un carácter a su entero correspondiente, entero:=valor(carácter)
 - GENTOKEN: genera un token que el A.Léxico pasa al sintáctico
 0-&gt;2: num = valor(car)
 2-&gt;2: num = num*10+valor(car)
 2-&gt;4: if (num &lt; 32768) genToken(cteEnt, num)
-            else error()
+   else error()
 
 25-&gt;26: 
 if (length(lex) &lt; 65) genToken(cadena, lex) 
@@ -265,8 +268,8 @@ else error()
 TEstadosFinales []:=lista de códigos de los tokens de operacion y otros menos los no identificadores, cadena o constante que se generan en los estados finales del autómata, permiten crear un token al usarse como argumento de genToken( )
 
 if transicion is not 1-&gt;3, 2-&gt;4 { 
-    a:=TEstadosFinales[numEstadoFinal] 
-    if a is not null genToken( a , ) 
+ a:=TEstadosFinales[numEstadoFinal] 
+ if a is not null genToken( a , ) 
 }
 
 buscarTPR(lex): devuelve el código del token que coincide con un lexema dado, codigo:=buscarTPR(lex) 
@@ -331,7 +334,7 @@ Atributos:
 <blockquote>
 <p><strong>ACLARACIÓN:</strong> usamos los símbolos en vez de los nombres propios de los tokens en las gramáticas debido a la mejor legibilidad que dan. Somos conscientes que el símbolo es la representación del token en el lenguaje y el viceversa en la gramática. En el apartado <em><a href="https://www.notion.so/Memoria-5755ae10d6334950bd41137bea137221">“Gramática para el árbol sintáctico”</a></em> se encuentra la gramática final propiamente dada.</p>
 </blockquote>
-<h3 id="grámatica-incial-dada"><span class="header-section-number">3.2.2</span> Grámatica incial dada:</h3>
+<h3 id="grámatica-incial-dada"><span class="header-section-number">3.2.2</span> Grámatica incial dada</h3>
 <pre class="text"><code>P -&gt; B P | F P | eof
 B -&gt; let T id ; | if ( E ) S | S | while ( E ) { C }
 T -&gt; int | boolean | string
@@ -394,9 +397,9 @@ R&#39; -&gt;  ( L )   |   ++    | λ</code></pre>
 <li>X → E | λ —&gt; First(X) ∩ Follow(X) = <strong>Ø</strong>
 <ul>
 <li>First( X ) = { id, (, cteEnt, cadena, boolT, boolF, λ }</li>
-<li>Follow( X ) = { ; }</li>
-</ul>
+<li><p>Follow( X ) = { ; }</p>
 <p>First(V) ⊆ First(U) ⊆ First(R) ⊆ First(E) ⊆ First(X)</p></li>
+</ul></li>
 <li>C → B C | λ —&gt; First(B C ) ∩ Follow(C) = <strong>Ø</strong>
 <ul>
 <li>First( C ) = First(B) = { let, if, id, return, print, input, do }</li>
@@ -405,9 +408,9 @@ R&#39; -&gt;  ( L )   |   ++    | λ</code></pre>
 <li>L → E Q | λ —&gt; First(EQ) ∩ Follow(L) = <strong>Ø</strong>
 <ul>
 <li>First( L ) = First(E) = { id, (, cteEnt, cadena, boolT, boolF}</li>
-<li>Follow( L ) = { ) }</li>
-</ul>
+<li><p>Follow( L ) = { ) }</p>
 <p>First(V) ⊆ First(U) ⊆ First(R) ⊆ First(E) ⊆ First(EQ)</p></li>
+</ul></li>
 <li>Q → , E Q | λ —&gt; First(, E Q) ∩ Follow(Q) = <strong>Ø</strong>
 <ul>
 <li>First( Q ) = { , }</li>
@@ -420,9 +423,9 @@ R&#39; -&gt;  ( L )   |   ++    | λ</code></pre>
 <li>A → T id K | λ —&gt; First(T id K) ∩ Follow(A) = <strong>Ø</strong>
 <ul>
 <li>First( A ) = First( T ) = { int, boolean, string }</li>
-<li>Follow( A ) = { ) }</li>
-</ul>
+<li><p>Follow( A ) = { ) }</p>
 <p>First(T) ⊆ First(T id K)</p></li>
+</ul></li>
 <li>K → , T id K | λ —&gt; First(, T id K ) ∩ Follow(K) = <strong>Ø</strong>
 <ul>
 <li>First( K ) = { , }</li>
@@ -562,88 +565,88 @@ Rp -&gt; lambda
 <p>No hay conversión de tipos automática en el lenguaje.</p>
 <h3 id="funciones-semánticas"><span class="header-section-number">3.3.1</span> Funciones semánticas</h3>
 <pre class="text"><code>tipo TS:
-        .crear() -&gt; crea una tabla de símbolos vacía
-        .destruir( tabla ) -&gt; destruye la tabla de símbolos &quot;tabla&quot;
-        .desp = desplazamiento actual de la tabla, última posición libre        
-        .insertatId(id) -&gt; se inserta en la última posición el identificador, creando una nueva entrada y poniendo el desplazamiento 
-                de la entrada como el valor actual de TS.desp
-        .insertarTipoId ( pos, tipo ) -&gt; inserta el tipo de la variable (id.pos) en la TS
-        
-        .insertarTipoParam ( tipo1 x tipo2 x ... ) -&gt; inserta un producto cartesiano de los tipos de los 
-                parámetros de los argumentos de una función
-        .insertarTipoDev ( tipo ) -&gt; inserta el tipo que devuelve una función en la tabla general
-        
-        .buscarId( id.pos ) -&gt; busca un identificador en la tabla, devuelve true si existe, false si no
-        .getTipoParam( id.pos ) -&gt; devuelve el valor (producto cartesiano de tipos) que identifica los tipos 
-                de los argumentos de la función id
+  .crear() -&gt; crea una tabla de símbolos vacía
+  .destruir( tabla ) -&gt; destruye la tabla de símbolos &quot;tabla&quot;
+  .desp = desplazamiento actual de la tabla, última posición libre  
+  .insertatId(id) -&gt; se inserta en la última posición el identificador, creando una nueva entrada y poniendo el desplazamiento 
+    de la entrada como el valor actual de TS.desp
+  .insertarTipoId ( pos, tipo ) -&gt; inserta el tipo de la variable (id.pos) en la TS
+  
+  .insertarTipoParam ( tipo1 x tipo2 x ... ) -&gt; inserta un producto cartesiano de los tipos de los 
+    parámetros de los argumentos de una función
+  .insertarTipoDev ( tipo ) -&gt; inserta el tipo que devuelve una función en la tabla general
+  
+  .buscarId( id.pos ) -&gt; busca un identificador en la tabla, devuelve true si existe, false si no
+  .getTipoParam( id.pos ) -&gt; devuelve el valor (producto cartesiano de tipos) que identifica los tipos 
+    de los argumentos de la función id
 tipo id:
-        .pos = posición en la TS que corresponda, adquiere el valor de TS.pos al insertarse con 
-                TS.insertarId(id)
+  .pos = posición en la TS que corresponda, adquiere el valor de TS.pos al insertarse con 
+    TS.insertarId(id)
 
 tipo reglas: son todas las reglas que contiene la gramática
-        .tipo = tipo que devuelve la regla (boolean, string, entero o int, vacio, function)
-                puede ser una producto cartesiano de tipos o solo uno 
-        .tipoDev= devolución de una regla </code></pre>
+  .tipo = tipo que devuelve la regla (boolean, string, entero o int, vacio, function)
+    puede ser una producto cartesiano de tipos o solo uno 
+  .tipoDev= devolución de una regla </code></pre>
 <h3 id="esquema-de-traducción"><span class="header-section-number">3.3.2</span> Esquema de Traducción</h3>
 <pre class="text"><code>P&#39; -&gt; { TSG = TS.crear() TSactual = TSG } P  { TS.destruir(TSG) } 
 P  -&gt; B P
 P  -&gt; F P 
 P  -&gt; eof 
 B  -&gt; let T id  puntoComa
-            { if TSactual.buscarId(id) == false ) 
-                    then 
-                        id.pos = TSActual.insertarId( id )
-                        TSActual.insertarTipoId( id.pos, T.tipo )
-                        TS.despl = despl + T.ancho
-            }   
+   { if TSactual.buscarId(id) == false ) 
+     then 
+      id.pos = TSActual.insertarId( id )
+      TSActual.insertarTipoId( id.pos, T.tipo )
+      TS.despl = despl + T.ancho
+   } 
 B  -&gt; if parAbierto E parCerrado S 
-        { if (E.tipo != boolean) 
-            then error(&quot;El tipo de E tiene que ser boolean ya que nos encontramos en la condición de if&quot;)
-        }
+  { if (E.tipo != boolean) 
+   then error(&quot;El tipo de E tiene que ser boolean ya que nos encontramos en la condición de if&quot;)
+  }
 B  -&gt; S 
 B  -&gt; do llaveAbierto C llaveCerrado while parAbierto E parCerrado puntoComa
-        { if (E.tipo != boolean) 
-            then error(&quot;La condición del while debe ser de tipo booleano&quot;)
-        }
+  { if (E.tipo != boolean) 
+   then error(&quot;La condición del while debe ser de tipo booleano&quot;)
+  }
 T  -&gt; int { T.tipo:= int, T.ancho:= 1 }
 T  -&gt; boolean { T.tipo:= boolean, T.ancho:= 1 }
 T  -&gt; string { T.tipo:= string, T.ancho:= 64}
 S  -&gt; id S&#39; puntoComa 
-    { if ( TSActual.buscarId( id ) == false ) ## no está en tabla local
-            then if (TSG.buscarId( id ) == true ) ## sí está en global-&gt; llamada a función o asignación a variable
-                            then if (S&#39;.tipo != TSG.getTipoParam(id) )  ## argumentos no coinciden con los de la función
-                                            then if (id.tipo != S&#39;.tipo ) ## asignación
-                                                            then error( &quot;Tipos en la asignación no coinciden&quot;)
-                                                        ## funcion
-                                                        else error(&quot;Argumentos no coinciden con los de la función&quot;) 
-        else if ( S&#39;.tipo == postIncrem and id.tipo != cteE )  
-                    then error(&quot;El operador post incremento solo es aplicable a variables del tipo entero&quot;)
-        else  ## es una declaracion e inicialización de una variable global i.e (a = 5)
-                id.pos = TSG.insertarId( id ) 
-                TSG.insertarTipo ( id.pos, S&#39;.tipo )
-                ancho = if (S&#39;tipo == string ) else 1
-                TSG.pos = TSG.pos + ancho
-    }
+ { if ( TSActual.buscarId( id ) == false ) ## no está en tabla local
+   then if (TSG.buscarId( id ) == true ) ## sí está en global-&gt; llamada a función o asignación a variable
+       then if (S&#39;.tipo != TSG.getTipoParam(id) )  ## argumentos no coinciden con los de la función
+           then if (id.tipo != S&#39;.tipo ) ## asignación
+               then error( &quot;Tipos en la asignación no coinciden&quot;)
+              ## funcion
+              else error(&quot;Argumentos no coinciden con los de la función&quot;) 
+  else if ( S&#39;.tipo == postIncrem and id.tipo != cteE )  
+     then error(&quot;El operador post incremento solo es aplicable a variables del tipo entero&quot;)
+  else  ## es una declaracion e inicialización de una variable global i.e (a = 5)
+    id.pos = TSG.insertarId( id ) 
+    TSG.insertarTipo ( id.pos, S&#39;.tipo )
+    ancho = if (S&#39;tipo == string ) else 1
+    TSG.pos = TSG.pos + ancho
+ }
 S  -&gt; return X puntoComa 
-    { 
-        S.tipo = tipo_ok
-        S.tipoRet = X.tipo  
-    }
+ { 
+  S.tipo = tipo_ok
+  S.tipoRet = X.tipo 
+ }
 S  -&gt; print parAbierto E
-        { 
-        S.tipoRet = vacio
-        S.tipo = tipo_ok if (E.tipo == string ) else error(&quot;La función print solo acepta parámetros de tipo string&quot;)        
-        }       
-        parCerrado puntoComa
+  { 
+  S.tipoRet = vacio
+  S.tipo = tipo_ok if (E.tipo == string ) else error(&quot;La función print solo acepta parámetros de tipo string&quot;)   
+  }  
+  parCerrado puntoComa
 S  -&gt; input parAbierto id 
-        { if (TSactual.buscarId(id) == true )
-                then if TSactual.buscarTipo(id) not in (string, cteEnt)
-                            then error(&quot;La función input debe recibir una variable de tipo string o entero&quot;) 
-            else if (TSG.buscarId(id) == true )
-                then if TSG.buscarTipo(id) not in (string, cteEnt)
-                            then error(&quot;La función input debe recibir una variable de tipo string o entero&quot;) 
-            else error(&quot;Variable no ha sido previamente declarada&quot;)
-        } parCerrado puntoComa
+  { if (TSactual.buscarId(id) == true )
+    then if TSactual.buscarTipo(id) not in (string, cteEnt)
+       then error(&quot;La función input debe recibir una variable de tipo string o entero&quot;) 
+   else if (TSG.buscarId(id) == true )
+    then if TSG.buscarTipo(id) not in (string, cteEnt)
+       then error(&quot;La función input debe recibir una variable de tipo string o entero&quot;) 
+   else error(&quot;Variable no ha sido previamente declarada&quot;)
+  } parCerrado puntoComa
 S&#39; -&gt; asig E puntoComa { S&#39;.tipo = E.tipo } 
 S&#39; -&gt; parAbierto L parCerrado { S&#39;.tipo = L.tipo }  
 S&#39; -&gt; postIncrem { S&#39;.tipo = postIncrem } 
@@ -654,22 +657,22 @@ C  -&gt; lambda { C.tipo = vacio }
 L  -&gt; E Q { L.tipo = L.tipo x Q.tipo }   ## tipo1 x tipo2 x tipo3 o vacio 
 L  -&gt; lambda { L.tipo = vacio }  
 Q  -&gt; coma E {if E.tipo != vacio) 
-                then Q.tipo = Q.tipo x E.tipo } 
-            Q      
+    then Q.tipo = Q.tipo x E.tipo } 
+   Q      
 Q  -&gt; lambda { Q.tipo = vacio } 
 F  -&gt; function id 
-        {   tabla = crearTS() 
-            TSactual = tabla  
-            Desp_tabla1 = 0 
-            TSG.insertarId( id ) }
-        H 
-            { TSactual.insertartipoTS (H.tipo); 
-                TSG.insertarTipoDev( id, H.tipo )}
-    parAbierto A parCerrado 
-    { TSG.insertarTipoParam( id.pos, A.tipo )} ## sintáctico solo acepta boolean string o int, si no es ninguno dará error
-    llaveAbierto C llaveCerrado 
-    { tabla.destruir()
-        TSActual = TSG }
+  { tabla = crearTS() 
+   TSactual = tabla  
+   Desp_tabla1 = 0 
+   TSG.insertarId( id ) }
+  H 
+   { TSactual.insertartipoTS (H.tipo); 
+    TSG.insertarTipoDev( id, H.tipo )}
+ parAbierto A parCerrado 
+ { TSG.insertarTipoParam( id.pos, A.tipo )} ## sintáctico solo acepta boolean string o int, si no es ninguno dará error
+ llaveAbierto C llaveCerrado 
+ { tabla.destruir()
+  TSActual = TSG }
 H  -&gt; T { H.tipo = T.tipo }
 H  -&gt; lambda { H.tipo = vacio }
 A  -&gt; T id K { if ( K.tipo != vacio) then A.tipo = T.tipo x K.tipo} ## concatenamiento de ids (tipo1 x tipo2 x tipo3 x ... )
@@ -680,38 +683,38 @@ E  -&gt; N O1 { E.tipo =  &quot;cteEnt&quot; }
 N  -&gt; Z O2 { N.tipo = &quot;cteEnt&quot; }
 Z  -&gt; R O3 { Z.tipo = &quot;boolean&quot; } 
 O1 -&gt; mas N { if R.tipo != cteEnt  
-                                then error(&quot;Operador + solo acepta datos enteros&quot;) 
-                        } O1
+        then error(&quot;Operador + solo acepta datos enteros&quot;) 
+      } O1
 O1 -&gt; por N { if R.tipo != cteEnt 
-                                then error(&quot;Operador * solo acepta datos enteros&quot;) 
-                        } O1
+        then error(&quot;Operador * solo acepta datos enteros&quot;) 
+      } O1
 O1 -&gt; lambda { O1.tipo = tipo_ok}
 O2 -&gt; equals Z { if Z.tipo != cteEnt 
-                                    then error(&quot;Operador &gt; solo acepta datos enteros&quot;) 
-                         } O2
+         then error(&quot;Operador &gt; solo acepta datos enteros&quot;) 
+          } O2
 O2 -&gt; mayor Z { if Z.tipo != cteEnt 
-                                    then error(&quot;Operador &gt; solo acepta datos enteros&quot;) 
-                            } O2 
+         then error(&quot;Operador &gt; solo acepta datos enteros&quot;) 
+       } O2 
 O2 -&gt; lambda { O1.tipo = &quot;boolean&quot;}
 O3 -&gt; or R { if R.tipo != boolean 
-                            then error(&quot;Operador || solo acepta datos lógicos&quot;) 
-                     } O3
+       then error(&quot;Operador || solo acepta datos lógicos&quot;) 
+      } O3
 O3 -&gt; and R { if R.tipo != boolean 
-                                then error(&quot;Operador || solo acepta datos lógicos&quot;) 
-                        else if O1.tipo == vacio then O3.tipo = tipo_ok } O3 
+        then error(&quot;Operador || solo acepta datos lógicos&quot;) 
+      else if O1.tipo == vacio then O3.tipo = tipo_ok } O3 
 O3 -&gt; lambda { O3.tipo = tipo_ok } 
 R  -&gt; id R&#39; { if (R&#39;.tipo == postIncrem and id.tipo != cteEnt ) 
-                                then error(&quot;El operador post incremento solo es aplicable a variables del tipo entero&quot;) 
-                            else if (R&#39;.tipo =! vacio ) ## se trata de una llamada a una función 
-                                        then if ( TSG.buscarId( id ) == false )
-                                                    then error(&quot;Errror la función no ha sido declarada previamente&quot;)
-                                        else if (R&#39;.tipo != TSG.getParam( id ) ) 
-                                                then error(&quot;Tipos de los atributos incorrectos en llamada a función&quot;)
-                                        else R.tipo = TSG.getTipoDev( id )
-                        else:
-                                R.tipo = id.tipo ## habria que buscarlo en ambas tablas para ver en 
-                                                                 ## en cual esta y coger el tipo de la tabla 
-                        }
+        then error(&quot;El operador post incremento solo es aplicable a variables del tipo entero&quot;) 
+       else if (R&#39;.tipo =! vacio ) ## se trata de una llamada a una función 
+          then if ( TSG.buscarId( id ) == false )
+             then error(&quot;Errror la función no ha sido declarada previamente&quot;)
+          else if (R&#39;.tipo != TSG.getParam( id ) ) 
+            then error(&quot;Tipos de los atributos incorrectos en llamada a función&quot;)
+          else R.tipo = TSG.getTipoDev( id )
+      else:
+        R.tipo = id.tipo ## habria que buscarlo en ambas tablas para ver en 
+                 ## en cual esta y coger el tipo de la tabla 
+      }
 R  -&gt; parAbierto E parCerrado { R.tipo:= E.tipo }
 R  -&gt; cteEnt { R.tipo:= int, R.ancho:= 1 }
 R  -&gt; cadena { R.tipo:= string R.ancho:= 64 }
@@ -719,36 +722,36 @@ R  -&gt; boolT { R.tipo:= boolean R.ancho:= 1 }
 R  -&gt; boolF { R.tipo:= boolean R.ancho:= 1 }
 R&#39; -&gt; lambda { R&#39;.tipo = vacio }
 R&#39; -&gt; parAbierto L parCerrado 
-            { R&#39;.tipo = L.tipo } 
+   { R&#39;.tipo = L.tipo } 
 R&#39; -&gt; postIncrem { R&#39;.tipo = postIncrem }  </code></pre>
 <h2 id="tabla-de-símbolos"><span class="header-section-number">3.4</span> Tabla de Símbolos</h2>
 <p>Para las tablas de simbolos hemos seguido un formato como el que se muestra a continuación:</p>
 <pre class="text"><code>---------------------------------------------------------------------------
-           TABLA PRINCIPAL #0
+  TABLA PRINCIPAL #0
 
 *  LEXEMA : &quot;demo&quot;
   ATRIBUTOS : 
-       + Tipo: funcion
-       +numParam: 0
-           +TipoRetorno: string
+ + Tipo: funcion
+ +numParam: 0
+  +TipoRetorno: string
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
-           TABLA de funcion &quot;demo&quot; #1
+  TABLA de funcion &quot;demo&quot; #1
 
 *  LEXEMA : &quot;v1&quot;
   ATRIBUTOS : 
-       + Tipo: int
-       + Despl: 0
+ + Tipo: int
+ + Despl: 0
 
 *  LEXEMA : &quot;v2&quot;
   ATRIBUTOS : 
-       + Tipo: int
-       + Despl: 1
+ + Tipo: int
+ + Despl: 1
 
 *  LEXEMA : &quot;v3&quot;
   ATRIBUTOS : 
-       + Tipo: int
-       + Despl: 2
+ + Tipo: int
+ + Despl: 2
 ---------------------------------------------------------------------------</code></pre>
 <h2 id="gestor-de-errores"><span class="header-section-number">3.5</span> Gestor de Errores</h2>
 <p>Este apartado lo hemos manejado según de dónde provenía el error. Para los errores léxicos hemos hecho que en vez de parar la ejecución siga produciendo tokens y buscando errores léxicos, para sí poder dar la mayor información posible pese a que no se pueda hacer un análisis sintáctico o gramátical.<br />
@@ -758,7 +761,7 @@ Hemos añadido la funcionalidad de que se autocorrigan los comentarios que no es
 Debajo de la línea usamos un indicador para mostrar en qué columna está el error, por lo que así el usuario puede saber exactamente dónde está el error, no solo a nivel de línea sino de carácter dentro de esta. Estos son algunos ejemplos:</p>
 <pre class="text"><code>***************************************************************************
 NonDeclaredError at line 2: 
-    estafuncionnoexiste();
+ estafuncionnoexiste();
                        ^```````````````~~~
 Error la función estafuncionnoexiste no ha sido declarada previamente
 ***************************************************************************
@@ -772,7 +775,7 @@ Cadena se debe especificar entre &quot; &quot;, no con &#39; &#39;. Corregido
 
 ***************************************************************************
 TypeError at line 7: 
-    input (v1);
+ input (v1);
             ^`````````
 Variable a es de tipo boolean, input() debe recibir una variable de tipo string o entero
 ***************************************************************************
@@ -780,7 +783,7 @@ Variable a es de tipo boolean, input() debe recibir una variable de tipo string 
 
 Error fatal, saliendo ...</code></pre>
 <h1 id="anexo---casos-de-prueba"><span class="header-section-number">4</span> Anexo - Casos de prueba</h1>
-<h2 id="correctos"><span class="header-section-number">4.1</span> Correctos:</h2>
+<h2 id="correctos"><span class="header-section-number">4.1</span> Correctos</h2>
 <p>Formato:</p>
 <ul>
 <li>Breve explicación del código y los elementos del lenguaje que queremos demostrar que se funcionan</li>
@@ -793,13 +796,22 @@ Error fatal, saliendo ...</code></pre>
 <li>Volcado de la Tabla de Símbolos</li>
 </ul>
 <h3 id="caso-1"><span class="header-section-number">4.1.1</span> Caso 1</h3>
-<p>Esto es una demostración de todo lo que se podría hacer con el lenguaje - Declaraciones con todos los tipos posibles. - Declaraciones de funciones con varios parámetros, algunas de ellas en sus códigos de bloque son recursivas. Se llaman a las funciones con los parámetros esperados. - Se utilizan todas las operaciones posibles - Se hacen returns con valores directamente o de otros resultados de funciones. - Se utiliza el bucle do while, junto con condiciones if simples - Asignaciones - Se utilizan funciones predeterminadas como input o print</p>
+<p>Esto es una demostración de todo lo que se podría hacer con el lenguaje</p>
+<ul>
+<li>Declaraciones con todos los tipos posibles.</li>
+<li>Declaraciones de funciones con varios parámetros, algunas de ellas en sus códigos de bloque son recursivas. Se llaman a las funciones con los parámetros esperados.</li>
+<li>Se utilizan todas las operaciones posibles</li>
+<li>Se hacen returns con valores directamente o de otros resultados de funciones.</li>
+<li>Se utiliza el bucle do while, junto con condiciones if simples</li>
+<li>Asignaciones</li>
+<li>Se utilizan funciones predeterminadas como input o print</li>
+</ul>
 <p>Código:</p>
-<pre class="jsx"><code>let string  cadena;
+<pre class="jsx"><code>let string cadena;
 input(cadena);
 let boolean logico1;
 let boolean logico2;
-let int     int2;
+let int  int2;
 int1 = 000000378;
 
 int2 = int1++;
@@ -808,42 +820,42 @@ logico1 = true;
 logico1 = false;
 function ff string(string ss)
 {
-    logico2 =  logico1;
-    if (logico2) cadena = ff (ss);
-    varglobal = 78;
-    return cadena;
+ logico2 =  logico1;
+ if (logico2) cadena = ff (ss);
+ varglobal = 78;
+ return cadena;
 }
-        
+  
 function funcion string (string logico2)
 {
-    let int var;
-    do {
-    logico1 = int1 == int2;print(0);logico2=&quot;&quot;;
-    } while (logico1);
+ let int var;
+ do {
+ logico1 = int1 == int2;print(0);logico2=&quot;&quot;;
+   } while (logico1);
   return logico2;
 }
 
 cadena = (ff(funcion(cadena)));
 print(cadena);
 let boolean booleano;
-function bisiesto boolean (int a)   
-{   let string bis;
-    print (&quot;Es bisiesto?&quot;);
-    input(bis);
-    return ((a + 4 == 0));  
+function bisiesto boolean (int a) 
+{ let string bis;
+ print (&quot;Es bisiesto?&quot;);
+ input(bis);
+ return ((a + 4 == 0)); 
 }
 function dias int (int m, int a)
 {
-    let int dd;
-    print (&quot;di cuantos dias tiene el mes &quot;);
-    print (m);
-    input(dd);
-    if (bisiesto(a)) dd = dd + 1;
-    return dd;
+ let int dd;
+ print (&quot;di cuantos dias tiene el mes &quot;);
+ print (m);
+ input(dd);
+ if (bisiesto(a)) dd = dd + 1;
+ return dd;
 }
-function esFechaCorrecta boolean (int d, int m, int a)  
+function esFechaCorrecta boolean (int d, int m, int a) 
 {
-    return (d == dias (m, a));
+ return (d == dias (m, a));
 }</code></pre>
 <pre class="text"><code>Listado de tokens:
 &lt; let , None &gt;
@@ -1104,45 +1116,44 @@ function esFechaCorrecta boolean (int d, int m, int a)
 &lt; parCerrado , None &gt;
 &lt; puntoComa , None &gt;
 &lt; llaveCerrado , None &gt;
-&lt; eof , None &gt;
 &lt; eof , None &gt;</code></pre>
 <p>Árbol de análisis sintáctico generado mediante VAST</p>
-<p><img src="images/arbol.png" alt="Arbol" /> &lt; !–.element height=“5000px” width=“5000px”– &gt;</p>
+<p><img src="./images/arbol.png" title="Ärbol Sintáctico generado por VAST" alt="Ärbol Sintáctico"style="width:30%"></p>
 <p>Volcado de la Tabla de Símbolos</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb18-1" title="1"><span class="er">TS</span> <span class="er">GLOBAL</span> <span class="er">#1</span></a>
 <a class="sourceLine" id="cb18-2" title="2"><span class="er">*Lexema:</span> <span class="er">&#39;contador&#39;</span></a>
 <a class="sourceLine" id="cb18-3" title="3"><span class="er">*Lexema:</span> <span class="er">&#39;x&#39;</span></a></code></pre></div>
 <h3 id="caso-2"><span class="header-section-number">4.1.2</span> Caso 2</h3>
 <blockquote>
-<p>Función potencia que devuelve un número a la potencia deseada, este caso correcto demuestra que crea una variable de la manera correcta con let para la inicialización y luego la asignación. Admitimos el do {S} while (E) con los comentarios de bloque /* */.</p>
+<p>Función potencia que devuelve un número a la potencia deseada, este caso correcto demuestra que crea una variable de la manera correcta con let para la inicialización y luego la asignación. Admitimos el do {S} while (E) con los comentarios de bloque /**/.</p>
 </blockquote>
 <p>Código:</p>
-<pre class="jsx"><code>function potencia int (int z, int dim)  {
-    let int s;
-    s = 0;
-    do{
-        z = z*z;
-        print(z);
-        s++;
-    } while(dim&gt;s);
-    return z;
+<pre class="jsx"><code>function potencia int (int z, int dim) {
+ let int s;
+ s = 0;
+ do{
+  z = z*z;
+  print(z);
+  s++;
+ } while(dim&gt;s);
+ return z;
 } /* fin de potencia*/</code></pre>
 <h3 id="caso-3"><span class="header-section-number">4.1.3</span> Caso 3</h3>
 <blockquote>
 <p>En este caso se comprueba con una simple función que devuelve string llamado demo, los operadores relaciones con el ==, y la palabra reservada input para obtener variables del usuario desde el I/O. También podemos ver que con el return, podemos devolver no solo variables o enteros, si no que también cadenas de caracteres.</p>
 </blockquote>
 <p>Código:</p>
-<pre class="jsx"><code>function demo string()  { /* definición de la función demo, sin argumentos y devuelve un string */
-    let int v1;
-    let int v2;
-    let int v3;
-    print (&quot;Escriba tres números: &quot;);
-    input (v1);
-    input (v2);
-    input (v3);
-    if(v1==v2) return &quot;Primer y segundo valor son idénticos&quot;;
-    if(v2==v3) return &quot;Segundo y tercer valor son idénticos&quot;;
-    if(v1==v3) return &quot;Primer y tercer valor son idénticos&quot;;
+<pre class="jsx"><code>function demo string() { /* definición de la función demo, sin argumentos y devuelve un string */
+ let int v1;
+ let int v2;
+ let int v3;
+ print (&quot;Escriba tres números: &quot;);
+ input (v1);
+ input (v2);
+ input (v3);
+ if(v1==v2) return &quot;Primer y segundo valor son idénticos&quot;;
+ if(v2==v3) return &quot;Segundo y tercer valor son idénticos&quot;;
+ if(v1==v3) return &quot;Primer y tercer valor son idénticos&quot;;
 }</code></pre>
 <h3 id="caso-4"><span class="header-section-number">4.1.4</span> Caso 4</h3>
 <blockquote>
@@ -1170,12 +1181,15 @@ print(factorial(factorial(2)));</code></pre>
 <p>Este último caso correcto, tenemos una comparación de dos inputs tipo string y comprobamos los tipos booleanos, los cuales son admitidos por el lenguaje y que los “if” solo admiten una sola sentencia despues de su ejecución.</p>
 </blockquote>
 <p>Código:</p>
-<p>```jsx function compara boolean (string input1, string input2, string input3){ let boolean result; result = false;</p>
-<pre><code>if(input1 == input2 &amp;&amp; input2 == input3) result = true;
-if(input1 == input2 &amp;&amp; input2 == input3) print(&quot;Los 3 inputs recibidos son iguales&quot;);
+<pre class="jsx"><code>function compara boolean (string input1, string input2, string input3){
+    let boolean result;
+    result = false;
+    
+    if(input1 == input2 &amp;&amp; input2 == input3) result = true;
+    if(input1 == input2 &amp;&amp; input2 == input3) print(&quot;Los 3 inputs recibidos son iguales&quot;);
 
-return result;</code></pre>
-<p>} /* funcion representativa */</p>
+    return result;
+} /* funcion representativa */</code></pre>
 <h2 id="incorrectos"><span class="header-section-number">4.2</span> Incorrectos:</h2>
 <p>Formato:</p>
 <ul>
@@ -1191,13 +1205,13 @@ return result;</code></pre>
 
 </blockquote>
 <p>Código:</p>
-<pre class="jsx"><code>function bisiesto boolean (int a, int b, c) {       
-    return (a % 4 == 0 &amp;&amp; a % 100 != 0 || a % 400 == 0);
+<pre class="jsx"><code>function bisiesto boolean (int a, int b, c) {  
+ return (a % 4 == 0 &amp;&amp; a % 100 != 0 || a % 400 == 0);
 } // fin de bisiesto: función lógica</code></pre>
 <p>Mensajes de error:</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb24-1" title="1"><span class="er">***************************************************************************</span></a>
 <a class="sourceLine" id="cb24-2" title="2"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">2:</span> </a>
-<a class="sourceLine" id="cb24-3" title="3">    <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
+<a class="sourceLine" id="cb24-3" title="3"> <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
 <a class="sourceLine" id="cb24-4" title="4">           <span class="er">^`````````</span></a>
 <a class="sourceLine" id="cb24-5" title="5"><span class="er">Simbolo:</span> <span class="er">&quot;%&quot;</span> <span class="er">no</span> <span class="er">permitido.</span> </a>
 <a class="sourceLine" id="cb24-6" title="6"><span class="er">No</span> <span class="er">pertence</span> <span class="er">al</span> <span class="er">lenguaje,</span> <span class="er">consulte</span> <span class="er">la</span> <span class="er">documentacion</span> <span class="er">para</span> <span class="er">ver</span> <span class="er">carácteres</span> <span class="er">aceptados</span></a>
@@ -1206,7 +1220,7 @@ return result;</code></pre>
 <a class="sourceLine" id="cb24-9" title="9"></a>
 <a class="sourceLine" id="cb24-10" title="10"><span class="er">***************************************************************************</span></a>
 <a class="sourceLine" id="cb24-11" title="11"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">2:</span> </a>
-<a class="sourceLine" id="cb24-12" title="12">    <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
+<a class="sourceLine" id="cb24-12" title="12"> <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
 <a class="sourceLine" id="cb24-13" title="13">                         <span class="er">^``````````````````~~</span></a>
 <a class="sourceLine" id="cb24-14" title="14"><span class="er">Simbolo:</span> <span class="er">&quot;%&quot;</span> <span class="er">no</span> <span class="er">permitido.</span> </a>
 <a class="sourceLine" id="cb24-15" title="15"><span class="er">No</span> <span class="er">pertence</span> <span class="er">al</span> <span class="er">lenguaje,</span> <span class="er">consulte</span> <span class="er">la</span> <span class="er">documentacion</span> <span class="er">para</span> <span class="er">ver</span> <span class="er">carácteres</span> <span class="er">aceptados</span></a>
@@ -1215,7 +1229,7 @@ return result;</code></pre>
 <a class="sourceLine" id="cb24-18" title="18"></a>
 <a class="sourceLine" id="cb24-19" title="19"><span class="er">***************************************************************************</span></a>
 <a class="sourceLine" id="cb24-20" title="20"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">2:</span> </a>
-<a class="sourceLine" id="cb24-21" title="21">    <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
+<a class="sourceLine" id="cb24-21" title="21"> <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
 <a class="sourceLine" id="cb24-22" title="22">                               <span class="er">^````````````````````````</span></a>
 <a class="sourceLine" id="cb24-23" title="23"><span class="er">Simbolo:</span> <span class="er">&quot;!&quot;</span> <span class="er">no</span> <span class="er">permitido.</span> </a>
 <a class="sourceLine" id="cb24-24" title="24"><span class="er">No</span> <span class="er">pertence</span> <span class="er">al</span> <span class="er">lenguaje,</span> <span class="er">consulte</span> <span class="er">la</span> <span class="er">documentacion</span> <span class="er">para</span> <span class="er">ver</span> <span class="er">carácteres</span> <span class="er">aceptados</span></a>
@@ -1224,7 +1238,7 @@ return result;</code></pre>
 <a class="sourceLine" id="cb24-27" title="27"></a>
 <a class="sourceLine" id="cb24-28" title="28"><span class="er">***************************************************************************</span></a>
 <a class="sourceLine" id="cb24-29" title="29"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">2:</span> </a>
-<a class="sourceLine" id="cb24-30" title="30">    <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
+<a class="sourceLine" id="cb24-30" title="30"> <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
 <a class="sourceLine" id="cb24-31" title="31">                                         <span class="er">^``````````````````````````````~~</span></a>
 <a class="sourceLine" id="cb24-32" title="32"><span class="er">Simbolo:</span> <span class="er">&quot;%&quot;</span> <span class="er">no</span> <span class="er">permitido.</span> </a>
 <a class="sourceLine" id="cb24-33" title="33"><span class="er">No</span> <span class="er">pertence</span> <span class="er">al</span> <span class="er">lenguaje,</span> <span class="er">consulte</span> <span class="er">la</span> <span class="er">documentacion</span> <span class="er">para</span> <span class="er">ver</span> <span class="er">carácteres</span> <span class="er">aceptados</span></a>
@@ -1272,7 +1286,7 @@ function Suma boolean (int aux, int fin){
     }while(fin&gt;x)
     
     return aux &gt; 10000;
-}   // la función devuelve un lógico
+} // la función devuelve un lógico
 
 function imprime (int a){
     print (a);
@@ -1300,7 +1314,7 @@ imprime (factorial (Suma (5, 6)));</code></pre>
 <a class="sourceLine" id="cb26-18" title="18"></a>
 <a class="sourceLine" id="cb26-19" title="19"><span class="er">***************************************************************************</span></a>
 <a class="sourceLine" id="cb26-20" title="20"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">18:</span> </a>
-<a class="sourceLine" id="cb26-21" title="21"><span class="er">}</span>   <span class="er">//</span> <span class="er">la</span> <span class="er">funciÃ³n</span> <span class="er">devuelve</span> <span class="er">un</span> <span class="er">lÃ³gico</span></a>
+<a class="sourceLine" id="cb26-21" title="21"><span class="er">}</span> <span class="er">//</span> <span class="er">la</span> <span class="er">funciÃ³n</span> <span class="er">devuelve</span> <span class="er">un</span> <span class="er">lÃ³gico</span></a>
 <a class="sourceLine" id="cb26-22" title="22">  <span class="er">^~</span></a>
 <a class="sourceLine" id="cb26-23" title="23"><span class="er">Comentarios</span> <span class="er">de</span> <span class="er">tipo</span> <span class="er">&#39;//comentario&#39;</span> <span class="er">no</span> <span class="er">estan</span> <span class="er">permitidos</span></a>
 <a class="sourceLine" id="cb26-24" title="24"><span class="er">***************************************************************************</span></a></code></pre></div>
@@ -1349,18 +1363,18 @@ print(test);</code></pre>
 </blockquote>
 <p>Código:</p>
 <pre class="jsx"><code>function FactorialFor int ( int n){
-    let int i;
-    let int factorial; factorial = 1;
-    for (i = 1; i &lt;= n; i++)
-    {
-        factorial *= i;
-    }
-    return factorial;
+ let int i;
+ let int factorial; factorial = 1;
+ for (i = 1; i &lt;= n; i++)
+ {
+  factorial *= i;
+ }
+ return factorial;
 }</code></pre>
 <p>Mensajes de error:</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb32-1" title="1"><span class="er">***************************************************************************</span></a>
 <a class="sourceLine" id="cb32-2" title="2"><span class="er">NonSupportedOperationError</span> <span class="er">at</span> <span class="er">line</span> <span class="er">4:</span> </a>
-<a class="sourceLine" id="cb32-3" title="3">    <span class="er">for</span> <span class="er">(i</span> <span class="er">=</span> <span class="er">1;</span> <span class="er">i</span> <span class="er">&lt;=</span> <span class="er">n;</span> <span class="er">i++)</span></a>
+<a class="sourceLine" id="cb32-3" title="3"> <span class="er">for</span> <span class="er">(i</span> <span class="er">=</span> <span class="er">1;</span> <span class="er">i</span> <span class="er">&lt;=</span> <span class="er">n;</span> <span class="er">i++)</span></a>
 <a class="sourceLine" id="cb32-4" title="4">       <span class="er">^```~~~</span></a>
 <a class="sourceLine" id="cb32-5" title="5"><span class="er">Esperaba</span> <span class="er">uno</span> <span class="er">de</span> <span class="er">los</span> <span class="er">siguientes</span> <span class="er">símbolos</span><span class="ot">[</span><span class="er">&#39;mayor&#39;</span><span class="ot">,</span> <span class="er">&#39;equals&#39;</span><span class="ot">,</span> <span class="er">&#39;parCerrado&#39;</span><span class="ot">,</span> <span class="er">&#39;coma&#39;</span><span class="ot">,</span> <span class="er">&#39;and&#39;</span><span class="ot">,</span> <span class="er">&#39;or&#39;</span><span class="ot">,</span> <span class="er">&#39;puntoComa&#39;</span><span class="ot">,</span> <span class="er">&#39;lambda&#39;</span><span class="ot">]</span></a>
 <a class="sourceLine" id="cb32-6" title="6"><span class="er">***************************************************************************</span></a></code></pre></div>

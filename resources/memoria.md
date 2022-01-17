@@ -4,11 +4,15 @@ author: Nicolás Cossío Miravalles, Bárbara Rodríguez Ruiz, Huangjue He
 date: January 20220
 geometry: margin=1cm
 output: pdf_document
-fontsize: 12pt
+fontsize: 10pt
+header-includes:
+  - \hypersetup{
+            allbordercolors={0 0 0},
+            pdfborderstyle={/S/U/W 1}}
 ---
 \newpage{}
 
-# Grupo 127, integrantes:
+# Grupo 127, integrantes
 
 - Nicolás Cossío Miravalles - [n.cossio@alumnos.upm.es](mailto:n.cossio@alumnos.upm.es) - b190082
 - Bárbara Rodríguez Ruiz - [barbara.rodriguez.ruiz@alumnos.upm.es](mailto:barbara.rodriguez.ruiz@alumnos.upm.es) - b190110
@@ -28,7 +32,7 @@ Asignadas  :
 
 - **Sentencias**: do-while
 - **Operadores especiales:** Post-auto-incremento ( ++ como sufijo)
-- **Comentarios:** de bloque ( /* coment */ )
+- **Comentarios:** de bloque ( /*coment*/ )
 - **Cadenas**: con comillas dobles ( “cadenas” )
 - **Técnicas de Análisis Sintáctico**: Descendente recursivo
 
@@ -74,13 +78,13 @@ string :   < string, - >
 
 ```text
 Operadores Aritméticos:
-	+ : < mas, - >
-	* : < por, - >
-	
+ + : < mas, - >
+ * : < por, - >
+ 
 Operadores Lógicos:
-	&& : < and, - >
-	|| : < or, - >
-	
+ && : < and, - >
+ || : < or, - >
+ 
 Operadores relacionales:
   == : < equals, - >
   >  : < mayor, - >
@@ -126,7 +130,7 @@ otro indica cualquier otro carácter distinto de *
 
 ---
 
-![Automata Finito Determinista](images/afd.jpeg)
+<img src="images/afd.jpeg" alt="Automata Finito Determinista" style="width:60%">
 
 - OC: cualquier carácter distinto de los ya especificados para ese estado
 
@@ -136,15 +140,15 @@ otro indica cualquier otro carácter distinto de *
 
 ```text
 - LEER: lee el siguiente carácter del fichero fuente. car := leer()
-				En todas las transiciones menos en las transiciones etiquetadas con O.C, excepto en 25->25
+    En todas las transiciones menos en las transiciones etiquetadas con O.C, excepto en 25->25
 - CONC: forma una cadena (lexema). Siempre después de leer(), lex:=lex⨁car 
-				En las transiciones: 13->14, 14->15 | 0->1, 1->1, x->x //por hacer, cadenas
+    En las transiciones: 13->14, 14->15 | 0->1, 1->1, x->x //por hacer, cadenas
 - VALOR: convierte un carácter a su entero correspondiente, entero:=valor(carácter)
 - GENTOKEN: genera un token que el A.Léxico pasa al sintáctico
 0->2: num = valor(car)
 2->2: num = num*10+valor(car)
 2->4: if (num < 32768) genToken(cteEnt, num)
-			else error()
+   else error()
 
 25->26: 
 if (length(lex) < 65) genToken(cadena, lex) 
@@ -153,8 +157,8 @@ else error()
 TEstadosFinales []:=lista de códigos de los tokens de operacion y otros menos los no identificadores, cadena o constante que se generan en los estados finales del autómata, permiten crear un token al usarse como argumento de genToken( )
 
 if transicion is not 1->3, 2->4 { 
-	a:=TEstadosFinales[numEstadoFinal] 
-	if a is not null genToken( a , ) 
+ a:=TEstadosFinales[numEstadoFinal] 
+ if a is not null genToken( a , ) 
 }
 
 buscarTPR(lex): devuelve el código del token que coincide con un lexema dado, codigo:=buscarTPR(lex) 
@@ -232,9 +236,9 @@ Atributos:
 ---
 
 > **ACLARACIÓN:** usamos los símbolos en vez de los nombres propios de los tokens en las gramáticas debido a la mejor legibilidad que dan. Somos conscientes que el símbolo es la representación del token en el lenguaje y el viceversa en la gramática. En el apartado *[“Gramática para el árbol sintáctico”](https://www.notion.so/Memoria-5755ae10d6334950bd41137bea137221)* se encuentra la gramática final propiamente dada.
-> 
+>
 
-### Grámatica incial dada:
+### Grámatica incial dada
 
 ```text
 P -> B P | F P | eof
@@ -287,49 +291,49 @@ Justificación de que es gramática LL(1):
 
 Como la gramática está factorizada no existe ninguna producción: *A → α | β | ...* donde First(α) ∩ First(β) ≠ **Ø**
 
-Para los consecuentes que pueden derivar a λ : 
+Para los consecuentes que pueden derivar a λ :
 
 - O1 → First( O1 ) ∩ Follow( O1 ) = **Ø**
-    - First( O1 ) = { +, *,  λ }
-    - Follow( O1 ) = Follow( E ) = First( Q ) + Follow( X ) + { ;, ) } = { ;, ), coma}
+  - First( O1 ) = { +, *,  λ }
+  - Follow( O1 ) = Follow( E ) = First( Q ) + Follow( X ) + { ;, ) } = { ;, ), coma}
 - O2 → First( O2 ) ∩ Follow( O2 ) = **Ø**
-    - First( O2 ) = { ==, >,  λ }
-    - Follow( O2 ) = Follow( N ) = First( O1 ) + First(O2) + Follow( E )= { +, *, ==, >, ; , ), coma }
+  - First( O2 ) = { ==, >,  λ }
+  - Follow( O2 ) = Follow( N ) = First( O1 ) + First(O2) + Follow( E )= { +, *, ==, >, ; , ), coma }
 - O3 → First( O3 ) ∩ Follow( O3 ) = **Ø**
-    - First( O3 ) = { &&, ||,  λ }
-    - Follow( O3 ) = Follow( Z ) = First( O2 ) + Follow( N )= { ==, >, +, *, ; , ), coma }
+  - First( O3 ) = { &&, ||,  λ }
+  - Follow( O3 ) = Follow( Z ) = First( O2 ) + Follow( N )= { ==, >, +, *, ; , ), coma }
 - X → E | λ  —> First(X) ∩ Follow(X) = **Ø**
-    - First( X ) = { id, (, cteEnt, cadena, boolT, boolF, λ }
-    - Follow( X ) = { ; }
-    
-    First(V) ⊆ First(U) ⊆ First(R) ⊆ First(E) ⊆ First(X) 
-    
+  - First( X ) = { id, (, cteEnt, cadena, boolT, boolF, λ }
+  - Follow( X ) = { ; }
+
+    First(V) ⊆ First(U) ⊆ First(R) ⊆ First(E) ⊆ First(X)
+
 - C → B C | λ —> First(B C ) ∩ Follow(C) = **Ø**
-    - First( C ) = First(B) = { let, if, id, return, print, input,  do }
-    - Follow( C ) =  { llaveAbierto }
+  - First( C ) = First(B) = { let, if, id, return, print, input,  do }
+  - Follow( C ) =  { llaveAbierto }
 - L → E Q | λ —> First(EQ) ∩ Follow(L) = **Ø**
-    - First( L ) = First(E) = { id, (, cteEnt, cadena, boolT, boolF}
-    - Follow( L ) = { ) }
-    
+  - First( L ) = First(E) = { id, (, cteEnt, cadena, boolT, boolF}
+  - Follow( L ) = { ) }
+
     First(V) ⊆ First(U) ⊆ First(R) ⊆ First(E) ⊆ First(EQ)
-    
+
 - Q → , E Q | λ —> First(, E Q) ∩ Follow(Q) = **Ø**
-    - First( Q ) = { , }
-    - Follow( Q ) = Follow( L ) = {  ) }
+  - First( Q ) = { , }
+  - Follow( Q ) = Follow( L ) = {  ) }
 - H → T | λ —>  First(T) ∩ Follow(H) = **Ø**
-    - Follow(H) = { (  }
+  - Follow(H) = { (  }
 - A → T id K | λ —>  First(T id K) ∩ Follow(A) = **Ø**
-    - First( A ) = First( T ) = { int, boolean, string }
-    - Follow( A ) = { ) }
-    
+  - First( A ) = First( T ) = { int, boolean, string }
+  - Follow( A ) = { ) }
+
     First(T) ⊆ First(T id K)
-    
+
 - K → , T id K | λ —> First(, T id K ) ∩ Follow(K) = **Ø**
-    - First( K ) = { , }
-    - Follow( K ) = Follow (A ) = { ) }
+  - First( K ) = { , }
+  - Follow( K ) = Follow (A ) = { ) }
 - R' -> First ( R ) ∩ Follow( R’ ) = **Ø**
-    - First( R’ ) = { (, ++, λ }
-    - Follow( R ’) = Follow( R ) = First( O ) + Follow( E ) = {  &&,  +, *, ==, >, λ  } + { coma, puntoComa, )  }  = {   )  }
+  - First( R’ ) = { (, ++, λ }
+  - Follow( R ’) = Follow( R ) = First( O ) + Follow( E ) = {  &&,  +, *, ==, >, λ  } + { coma, puntoComa, )  }  = {   )  }
 
 function hola int (){
 
@@ -463,7 +467,7 @@ Rp -> lambda
 
 #### **Tipos de Datos**
 
-El lenguaje dispone de los siguientes tipos de datos básicos: 
+El lenguaje dispone de los siguientes tipos de datos básicos:
 
 - El tipo **entero** se refiere a un número entero que debe representarse con un tamaño de 1 palabra (16 bits). Se representa con la palabra `int`.
 - El tipo **lógico** permite representar valores lógicos. Se representa también con un tamaño de 1 palabra (16 bits). Las expresiones relacionales y lógicas devuelven un valor lógico. Se representa con la palabra `boolean`.
@@ -475,28 +479,28 @@ No hay conversión de tipos automática en el lenguaje.
 
 ```text
 tipo TS:
-		.crear() -> crea una tabla de símbolos vacía
-		.destruir( tabla ) -> destruye la tabla de símbolos "tabla"
-		.desp = desplazamiento actual de la tabla, última posición libre		
-		.insertatId(id) -> se inserta en la última posición el identificador, creando una nueva entrada y poniendo el desplazamiento 
-				de la entrada como el valor actual de TS.desp
-		.insertarTipoId ( pos, tipo ) -> inserta el tipo de la variable (id.pos) en la TS
-		
-		.insertarTipoParam ( tipo1 x tipo2 x ... ) -> inserta un producto cartesiano de los tipos de los 
-				parámetros de los argumentos de una función
-		.insertarTipoDev ( tipo ) -> inserta el tipo que devuelve una función en la tabla general
-		
-		.buscarId( id.pos ) -> busca un identificador en la tabla, devuelve true si existe, false si no
-		.getTipoParam( id.pos ) -> devuelve el valor (producto cartesiano de tipos) que identifica los tipos 
-				de los argumentos de la función id
+  .crear() -> crea una tabla de símbolos vacía
+  .destruir( tabla ) -> destruye la tabla de símbolos "tabla"
+  .desp = desplazamiento actual de la tabla, última posición libre  
+  .insertatId(id) -> se inserta en la última posición el identificador, creando una nueva entrada y poniendo el desplazamiento 
+    de la entrada como el valor actual de TS.desp
+  .insertarTipoId ( pos, tipo ) -> inserta el tipo de la variable (id.pos) en la TS
+  
+  .insertarTipoParam ( tipo1 x tipo2 x ... ) -> inserta un producto cartesiano de los tipos de los 
+    parámetros de los argumentos de una función
+  .insertarTipoDev ( tipo ) -> inserta el tipo que devuelve una función en la tabla general
+  
+  .buscarId( id.pos ) -> busca un identificador en la tabla, devuelve true si existe, false si no
+  .getTipoParam( id.pos ) -> devuelve el valor (producto cartesiano de tipos) que identifica los tipos 
+    de los argumentos de la función id
 tipo id:
-		.pos = posición en la TS que corresponda, adquiere el valor de TS.pos al insertarse con 
-				TS.insertarId(id)
+  .pos = posición en la TS que corresponda, adquiere el valor de TS.pos al insertarse con 
+    TS.insertarId(id)
 
 tipo reglas: son todas las reglas que contiene la gramática
-		.tipo = tipo que devuelve la regla (boolean, string, entero o int, vacio, function)
-				puede ser una producto cartesiano de tipos o solo uno 
-		.tipoDev= devolución de una regla 
+  .tipo = tipo que devuelve la regla (boolean, string, entero o int, vacio, function)
+    puede ser una producto cartesiano de tipos o solo uno 
+  .tipoDev= devolución de una regla 
 ```
 
 ### Esquema de Traducción
@@ -506,61 +510,61 @@ P' -> { TSG = TS.crear() TSactual = TSG } P  { TS.destruir(TSG) }
 P  -> B P
 P  -> F P 
 P  -> eof 
-B  -> let T id 	puntoComa
-			{ if TSactual.buscarId(id) == false ) 
-					then 
-						id.pos = TSActual.insertarId( id )
-						TSActual.insertarTipoId( id.pos, T.tipo )
-						TS.despl = despl + T.ancho
-			}	
+B  -> let T id  puntoComa
+   { if TSactual.buscarId(id) == false ) 
+     then 
+      id.pos = TSActual.insertarId( id )
+      TSActual.insertarTipoId( id.pos, T.tipo )
+      TS.despl = despl + T.ancho
+   } 
 B  -> if parAbierto E parCerrado S 
-		{ if (E.tipo != boolean) 
-			then error("El tipo de E tiene que ser boolean ya que nos encontramos en la condición de if")
-		}
+  { if (E.tipo != boolean) 
+   then error("El tipo de E tiene que ser boolean ya que nos encontramos en la condición de if")
+  }
 B  -> S 
 B  -> do llaveAbierto C llaveCerrado while parAbierto E parCerrado puntoComa
-		{ if (E.tipo != boolean) 
-			then error("La condición del while debe ser de tipo booleano")
-		}
+  { if (E.tipo != boolean) 
+   then error("La condición del while debe ser de tipo booleano")
+  }
 T  -> int { T.tipo:= int, T.ancho:= 1 }
 T  -> boolean { T.tipo:= boolean, T.ancho:= 1 }
 T  -> string { T.tipo:= string, T.ancho:= 64}
 S  -> id S' puntoComa 
-	{ if ( TSActual.buscarId( id ) == false ) ## no está en tabla local
-			then if (TSG.buscarId( id ) == true ) ## sí está en global-> llamada a función o asignación a variable
-							then if (S'.tipo != TSG.getTipoParam(id) )  ## argumentos no coinciden con los de la función
-											then if (id.tipo != S'.tipo ) ## asignación
-															then error( "Tipos en la asignación no coinciden")
-														## funcion
-														else error("Argumentos no coinciden con los de la función")	
-		else if ( S'.tipo == postIncrem and id.tipo != cteE )  
-					then error("El operador post incremento solo es aplicable a variables del tipo entero")
-		else  ## es una declaracion e inicialización de una variable global i.e (a = 5)
-				id.pos = TSG.insertarId( id ) 
-				TSG.insertarTipo ( id.pos, S'.tipo )
-				ancho = if (S'tipo == string ) else 1
-				TSG.pos = TSG.pos + ancho
-	}
+ { if ( TSActual.buscarId( id ) == false ) ## no está en tabla local
+   then if (TSG.buscarId( id ) == true ) ## sí está en global-> llamada a función o asignación a variable
+       then if (S'.tipo != TSG.getTipoParam(id) )  ## argumentos no coinciden con los de la función
+           then if (id.tipo != S'.tipo ) ## asignación
+               then error( "Tipos en la asignación no coinciden")
+              ## funcion
+              else error("Argumentos no coinciden con los de la función") 
+  else if ( S'.tipo == postIncrem and id.tipo != cteE )  
+     then error("El operador post incremento solo es aplicable a variables del tipo entero")
+  else  ## es una declaracion e inicialización de una variable global i.e (a = 5)
+    id.pos = TSG.insertarId( id ) 
+    TSG.insertarTipo ( id.pos, S'.tipo )
+    ancho = if (S'tipo == string ) else 1
+    TSG.pos = TSG.pos + ancho
+ }
 S  -> return X puntoComa 
-	{ 
-		S.tipo = tipo_ok
-		S.tipoRet = X.tipo	
-	}
+ { 
+  S.tipo = tipo_ok
+  S.tipoRet = X.tipo 
+ }
 S  -> print parAbierto E
-		{ 
-		S.tipoRet = vacio
-		S.tipo = tipo_ok if (E.tipo == string ) else error("La función print solo acepta parámetros de tipo string") 		
-		}		
-		parCerrado puntoComa
+  { 
+  S.tipoRet = vacio
+  S.tipo = tipo_ok if (E.tipo == string ) else error("La función print solo acepta parámetros de tipo string")   
+  }  
+  parCerrado puntoComa
 S  -> input parAbierto id 
-		{ if (TSactual.buscarId(id) == true )
-				then if TSactual.buscarTipo(id) not in (string, cteEnt)
-							then error("La función input debe recibir una variable de tipo string o entero") 
-			else if (TSG.buscarId(id) == true )
-				then if TSG.buscarTipo(id) not in (string, cteEnt)
-							then error("La función input debe recibir una variable de tipo string o entero") 
-			else error("Variable no ha sido previamente declarada")
-		} parCerrado puntoComa
+  { if (TSactual.buscarId(id) == true )
+    then if TSactual.buscarTipo(id) not in (string, cteEnt)
+       then error("La función input debe recibir una variable de tipo string o entero") 
+   else if (TSG.buscarId(id) == true )
+    then if TSG.buscarTipo(id) not in (string, cteEnt)
+       then error("La función input debe recibir una variable de tipo string o entero") 
+   else error("Variable no ha sido previamente declarada")
+  } parCerrado puntoComa
 S' -> asig E puntoComa { S'.tipo = E.tipo } 
 S' -> parAbierto L parCerrado { S'.tipo = L.tipo }  
 S' -> postIncrem { S'.tipo = postIncrem } 
@@ -571,22 +575,22 @@ C  -> lambda { C.tipo = vacio }
 L  -> E Q { L.tipo = L.tipo x Q.tipo }   ## tipo1 x tipo2 x tipo3 o vacio 
 L  -> lambda { L.tipo = vacio }  
 Q  -> coma E {if E.tipo != vacio) 
-				then Q.tipo = Q.tipo x E.tipo } 
-			Q      
+    then Q.tipo = Q.tipo x E.tipo } 
+   Q      
 Q  -> lambda { Q.tipo = vacio } 
 F  -> function id 
-		{	tabla = crearTS() 
-			TSactual = tabla  
-			Desp_tabla1 = 0 
-			TSG.insertarId( id ) }
-		H 
-			{ TSactual.insertartipoTS (H.tipo); 
-				TSG.insertarTipoDev( id, H.tipo )}
-	parAbierto A parCerrado 
-	{ TSG.insertarTipoParam( id.pos, A.tipo )} ## sintáctico solo acepta boolean string o int, si no es ninguno dará error
-	llaveAbierto C llaveCerrado 
-	{ tabla.destruir()
-		TSActual = TSG }
+  { tabla = crearTS() 
+   TSactual = tabla  
+   Desp_tabla1 = 0 
+   TSG.insertarId( id ) }
+  H 
+   { TSactual.insertartipoTS (H.tipo); 
+    TSG.insertarTipoDev( id, H.tipo )}
+ parAbierto A parCerrado 
+ { TSG.insertarTipoParam( id.pos, A.tipo )} ## sintáctico solo acepta boolean string o int, si no es ninguno dará error
+ llaveAbierto C llaveCerrado 
+ { tabla.destruir()
+  TSActual = TSG }
 H  -> T { H.tipo = T.tipo }
 H  -> lambda { H.tipo = vacio }
 A  -> T id K { if ( K.tipo != vacio) then A.tipo = T.tipo x K.tipo} ## concatenamiento de ids (tipo1 x tipo2 x tipo3 x ... )
@@ -597,38 +601,38 @@ E  -> N O1 { E.tipo =  "cteEnt" }
 N  -> Z O2 { N.tipo = "cteEnt" }
 Z  -> R O3 { Z.tipo = "boolean" } 
 O1 -> mas N { if R.tipo != cteEnt  
-								then error("Operador + solo acepta datos enteros") 
-						} O1
+        then error("Operador + solo acepta datos enteros") 
+      } O1
 O1 -> por N { if R.tipo != cteEnt 
-								then error("Operador * solo acepta datos enteros") 
-						} O1
+        then error("Operador * solo acepta datos enteros") 
+      } O1
 O1 -> lambda { O1.tipo = tipo_ok}
 O2 -> equals Z { if Z.tipo != cteEnt 
-									then error("Operador > solo acepta datos enteros") 
-					     } O2
+         then error("Operador > solo acepta datos enteros") 
+          } O2
 O2 -> mayor Z { if Z.tipo != cteEnt 
-									then error("Operador > solo acepta datos enteros") 
-							} O2 
+         then error("Operador > solo acepta datos enteros") 
+       } O2 
 O2 -> lambda { O1.tipo = "boolean"}
 O3 -> or R { if R.tipo != boolean 
-							then error("Operador || solo acepta datos lógicos") 
-					 } O3
+       then error("Operador || solo acepta datos lógicos") 
+      } O3
 O3 -> and R { if R.tipo != boolean 
-								then error("Operador || solo acepta datos lógicos") 
-						else if O1.tipo == vacio then O3.tipo = tipo_ok } O3 
+        then error("Operador || solo acepta datos lógicos") 
+      else if O1.tipo == vacio then O3.tipo = tipo_ok } O3 
 O3 -> lambda { O3.tipo = tipo_ok } 
 R  -> id R' { if (R'.tipo == postIncrem and id.tipo != cteEnt ) 
-								then error("El operador post incremento solo es aplicable a variables del tipo entero") 
-							else if (R'.tipo =! vacio ) ## se trata de una llamada a una función 
-										then if ( TSG.buscarId( id ) == false )
-													then error("Errror la función no ha sido declarada previamente")
-										else if (R'.tipo != TSG.getParam( id ) ) 
-												then error("Tipos de los atributos incorrectos en llamada a función")
-										else R.tipo = TSG.getTipoDev( id )
-						else:
-								R.tipo = id.tipo ## habria que buscarlo en ambas tablas para ver en 
-																 ## en cual esta y coger el tipo de la tabla 
-						}
+        then error("El operador post incremento solo es aplicable a variables del tipo entero") 
+       else if (R'.tipo =! vacio ) ## se trata de una llamada a una función 
+          then if ( TSG.buscarId( id ) == false )
+             then error("Errror la función no ha sido declarada previamente")
+          else if (R'.tipo != TSG.getParam( id ) ) 
+            then error("Tipos de los atributos incorrectos en llamada a función")
+          else R.tipo = TSG.getTipoDev( id )
+      else:
+        R.tipo = id.tipo ## habria que buscarlo en ambas tablas para ver en 
+                 ## en cual esta y coger el tipo de la tabla 
+      }
 R  -> parAbierto E parCerrado { R.tipo:= E.tipo }
 R  -> cteEnt { R.tipo:= int, R.ancho:= 1 }
 R  -> cadena { R.tipo:= string R.ancho:= 64 }
@@ -636,7 +640,7 @@ R  -> boolT { R.tipo:= boolean R.ancho:= 1 }
 R  -> boolF { R.tipo:= boolean R.ancho:= 1 }
 R' -> lambda { R'.tipo = vacio }
 R' -> parAbierto L parCerrado 
-			{ R'.tipo = L.tipo } 
+   { R'.tipo = L.tipo } 
 R' -> postIncrem { R'.tipo = postIncrem }  
 ```
 
@@ -646,31 +650,31 @@ Para las tablas de simbolos hemos seguido un formato como el que se muestra a co
 
  ```text
 ---------------------------------------------------------------------------
-			TABLA PRINCIPAL #0
+   TABLA PRINCIPAL #0
 
 *  LEXEMA : "demo"
    ATRIBUTOS : 
-		+ Tipo: funcion
-		+numParam: 0
-			+TipoRetorno: string
+  + Tipo: funcion
+  +numParam: 0
+   +TipoRetorno: string
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
-			TABLA de funcion "demo" #1
+   TABLA de funcion "demo" #1
 
 *  LEXEMA : "v1"
    ATRIBUTOS : 
-		+ Tipo: int
-		+ Despl: 0
+  + Tipo: int
+  + Despl: 0
 
 *  LEXEMA : "v2"
    ATRIBUTOS : 
-		+ Tipo: int
-		+ Despl: 1
+  + Tipo: int
+  + Despl: 1
 
 *  LEXEMA : "v3"
    ATRIBUTOS : 
-		+ Tipo: int
-		+ Despl: 2
+  + Tipo: int
+  + Despl: 2
 ---------------------------------------------------------------------------
 ```
 
@@ -684,10 +688,11 @@ Sobre los errores sintácticos o semánticos, detenemos completamente el anális
 Para los mensajes de error hemos creado una clase que implementan todas las partes del analizador con su propio método para crear una instancia de este tipo error. Al crearse un error este automáticamente crea un string del error diciendo el tipo de error, la línea donde ha ocurrido, además obteniendo dicha línea y mostrándola, para ser más visual.  
 Debajo de la línea usamos un indicador para mostrar en qué columna está el error, por lo que así el usuario puede saber exactamente dónde está el error, no solo a nivel de línea sino de carácter dentro de esta.
 Estos son algunos ejemplos:
+
 ```text
 ***************************************************************************
 NonDeclaredError at line 2: 
-	estafuncionnoexiste();
+ estafuncionnoexiste();
                        ^```````````````~~~
 Error la función estafuncionnoexiste no ha sido declarada previamente
 ***************************************************************************
@@ -701,18 +706,18 @@ Cadena se debe especificar entre " ", no con ' '. Corregido
 
 ***************************************************************************
 TypeError at line 7: 
-	input (v1);
+ input (v1);
             ^`````````
 Variable a es de tipo boolean, input() debe recibir una variable de tipo string o entero
 ***************************************************************************
 
 
 Error fatal, saliendo ...
-``` 
+```
 
 # Anexo - Casos de prueba
 
-## Correctos:
+## Correctos
 
 Formato:
 
@@ -728,23 +733,23 @@ Para el perimer caso además se mostrará la siguiente información:
 ### Caso 1
 
 Esto es una demostración de todo lo que se podría hacer con el lenguaje
-- Declaraciones con todos los tipos posibles. 
-- Declaraciones de funciones con varios parámetros, algunas de ellas en sus códigos de bloque son recursivas. Se llaman a las funciones con los parámetros esperados. 
-- Se utilizan todas las operaciones posibles
-- Se hacen returns con valores directamente o de otros resultados de funciones. 
-- Se utiliza el bucle do while, junto con condiciones if simples
-- Asignaciones 
-- Se utilizan funciones predeterminadas como input o print
 
+- Declaraciones con todos los tipos posibles.
+- Declaraciones de funciones con varios parámetros, algunas de ellas en sus códigos de bloque son recursivas. Se llaman a las funciones con los parámetros esperados.
+- Se utilizan todas las operaciones posibles
+- Se hacen returns con valores directamente o de otros resultados de funciones.
+- Se utiliza el bucle do while, junto con condiciones if simples
+- Asignaciones
+- Se utilizan funciones predeterminadas como input o print
 
 Código:
 
 ```jsx
-let string	cadena;
+let string cadena;
 input(cadena);
 let boolean logico1;
 let boolean logico2;
-let int		int2;
+let int  int2;
 int1 = 000000378;
 
 int2 = int1++;
@@ -753,44 +758,45 @@ logico1 = true;
 logico1 = false;
 function ff string(string ss)
 {
-	logico2 =  logico1;
-	if (logico2) cadena = ff (ss);
-	varglobal = 78;
-	return cadena;
+ logico2 =  logico1;
+ if (logico2) cadena = ff (ss);
+ varglobal = 78;
+ return cadena;
 }
-		
+  
 function funcion string (string logico2)
 {
-	let int var;
-	do {
-	logico1 = int1 == int2;print(0);logico2="";
-  	} while (logico1);
+ let int var;
+ do {
+ logico1 = int1 == int2;print(0);logico2="";
+   } while (logico1);
   return logico2;
 }
 
 cadena = (ff(funcion(cadena)));
 print(cadena);
 let boolean booleano;
-function bisiesto boolean (int a)	
-{	let string bis;
-	print ("Es bisiesto?");
-	input(bis);
-	return ((a + 4 == 0));	
+function bisiesto boolean (int a) 
+{ let string bis;
+ print ("Es bisiesto?");
+ input(bis);
+ return ((a + 4 == 0)); 
 }
 function dias int (int m, int a)
 {
-	let int dd;
-	print ("di cuantos dias tiene el mes ");
-	print (m);
-	input(dd);
-	if (bisiesto(a)) dd = dd + 1;
-	return dd;
+ let int dd;
+ print ("di cuantos dias tiene el mes ");
+ print (m);
+ input(dd);
+ if (bisiesto(a)) dd = dd + 1;
+ return dd;
 }
-function esFechaCorrecta boolean (int d, int m, int a)	
+function esFechaCorrecta boolean (int d, int m, int a) 
 {
-	return (d == dias (m, a));
+ return (d == dias (m, a));
 }
 ```
+
 ```text
 Listado de tokens:
 < let , None >
@@ -1052,13 +1058,11 @@ Listado de tokens:
 < puntoComa , None >
 < llaveCerrado , None >
 < eof , None >
-< eof , None >
 ```
 
 Árbol de análisis sintáctico generado mediante VAST
 
-![Arbol](images/arbol.png)
-
+<img src="./images/arbol.png" title="Ärbol Sintáctico generado por VAST" alt="Ärbol Sintáctico"style="width:30%">
 
 Volcado de la Tabla de Símbolos
 
@@ -1070,55 +1074,55 @@ TS GLOBAL #1
 
 ### Caso 2
 
-> Función potencia que devuelve un número a la potencia deseada, este caso correcto demuestra que crea una variable de la manera correcta con let para la inicialización y luego la asignación. Admitimos el do {S} while (E) con los comentarios de bloque /* */.
-> 
+> Función potencia que devuelve un número a la potencia deseada, este caso correcto demuestra que crea una variable de la manera correcta con let para la inicialización y luego la asignación. Admitimos el do {S} while (E) con los comentarios de bloque /**/.
+>
 
 Código:
 
 ```jsx
-function potencia int (int z, int dim)	{
-	let int s;
-	s = 0;
-	do{
-		z = z*z;
-		print(z);
-		s++;
-	} while(dim>s);
-	return z;
+function potencia int (int z, int dim) {
+ let int s;
+ s = 0;
+ do{
+  z = z*z;
+  print(z);
+  s++;
+ } while(dim>s);
+ return z;
 } /* fin de potencia*/
 ```
 
 ### Caso 3
 
 > En este caso se comprueba con una simple función que devuelve string llamado demo, los operadores relaciones con el ==, y la palabra reservada input para obtener variables del usuario desde el I/O. También podemos ver que con el return, podemos devolver no solo variables o enteros, si no que también cadenas de caracteres.
-> 
+>
 
 Código:
 
 ```jsx
-function demo string()	{ /* definición de la función demo, sin argumentos y devuelve un string */
-	let int v1;
-	let int v2;
-	let int v3;
-	print ("Escriba tres números: ");
-	input (v1);
-	input (v2);
-	input (v3);
-	if(v1==v2) return "Primer y segundo valor son idénticos";
-	if(v2==v3) return "Segundo y tercer valor son idénticos";
-	if(v1==v3) return "Primer y tercer valor son idénticos";
+function demo string() { /* definición de la función demo, sin argumentos y devuelve un string */
+ let int v1;
+ let int v2;
+ let int v3;
+ print ("Escriba tres números: ");
+ input (v1);
+ input (v2);
+ input (v3);
+ if(v1==v2) return "Primer y segundo valor son idénticos";
+ if(v2==v3) return "Segundo y tercer valor son idénticos";
+ if(v1==v3) return "Primer y tercer valor son idénticos";
 }
 ```
 
 ### Caso 4
 
 > Función básica de calcular el factorial de un número. Comprobamos que sean todos los operadores relacionales y aritméticos aceptados, como son el equals (==), el por (*). La última sentencia hacemos comprobación sobre funciones anidadas, demostrando que el procesador lo admite.
-> 
+>
 
 Código:
 
 ```jsx
-function factorial int (int n){	/* n: parámetro formal de la función entera */
+function factorial int (int n){ /* n: parámetro formal de la función entera */
     let int result;
     let int aux;
     result = 1;
@@ -1139,7 +1143,7 @@ print(factorial(factorial(2)));
 ### Caso 5
 
 > Este último caso correcto, tenemos una comparación de dos inputs tipo string y comprobamos los tipos booleanos, los cuales son admitidos por el lenguaje y que los “if” solo admiten una sola sentencia despues de su ejecución.
-> 
+>
 
 Código:
 
@@ -1153,7 +1157,7 @@ function compara boolean (string input1, string input2, string input3){
 
     return result;
 } /* funcion representativa */
-
+```
 
 ## Incorrectos:
 
@@ -1172,8 +1176,8 @@ Formato:
 Código:
 
 ``` jsx
-function bisiesto boolean (int a, int b, c) {		
-	return (a % 4 == 0 && a % 100 != 0 || a % 400 == 0);
+function bisiesto boolean (int a, int b, c) {  
+ return (a % 4 == 0 && a % 100 != 0 || a % 400 == 0);
 } // fin de bisiesto: función lógica
 ```
 
@@ -1182,7 +1186,7 @@ Mensajes de error:
 ```json
 ***************************************************************************
 Lexical error at line 2: 
-	return (a % 4 == 0 && a % 100 != 0 || a % 400 == 0);
+ return (a % 4 == 0 && a % 100 != 0 || a % 400 == 0);
            ^`````````
 Simbolo: "%" no permitido. 
 No pertence al lenguaje, consulte la documentacion para ver carácteres aceptados
@@ -1191,7 +1195,7 @@ No pertence al lenguaje, consulte la documentacion para ver carácteres aceptado
 
 ***************************************************************************
 Lexical error at line 2: 
-	return (a % 4 == 0 && a % 100 != 0 || a % 400 == 0);
+ return (a % 4 == 0 && a % 100 != 0 || a % 400 == 0);
                          ^``````````````````~~
 Simbolo: "%" no permitido. 
 No pertence al lenguaje, consulte la documentacion para ver carácteres aceptados
@@ -1200,7 +1204,7 @@ No pertence al lenguaje, consulte la documentacion para ver carácteres aceptado
 
 ***************************************************************************
 Lexical error at line 2: 
-	return (a % 4 == 0 && a % 100 != 0 || a % 400 == 0);
+ return (a % 4 == 0 && a % 100 != 0 || a % 400 == 0);
                                ^````````````````````````
 Simbolo: "!" no permitido. 
 No pertence al lenguaje, consulte la documentacion para ver carácteres aceptados
@@ -1209,7 +1213,7 @@ No pertence al lenguaje, consulte la documentacion para ver carácteres aceptado
 
 ***************************************************************************
 Lexical error at line 2: 
-	return (a % 4 == 0 && a % 100 != 0 || a % 400 == 0);
+ return (a % 4 == 0 && a % 100 != 0 || a % 400 == 0);
                                          ^``````````````````````````````~~
 Simbolo: "%" no permitido. 
 No pertence al lenguaje, consulte la documentacion para ver carácteres aceptados
@@ -1241,7 +1245,7 @@ Process finished with exit code 1
 ### Caso 2
 
 > Bloque de código de factoriales y booleanos de sumas con un error sintáctico en la primera línea para la asignación conjunta con la inicialización de variables, en los comentarios estilo ‘//’ y el uso no aceptado de la resta con el menos ‘-’.
-> 
+>
 
 Código:
 
@@ -1263,7 +1267,7 @@ function Suma boolean (int aux, int fin){
     }while(fin>x)
     
     return aux > 10000;
-}	// la función devuelve un lógico
+} // la función devuelve un lógico
 
 function imprime (int a){
     print (a);
@@ -1295,7 +1299,7 @@ No pertence al lenguaje, consulte la documentacion para ver carácteres aceptado
 
 ***************************************************************************
 Lexical error at line 18: 
-}	// la funciÃ³n devuelve un lÃ³gico
+} // la funciÃ³n devuelve un lÃ³gico
   ^~
 Comentarios de tipo '//comentario' no estan permitidos
 ***************************************************************************
@@ -1304,7 +1308,7 @@ Comentarios de tipo '//comentario' no estan permitidos
 ### Caso 3
 
 > Bloque de código que tiene un error léxico por usar una cadena que excede el tamaño máximo permitido además de asignar variables junto a la inicialización de variables.
-> 
+>
 
 Código:
 
@@ -1336,7 +1340,7 @@ Digito con valor mayor al permitido (32768) en el sistema
 ### Caso 4
 
 > Este código del caso 4 comprueba el tipo de la función (void, que no está reconocida) además del tipo obligatorio dentro del paréntesis de los inputs. Esto provoca un error sintáctico al no usar o poner los tipos de variable adecuados.
-> 
+>
 
 Código:
 
@@ -1362,19 +1366,19 @@ Tipo de función no aceptado. Debe usar ['int', 'boolean', 'string'] o "" (no po
 ### Caso 5
 
 > Función de factorial de un número pero con bucle for, la cual no es reconocida en el lenguaje. Error sintáctico en la función con paréntesis faltante.
-> 
+>
 
 Código:
 
 ```jsx
 function FactorialFor int ( int n){
-	let int i;
-	let int factorial; factorial = 1;
-	for (i = 1; i <= n; i++)
-	{
-		factorial *= i;
-	}
-	return factorial;
+ let int i;
+ let int factorial; factorial = 1;
+ for (i = 1; i <= n; i++)
+ {
+  factorial *= i;
+ }
+ return factorial;
 }
 ```
 
@@ -1383,7 +1387,7 @@ Mensajes de error:
 ```json
 ***************************************************************************
 NonSupportedOperationError at line 4: 
-	for (i = 1; i <= n; i++)
+ for (i = 1; i <= n; i++)
        ^```~~~
 Esperaba uno de los siguientes símbolos['mayor', 'equals', 'parCerrado', 'coma', 'and', 'or', 'puntoComa', 'lambda']
 ***************************************************************************

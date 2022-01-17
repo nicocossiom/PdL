@@ -187,7 +187,7 @@ class Lexer:
         self.car = ""  # current character being read
         self.line = 1
         self.tokenizing = True  # keeps track of if a token is being built -> True:yes, False:No
-        self.col = 0
+        self.col = 1
         self.startCol = 0
 
     def skipBlockComments(self):
@@ -202,12 +202,12 @@ class Lexer:
                 if self.car == "\n":
                     self.line += 1
                     self.startCol = 0
-                    self.col = 0
+                    self.col = 1
             self.nextChar()
             self.nextChar()
         elif self.car == "/":
             FILE.readline()
-            self.col = 0
+            self.col = 1
             self.nextChar()
             self.error("Comentarios de tipo '//comentario' no estan permitidos")
             self.line += 1
@@ -229,7 +229,7 @@ class Lexer:
             while self.car != "" and ord(self.car) < 33:
                 if self.car == "\n":
                     self.line += 1
-                    self.col = -1
+                    self.col = 1
                     self.startCol = 0
                 if self.car == "":
                     break  # Block comment processing
@@ -314,10 +314,10 @@ class Lexer:
         self.tokenizing = True  # start to tokenize
         if Lexer.peekNextCar() == "":
             result = self.genToken("eof")  # llega al final de archivo -> eof
+        self.startCol = self.col
         while self.tokenizing:
             self.next()
             if self.car == "": break
-            self.startCol = self.col
             # Integer being formed
             if self.car.isdigit() and self.lex == "":
                 self.generateNumber()
@@ -625,6 +625,7 @@ class Syntactic:
         self.lastActualToken = self.actualToken
         self.lastToken = self.actualToken
         self.actualToken: Token = LEXER.tokenize()
+        self.index += 1
         if not self.actualToken:
             return self.next()
         else:
@@ -642,10 +643,10 @@ class Syntactic:
         :param rule: rule to be added to the parse list
         :return: True if code == current token, else False
         """
-        print(f"equipara({self.token} , {code} )", end="")
+        # print(f"equipara({self.token} , {code} )", end="")
 
         if self.token == code:
-            print("CORRECTO")
+            # print("CORRECTO")
             if rule is not None:
                 # only add rule when it's first check in a function (has regla), and we're sure it's the correct token
                 Syntactic.addParseElement(rule)
@@ -666,7 +667,7 @@ class Syntactic:
                 symbol = code
             self.error("WrongTokenError", f"Recibido {symbol} - Esperaba el token {self.token}",
                        True)
-        print("INCORRECTO -> siguiente")
+        # print("INCORRECTO -> siguiente")
         return False
 
     def equierror(self, expected):
@@ -699,7 +700,7 @@ class Syntactic:
             PARSESTRING = f"Descendente {regla} ".replace("None", "")
         else:
             PARSESTRING += f"{regla} "
-        print(PARSESTRING)
+        # print(PARSESTRING)
 
     def start(self):
         """Starts the Syntactic process"""
@@ -709,7 +710,8 @@ class Syntactic:
         self.next()
         self.P()
         PARSEFILE.write(PARSESTRING)
-        print("Terminado")
+        print(Colors.OKGREEN + f"Archivo {sys.argv[1]} analizado, es correcto" + Colors.ENDC
+              + "\nErrores corregidos durante el análisis:")
 
     def P(self) -> None:
         if self.token in First["B"]:
@@ -737,6 +739,8 @@ class Syntactic:
         elif self.equipara("if", 5) and self.equipara("parAbierto"):
             E = self.E()
             if self.equipara("parCerrado"):
+                if self.token == "llaveAbierto":
+                    self.error("IfBlockError", "Solo estan soportados los ifs simples")
                 self.S()
                 if E.tipo != "boolean":
                     self.error("WrongDataTypeError",
@@ -777,23 +781,25 @@ class Syntactic:
                         if id.tipo == "function" and params != params_dados:  # funcion con parametros incorrectos
                             self.error("ArgumentTypeError", f"La funcion {id} recibe los argumentos de tipo "
                                                             f"{params}, tipos recibidos {params_dados}")
-            elif Sp.tipo == "postIncrem" and id.tipo != "int":
-                self.error("WrongDataTypeError",
-                           "El operador post incremento solo es aplicable a variables del tipo entero")
             else:  # es una asignacion
-                glob_var = None
+                var_tabla = None
                 if self.TSActual.buscarId(id):
-                    glob_var = self.TSActual.map[id]
+                    var_tabla = self.TSActual.map[id]
                 elif self.TSG.buscarId(id):
-                    glob_var = self.TSG.map[id]
-                if not glob_var:  # declaracion e inicialización de una variable global i.e (a = 5)
+                    var_tabla = self.TSG.map[id]
+                if not var_tabla:  # declaracion e inicialización de una variable global i.e (a = 5)
                     id: TS.TSElement = self.TSG.insertarId(id, Sp.tipo)
                     if Sp.tipo != "postIncrem" and id.tipo != Sp.tipo:  # es una asignacion
                         self.error("TypeError",
-                                   f"Tipo de la variable: \"{id.lex}\" no coincide con tipo de la asignación")
+                                   f"Tipo de la variable: \"{id.lex}\" no coincide con tipo tipo de la "
+                                            f"asignación: \"{Sp.tipo}\"")
                     return ProductionObject(tipo=True)
-                if glob_var.tipo != Sp.tipo:  # es una asignacion normal
-                    self.error("TypeError", f"Tipo de la variable: \"{id.lex}\" no coincide con tipo de la asignación")
+                elif Sp.tipo == "postIncrem" and var_tabla.tipo != "int":
+                    self.error("WrongDataTypeError",
+                               "El operador post incremento solo es aplicable a variables del tipo entero")
+                elif Sp.tipo != "postIncrem" and var_tabla.tipo != Sp.tipo:  # es una asignacion normal
+                    self.error("TypeError", f"Tipo de la variable: \"{var_tabla.tipo}\" no coincide con el tipo de la "
+                                            f"asignación: \"{Sp.tipo}\"")
 
         elif self.equipara("return", 12):
             X = self.X()
@@ -874,7 +880,7 @@ class Syntactic:
 
     def Q(self, lista=None) -> List[str]:
         if self.equipara("coma", 24):
-            Q = lista if not lista else []
+            Q = lista if lista else []
             E = self.E()
             if E:
                 Q.append(E.tipo)

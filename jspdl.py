@@ -69,7 +69,7 @@ def createProcessor():
             if os.path.exists(os.getcwd() + "/" + sys.argv[1]):
                 FILE = open(sys.argv[1], "r")
                 FILENAME = os.path.basename(FILE.name)
-                OUTPUTDIR = os.getcwd() + "/" + FILENAME.replace(".jspdl", "")
+                OUTPUTDIR = os.getcwd() + "/" + FILENAME.replace(".js", "")
                 try:
                     os.mkdir(OUTPUTDIR)
                 except FileExistsError:
@@ -297,7 +297,7 @@ class Lexer:
         the next (not looked at) character and tries to find another following quotation
         :return: False if there is no next quotation
         """
-        if self.car != "" and self.car == "\\" and Lexer.peekNextCar() == '\"':
+        if self.car != "" and self.car == "\\" and (Lexer.peekNextCar() == '\"' or Lexer.peekNextCar() == "\'"):
             self.nextChar()
             self.concatenate()
             self.nextChar()
@@ -341,13 +341,15 @@ class Lexer:
                         else:
                             self.error(f"Identificador {self.lex} excede el tamaño máximo de caracteres permitido (64)")
             # String (cadena) processing
-            elif self.car == "\"":
+            elif self.car == "\"" or self.car == "\'":
+                if self.car == "\'":
+                    self.error("Cadena se debe especificar entre \" \", no con \' \'. Corregido")
                 self.next()
-                while self.car != "" and not self.getQuotation() and self.car != "\"":
+                while self.car != "" and not self.getQuotation() and (self.car != "\"" and self.car != '\''):
                     self.concatenate()
                     self.nextChar()
                 if self.car == "":
-                    self.error("EOF mientras se escaneaba una cadena")
+                    self.error("Cadena debe ir entre \", falta el segundo")
                 elif len(self.lex) < 65:
                     result = self.genToken("cadena", self.lex)
                 else:
@@ -378,14 +380,6 @@ class Lexer:
                         result = self.genToken("asig")
                 else:
                     result = self.genToken(SYMB_OPS[self.car])
-            elif self.car in "\'":
-                self.nextChar()
-                while self.car != "\'":
-                    self.nextChar()
-                if self.car != "":
-                    self.error("Cadena se debe especificar entre \" \", no con \' \'")
-                else:
-                    self.error("Cadenas deben ir entre \" \"")
             else:
                 self.error(
                     f"Símbolo: \"{self.car}\" no permitido. \nNo pertence al lenguaje, consulte la documentación para "
@@ -423,7 +417,7 @@ Follow = {
     "O2": ["mayor", "equals", "parCerrado", "puntoComa", "coma", "and", "or", "lambda"],
     "O3": ["mayor", "equals", "parCerrado", "coma", "and", "or", "puntoComa", "lambda"],
     "X": "puntoComa",
-    "C": "llaveAbierto",
+    "C": "llaveCerrado",
     "L": "parCerrado",
     "Q": "parCerrado",
     "H": "parAbierto",
@@ -472,21 +466,21 @@ class TS:
 
     def __str__(self):
         size_sep = 75
-        name = "TABLA PRINCIPAL" if self.name == "TSG" else f"TABLA de función \"{self.name}\""
+        name = "TABLA PRINCIPAL" if self.name == "TSG" else f"TABLA de funcion \"{self.name}\""
         final_string = "\n" + "-" * size_sep + f"\n\t\t\t{name} #{self.creation_number}\n"
         for lex, entrada in self.map.items():
-            final_string += f"\n*  LEXEMA :     \"{lex}\"\n" \
+            final_string += f"\n*  LEXEMA : \"{lex}\"" \
                             f"\n   ATRIBUTOS : \n\t\t" \
-                            f"+Tipo: {entrada.tipo}\n"
+                            f"+ Tipo: {entrada.tipo}\n"
             if isinstance(entrada, TS.FunctionElement):
                 final_string += f"\t\t+numParam: {entrada.num_param}\n\t\t\t"
 
                 for i in range(len(entrada.tipo_params)):
-                    final_string += f"+TipoParam{i}: {entrada.tipo_params[i]}\n\t\t\t"
+                    final_string += f"+ TipoParam{i}: {entrada.tipo_params[i]}\n\t\t\t"
 
-                final_string += f"+TipoRetorno: {entrada.tipo_dev}"
+                final_string += f"+TipoRetorno: {entrada.tipo_dev}\n"
             else:
-                final_string += f"\n  Despl: {entrada.desp}\n"
+                final_string += f"\t\t+ Despl: {entrada.desp}\n"
         return final_string + "-" * size_sep
 
     @staticmethod
@@ -613,6 +607,7 @@ class Syntactic:
     # which will be referred to as self.{} inside the methods, but they're not instance class variables
     TSG: TS = None
     TSActual: TS = None
+    TSLIST = []
 
     def __init__(self) -> None:
         createLexer()
@@ -620,12 +615,14 @@ class Syntactic:
         self.actualToken: Token = None
         self.token = None
         self.lastToken = None
+        self.lastActualToken = None
 
     def next(self) -> Token:
         """
         Returns code (str) of the next token from the Lexer and stores the actual token in self
         :return: next Token
         """
+        self.lastActualToken = self.actualToken
         self.lastToken = self.actualToken
         self.actualToken: Token = LEXER.tokenize()
         if not self.actualToken:
@@ -646,6 +643,7 @@ class Syntactic:
         :return: True if code == current token, else False
         """
         print(f"equipara({self.token} , {code} )", end="")
+
         if self.token == code:
             print("CORRECTO")
             if rule is not None:
@@ -655,11 +653,19 @@ class Syntactic:
             return True
         if rule is None:  # after first check (means we're in the middle of a state
             # we expected a certain token but it was not it, now we can say it's an error
+            if self.token == "eof":
+                self.lastActualToken = TOKENLIST[-2]
+                try:
+                    symbol = SYMB_OPS_R[code]
+                except KeyError:
+                    symbol = code
+                self.error("WrongTokenError", f"No ha cerrado con {symbol}")
             try:
                 symbol = SYMB_OPS_R[code]
             except KeyError:
                 symbol = code
-            self.error("WrongTokenError", f"Recibido {symbol} - Esperaba el token {self.token}", True)
+            self.error("WrongTokenError", f"Recibido {symbol} - Esperaba el token {self.token}",
+                       True)
         print("INCORRECTO -> siguiente")
         return False
 
@@ -675,10 +681,11 @@ class Syntactic:
 
         except KeyError:
             symbol = self.token
-        self.error("WrongTokenError", f"Recibido \"{symbol}\" - Esperaba uno de los siguientes tokens {expected_with_symbol}", True)
+        self.error("WrongTokenError",
+                   f"Recibido \"{symbol}\" - Esperaba uno de los siguientes tokens {expected_with_symbol}", True)
 
     def error(self, error_type, msg: string, attr=None):
-        token = self.actualToken if attr else self.lastToken
+        token = self.actualToken if attr else self.lastActualToken
         strings = gen_error_line(token.line, token.startCol, token.endCol)
         Error(strings[0] + "\n" + msg, error_type, token.line,
               strings[1] + "\n" + msg, attr)
@@ -689,14 +696,15 @@ class Syntactic:
         """Writes the given parse element int the tokens.txt """
         global PARSESTRING
         if PARSESTRING is None:
-            PARSESTRING = f"Descendente {regla}, ".replace("None", "")
+            PARSESTRING = f"Descendente {regla} ".replace("None", "")
         else:
-            PARSESTRING += f"{regla},"
+            PARSESTRING += f"{regla} "
         print(PARSESTRING)
 
     def start(self):
         """Starts the Syntactic process"""
         self.TSG = TS()
+        self.TSLIST.append(self.TSG)
         self.TSActual = self.TSG
         self.next()
         self.P()
@@ -714,6 +722,7 @@ class Syntactic:
             self.P()
         elif self.equipara("eof"):
             Syntactic.addParseElement(3)
+            self.writeTS()
             return
 
     def B(self) -> ProductionObject(tipo=True):
@@ -746,7 +755,6 @@ class Syntactic:
         else:
             self.equierror(First["B"])
 
-
     def T(self) -> ProductionObject:
         if self.equipara("int", 8):
             return ProductionObject(tipo="int", ancho=1)
@@ -764,11 +772,12 @@ class Syntactic:
                 if self.TSG.buscarId(id):
                     id: TS.FunctionElement = self.TSG.map[id]
                     params = id.tipo_params
-                    params_dados = Sp.tipo
-                    if id.tipo == "function" and params != params_dados:  # funcion con parametros incorrectos
-                        self.error("ArgumentTypeError", f"La funcion {id} recibe los argumentos de tipo {params}, "
-                                                        f"tipos recibidos {params_dados}")
-            if Sp.tipo == "postIncrem" and id.tipo != "int":
+                    if Sp:
+                        params_dados = Sp.tipo
+                        if id.tipo == "function" and params != params_dados:  # funcion con parametros incorrectos
+                            self.error("ArgumentTypeError", f"La funcion {id} recibe los argumentos de tipo "
+                                                            f"{params}, tipos recibidos {params_dados}")
+            elif Sp.tipo == "postIncrem" and id.tipo != "int":
                 self.error("WrongDataTypeError",
                            "El operador post incremento solo es aplicable a variables del tipo entero")
             else:  # es una asignacion
@@ -828,7 +837,8 @@ class Syntactic:
                 if L: return ProductionObject(tipo=L.tipo)
         elif self.equipara("postIncrem", 17) and self.equipara("puntoComa"):
             return ProductionObject(tipo="postIncrem")
-        self.equierror(First["Sp"])
+        else:
+            self.equierror(First["Sp"])
 
     def X(self) -> ProductionObject:
         if self.token in First['E']:
@@ -844,8 +854,9 @@ class Syntactic:
     def C(self) -> None:
         if self.token in First["B"]:
             Syntactic.addParseElement(20)
-            self.B()
-            self.C()
+            if self.token != "eof":
+                self.B()
+                self.C()
         elif self.token in Follow['C']:
             Syntactic.addParseElement(21)
 
@@ -879,6 +890,7 @@ class Syntactic:
             if self.equipara("id"):
                 tipo_ret = self.H().tipo
                 self.TSActual = TS(id)  # tabla de funcion
+                self.TSLIST.append(self.TSActual)
                 if self.equipara("parAbierto"):
                     A = self.A()
                     if A:
@@ -892,7 +904,8 @@ class Syntactic:
                             # insertar funcion en TSG de una
                             self.TSActual = self.TSG  # ~= destruir tabla de la funcion
                             return ProductionObject(tipo=True)
-        self.equierror(First["F"])
+        else:
+            self.equierror(First["F"])
 
     def H(self) -> ProductionObject:
         if self.token in First['T']:
@@ -901,8 +914,10 @@ class Syntactic:
             return ProductionObject(tipo=T.tipo)
         elif self.token in Follow['H']:
             Syntactic.addParseElement(28)
+            return ProductionObject(tipo="")
         else:
-            self.error("TypeError", f"Tipo de función no aceptado. Debe usar {First['T']} o \"\" (no poner nada para void)")
+            self.error("TypeError",
+                       f"Tipo de función no aceptado. Debe usar {First['T']} o \"\" (no poner nada para void)")
 
     def A(self) -> ProductionObject:
         if self.token in First['T']:
@@ -998,18 +1013,18 @@ Estructura de producciones de operaciones
             return self.O3(R)
 
     def O1(self, prev=None) -> ProductionObject:
-        if self.equipara("or", 42):
+        if self.equipara("or", 36):
             N = self.N()
             if N.tipo != "boolean":
                 self.error("WrongDataTypeError", f"Operador || solo acepta datos lógicos, tipo dado {N.tipo}")
             return self.O1()
-        elif self.equipara("and", 43):
+        elif self.equipara("and", 37):
             N = self.N()
             if N.tipo != "boolean":
                 self.error("OperandTypeError", f"Operador && solo acepta datos lógicos, tipo dado {N.tipo}")
             return self.O1()
         elif self.token in Follow['O3']:
-            Syntactic.addParseElement(44)
+            Syntactic.addParseElement(38)
             if prev:
                 return prev
             return ProductionObject(tipo="boolean")
@@ -1036,19 +1051,19 @@ Estructura de producciones de operaciones
             self.error("NonSupportedOperationError", f"Esperaba uno de los siguientes símbolos{Follow['O2']}")
 
     def O3(self, prev=None) -> ProductionObject:
-        if self.equipara("mas", 36):
+        if self.equipara("mas", 42):
             R = self.R()
             if R.tipo != "int":
                 self.error("OperandTypeError", f"Operador + solo acepta datos enteros, tipo dado {R.tipo}")
             else:
                 return self.O3()
-        elif self.equipara("por", 37):
+        elif self.equipara("por", 43):
             R = self.R()
             if R.tipo != "int":
                 self.error("OperandTypeError", f"Operador * solo acepta datos enteros, tipo dado {R.tipo}")
             return self.O3()
         elif self.token in Follow['O3']:
-            Syntactic.addParseElement(38)
+            Syntactic.addParseElement(44)
             if prev:
                 return prev
             return ProductionObject(tipo="int")
@@ -1098,6 +1113,10 @@ Estructura de producciones de operaciones
             return ProductionObject(tipo="postIncrem")
         elif self.token in Follow["Rp"]:
             Syntactic.addParseElement(53)
+
+    def writeTS(self):
+        for ts in self.TSLIST:
+            TSFILE.write(str(ts))
 
 
 def createSyntactic():

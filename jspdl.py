@@ -1044,14 +1044,14 @@ Estructura de producciones de operaciones
 
     def O2(self, prev=None) -> ProductionObject:
         if self.equipara("equals", 39):
-            N = self.N()
-            if N.tipo != "int":
-                self.error("OperandTypeError", f"Operador == solo acepta datos de tipo entero, tipo dado {N.tipo}")
+            Z = self.Z()
+            if Z.tipo != "int":
+                self.error("OperandTypeError", f"Operador == solo acepta datos de tipo entero, tipo dado {Z.tipo}")
             return self.O2()
         elif self.equipara("mayor", 40):
-            N = self.N()
-            if N.tipo != "int":
-                self.error("OperandTypeError", f"Operador > solo acepta datos de tipo entero, tipo dado {N.tipo}")
+            Z = self.N()
+            if Z.tipo != "int":
+                self.error("OperandTypeError", f"Operador > solo acepta datos de tipo entero, tipo dado {Z.tipo}")
             return self.O2()
         elif self.token in Follow['O2']:
             Syntactic.addParseElement(41)

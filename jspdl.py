@@ -382,8 +382,10 @@ class Lexer:
                     result = self.genToken(SYMB_OPS[self.car])
             else:
                 self.error(
-                    f"Símbolo: \"{self.car}\" no permitido. \nNo pertence al lenguaje, consulte la documentación para "
+                    f"Simbolo: \"{self.car}\" no permitido. \nNo pertence al lenguaje, consulte la documentacion para "
                     f"ver carácteres aceptados")
+                while self.car != "":
+                    self.tokenize()
         return result
 
 
@@ -686,6 +688,8 @@ class Syntactic:
                    f"Recibido \"{symbol}\" - Esperaba uno de los siguientes tokens {expected_with_symbol}", True)
 
     def error(self, error_type, msg: string, attr=None):
+        if self.token == "eof":
+            self.lastActualToken = TOKENLIST[-2]
         token = self.actualToken if attr else self.lastActualToken
         strings = gen_error_line(token.line, token.startCol, token.endCol)
         Error(strings[0] + "\n" + msg, error_type, token.line,
@@ -798,8 +802,7 @@ class Syntactic:
                     self.error("WrongDataTypeError",
                                "El operador post incremento solo es aplicable a variables del tipo entero")
                 elif Sp.tipo != "postIncrem" and var_tabla.tipo != Sp.tipo:  # es una asignacion normal
-                    self.error("TypeError", f"Tipo de la variable: \"{var_tabla.tipo}\" no coincide con el tipo de la "
-                                            f"asignación: \"{Sp.tipo}\"")
+                    self.error("TypeError", f"Tipo de la variable: \"{var_tabla.tipo}\" no coincide con el tipo de la asignación: \"{Sp.tipo}\"")
 
         elif self.equipara("return", 12):
             X = self.X()
@@ -938,6 +941,7 @@ class Syntactic:
         elif self.token in Follow['A']:
             Syntactic.addParseElement(30)
         else:
+            self.error("FunctionCallError", f"No ha cerrado paréntesis en la llamada a la función")
             self.error("FunctionCallError", f"No ha cerrado paréntesis en la llamada a la función")
 
     def K(self, lista=None) -> List[str]:

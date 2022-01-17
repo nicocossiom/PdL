@@ -823,17 +823,19 @@ class Syntactic:
         elif self.equipara("input", 14) and self.equipara("parAbierto"):
             id = self.actualToken.att
             if self.equipara("id") and self.equipara("parCerrado") and self.equipara("puntoComa"):
+                tipo = None
                 if self.TSActual.buscarId(id):
                     tipo = self.TSActual.map[id].tipo
                 elif self.TSG.buscarId(id):
                     tipo = self.TSG.map[id].tipo
-                    if tipo not in {"boolean", "string"}:
-                        self.error("TypeError", f"Variable a es de tipo {tipo}, input() debe recibir una variable de "
-                                                f"tipo string o entero")
-                    else:
-                        return ProductionObject(tipo=True)
-                else:
+                if tipo not in {"int", "string"}:
+                    self.error("TypeError", f"Variable a es de tipo {tipo}, input() debe recibir una variable de "
+                                            f"tipo string o entero")
+                if not tipo:
                     self.TSG.insertarId(id, "int")
+                else:
+                    return ProductionObject(tipo=True)
+
         else:
             self.equierror(First["S"])
 

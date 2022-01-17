@@ -416,8 +416,8 @@ First = {
 # usamos eof como $ para marcar fin de sentencia admisible
 Follow = {
     "O1": ["puntoComa", "parCerrado", "coma"],
-    "O2": ["mayor", "equals", "parCerrado", "puntoComa", "coma", "and", "or", "lambda"],
-    "O3": ["mayor", "equals", "parCerrado", "coma", "and", "or", "puntoComa", "lambda"],
+    "O2": ["mayor", "equals", "parCerrado", "puntoComa", "coma", "and", "or"],
+    "O3": ["mayor", "equals", "parCerrado", "coma", "and", "or", "puntoComa"],
     "X": "puntoComa",
     "C": "llaveCerrado",
     "L": "parCerrado",
@@ -425,7 +425,7 @@ Follow = {
     "H": "parAbierto",
     "A": "parCerrado",
     "K": "parCerrado",
-    "Rp": ["and", "mas", "por", "coma", "puntoComa", "parCerrado"],
+    "Rp": ["or", "and", "mas", "por", "coma", "puntoComa", "parCerrado", "equals", "mayor"],
 }
 SYMB_OPS_R = {
     "mas": "+",
@@ -649,12 +649,12 @@ class Syntactic:
 
         if self.token == code:
             # print("CORRECTO")
-            if rule is not None:
+            if rule:
                 # only add rule when it's first check in a function (has regla), and we're sure it's the correct token
                 Syntactic.addParseElement(rule)
             self.next()
             return True
-        if rule is None:  # after first check (means we're in the middle of a state
+        if not rule:  # after first check (means we're in the middle of a state
             # we expected a certain token but it was not it, now we can say it's an error
             if self.token == "eof":
                 self.lastActualToken = TOKENLIST[-2]
@@ -794,12 +794,14 @@ class Syntactic:
                 elif self.TSG.buscarId(id):
                     var_tabla = self.TSG.map[id]
                 if not var_tabla:  # declaracion e inicialización de una variable global i.e (a = 5)
-                    id: TS.TSElement = self.TSG.insertarId(id, Sp.tipo)
-                    if Sp.tipo != "postIncrem" and id.tipo != Sp.tipo:  # es una asignacion
-                        self.error("TypeError",
-                                   f"Tipo de la variable: \"{id.lex}\" no coincide con tipo tipo de la "
-                                            f"asignación: \"{Sp.tipo}\"")
-                    return ProductionObject(tipo=True)
+                    if Sp.tipo == "int":
+                        id: TS.TSElement = self.TSG.insertarId(id, Sp.tipo)
+                        if Sp.tipo != "postIncrem" and id.tipo != Sp.tipo:
+                            self.error("TypeError",
+                                       f"Tipo de la variable: \"{id.lex}\" no coincide con tipo tipo de la asignación: \"{Sp.tipo}\"")
+                        return ProductionObject(tipo=True)
+                    else:
+                        self.error("TypeError", f"Solo se pueden hacer asignaciones sin inicializacion cuando la asignacion es de tipo int, en este caso es de tipo {Sp.tipo}")
                 elif Sp.tipo == "postIncrem" and var_tabla.tipo != "int":
                     self.error("WrongDataTypeError",
                                "El operador post incremento solo es aplicable a variables del tipo entero")
@@ -964,47 +966,6 @@ class Syntactic:
             self.error("ArgumentDeclarationError",
                        "Los argumentos de las funciones deben estar separados por \',\'")
 
-    """
-Estructura de producciones de operaciones
-    Gramatica
-    # precedencia menos a más:  {||} -> {&&} -> {==} -> {>} -> {+} -> {*} -> {++}
-    E  ->  N O1  #operadores aritméticos 
-    N  ->  Z O2  #operadores relacionales
-    Z  ->  R O3  #operadores lógicos
-    O1 ->  + Z O1  | * Z O1  | λ
-    O2 ->  == N O2 | > N O2  | λ
-    O3 ->  || R O3 | && R O3 | λ
-    R  ->  id R'   | ( E )  | entero | cadena | true | false 
-    R' ->  ( L )   |   ++    | λ
-    La forma basica es: E O1 -> N O2 -> Z O3 -> R para los ids/valores. Se hace return y se ejecutan las Ox que se han
-    quedado a la espera, esto es lo que da el orden de precedencia en operadores. Se hace hasta que se encuentra un 
-    token de operacion en alguna de las Ox (si no sucede se dara error en los else finales). Cuando se encuentra 
-    se llama a la funcion superior respectiva  ( O1 -> N , O2 -> Z , O3 -> R ), cuando vuelva de esta
-    es el momento en el que se hace la comprobacion de tipos. Despues Ox se llama a si misma de forma recursiva 
-    devolviendo el resultado de dicha llamada recursiva. Esta recursion se rompe cuando se llega al follow de la 
-    produccion indicando que la operacion que prosigue es de otra precedencia  o se ha terminado la expresion.
-  
-    Se devuelve tipo_ok que emerge de las llamadas recursivas hasta E.
-    Por lo que se forma un arbol recursivo donde se procesan los tokens respetando la precedencia de 
-    operadores mediante las llamas recursivas a las funciones superiores y las funciones recursivas de los operadores 
-    para mantener la precedencia entre los que tiene la misma. 
-
-    Ejemplo: a > b && c+d == 20 -> ¿ se cumple que a sea mayor que b y que c + d son 20 ? 
-    E O1-> N O2-> Z O3 -> R -> id (a)
-                    O3 R -> return por el follow
-             O2 Z O2 -> mayor (>) y return por el follow en el segundo O2
-                Z O3 -> R -> id (b)
-                  O3 R O3-> && (and) 
-                     R -> id (c)
-                        O3 -> return por el follow
-      O1 N O1 -> + (mas)
-         N O2 -> Z O3 R -> id (d) y return por el follow en O3
-           O2 Z O2 -> equals (==)
-              Z O3 -> R -> cteEnt (20) 
-                O3 R -> return por follow en O3
-    E -> da el ok sintactico y semantico    
-    """
-
     def E(self) -> ProductionObject:
         if self.token in First["N"]:
             Syntactic.addParseElement(33)
@@ -1036,7 +997,7 @@ Estructura de producciones de operaciones
             if N.tipo != "boolean":
                 self.error("OperandTypeError", f"Operador && solo acepta datos lógicos, tipo dado {N.tipo}")
             return self.O1()
-        elif self.token in Follow['O3']:
+        elif self.token in Follow['O1']:
             Syntactic.addParseElement(38)
             if prev:
                 return prev
@@ -1051,7 +1012,7 @@ Estructura de producciones de operaciones
                 self.error("OperandTypeError", f"Operador == solo acepta datos de tipo entero, tipo dado {Z.tipo}")
             return self.O2()
         elif self.equipara("mayor", 40):
-            Z = self.N()
+            Z = self.Z()
             if Z.tipo != "int":
                 self.error("OperandTypeError", f"Operador > solo acepta datos de tipo entero, tipo dado {Z.tipo}")
             return self.O2()

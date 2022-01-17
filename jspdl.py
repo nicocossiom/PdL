@@ -933,7 +933,6 @@ class Syntactic:
             if self.equipara("id"):
                 K = self.K([T.tipo])
                 self.TSActual.insertarId(id, T.tipo)
-
                 if K:
                     return ProductionObject(tipo=K)
         elif self.token in Follow['A']:
@@ -943,7 +942,7 @@ class Syntactic:
 
     def K(self, lista=None) -> List[str]:
         if self.equipara("coma", 31):
-            K = lista if not lista else []
+            K = lista if lista else []
             T = self.T()
             K.append(T.tipo)
             id = self.actualToken.att
@@ -1081,13 +1080,20 @@ Estructura de producciones de operaciones
         if self.equipara("id", 45):
             Rp = self.Rp()
             if Rp:  # es una llamada a una funcion o post incremento
-                if Rp.tipo == "postIcrem" and id != "int":
-                    self.error("OperandTypeError",
+                if Rp.tipo == "postIncrem":
+                    if not self.TSG.buscarId(id) and not self.TSActual.buscarId(id) :
+                        self.error("NonDeclaredError", f"Error la variable {id} no ha sido declarada previamente")
+                    try:
+                        ident = self.TSActual.map[id]
+                    except KeyError:
+                        ident = self.TSG.map[id]
+                    if ident.tipo != "int":
+                        self.error("OperandTypeError",
                                "El operador post incremento solo es aplicable a variables del tipo entero")
-                if not self.TSG.buscarId(id):
+                elif not self.TSG.buscarId(id):
                     self.error("NonDeclaredError", f"Error la función {id} no ha sido declarada previamente")
                 elif Rp.tipo != self.TSG.map[id].tipo_params:
-                    self.error("WrongArguemensError", "Tipos de los atributos incorrectos en llamada a función")
+                    self.error("WrongArguemensError", f"Tipos de los atributos incorrectos en llamada a función \"{id}\" ")
                 else:
                     return ProductionObject(tipo=self.TSG.map[id].tipo_dev)
             else:

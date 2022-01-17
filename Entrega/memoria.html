@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Nicolás Cossío Miravalles, Bárbara Rodríguez Ruiz, Huangjue He" />
+  <title>Javascript PdL</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  % Contents of listings-setup.tex
+  \usepackage{xcolor}
+  
+  \lstset{
+      basicstyle=\ttfamily,
+      numbers=left,
+      numberstyle=\footnotesize,
+      stepnumber=1,
+      numbersep=5pt,
+      backgroundcolor=\color{black!10},
+      showspaces=false,
+      showstringspaces=false,
+      showtabs=false,
+      tabsize=2,
+      captionpos=b,
+      breaklines=true,
+      breakatwhitespace=true,
+      breakautoindent=true,
+      linewidth=\textwidth
+  }
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Javascript PdL</h1>
+<p class="author">Nicolás Cossío Miravalles, Bárbara Rodríguez Ruiz, Huangjue He</p>
+<p class="date">Enero 2022</p>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#grupo-127-integrantes"><span class="toc-section-number">1</span> Grupo 127, integrantes</a></li>
+<li><a href="#código-fuente-e-instrucciones-de-instalación"><span class="toc-section-number">2</span> Código fuente e instrucciones de instalación</a></li>
+<li><a href="#carácterísticas-específicas-del-lenguaje"><span class="toc-section-number">3</span> Carácterísticas específicas del lenguaje</a><ul>
+<li><a href="#analizador-léxico"><span class="toc-section-number">3.1</span> Analizador Léxico</a><ul>
+<li><a href="#tokens"><span class="toc-section-number">3.1.1</span> Tokens</a></li>
+<li><a href="#gramática-regular"><span class="toc-section-number">3.1.2</span> Gramática Regular</a></li>
+<li><a href="#automata-finito-determinista"><span class="toc-section-number">3.1.3</span> Automata Finito Determinista</a></li>
+<li><a href="#acciones-semánticas"><span class="toc-section-number">3.1.4</span> Acciones Semánticas</a></li>
+<li><a href="#errores-que-recoge-el-autómata"><span class="toc-section-number">3.1.5</span> Errores que recoge el autómata</a></li>
+<li><a href="#tabla-de-símbolos---diseño-general"><span class="toc-section-number">3.1.6</span> Tabla de símbolos - Diseño general</a></li>
+</ul></li>
+<li><a href="#analizador-sintáctico"><span class="toc-section-number">3.2</span> Analizador Sintáctico</a><ul>
+<li><a href="#gcl-del-lenguaje"><span class="toc-section-number">3.2.1</span> GCL del lenguaje</a></li>
+<li><a href="#grámatica-incial-dada"><span class="toc-section-number">3.2.2</span> Grámatica incial dada</a></li>
+<li><a href="#gramática-transformada"><span class="toc-section-number">3.2.3</span> Gramática transformada</a></li>
+<li><a href="#reglas"><span class="toc-section-number">3.2.4</span> Reglas</a></li>
+<li><a href="#gramática-para-el-árbol-sintáctico"><span class="toc-section-number">3.2.5</span> Gramática para el árbol sintáctico</a></li>
+</ul></li>
+<li><a href="#analizador-semántico"><span class="toc-section-number">3.3</span> Analizador Semántico</a><ul>
+<li><a href="#funciones-semánticas"><span class="toc-section-number">3.3.1</span> Funciones semánticas</a></li>
+<li><a href="#esquema-de-traducción"><span class="toc-section-number">3.3.2</span> Esquema de Traducción</a></li>
+</ul></li>
+<li><a href="#tabla-de-símbolos"><span class="toc-section-number">3.4</span> Tabla de Símbolos</a></li>
+<li><a href="#gestor-de-errores"><span class="toc-section-number">3.5</span> Gestor de Errores</a></li>
+</ul></li>
+<li><a href="#anexo---casos-de-prueba"><span class="toc-section-number">4</span> Anexo - Casos de prueba</a><ul>
+<li><a href="#correctos"><span class="toc-section-number">4.1</span> Correctos</a><ul>
+<li><a href="#caso-1"><span class="toc-section-number">4.1.1</span> Caso 1</a></li>
+<li><a href="#caso-2"><span class="toc-section-number">4.1.2</span> Caso 2</a></li>
+<li><a href="#caso-3"><span class="toc-section-number">4.1.3</span> Caso 3</a></li>
+<li><a href="#caso-4"><span class="toc-section-number">4.1.4</span> Caso 4</a></li>
+<li><a href="#caso-5"><span class="toc-section-number">4.1.5</span> Caso 5</a></li>
+</ul></li>
+<li><a href="#incorrectos"><span class="toc-section-number">4.2</span> Incorrectos:</a><ul>
+<li><a href="#caso-1-1"><span class="toc-section-number">4.2.1</span> Caso 1</a></li>
+<li><a href="#caso-2-1"><span class="toc-section-number">4.2.2</span> Caso 2</a></li>
+<li><a href="#caso-3-1"><span class="toc-section-number">4.2.3</span> Caso 3</a></li>
+<li><a href="#caso-4-1"><span class="toc-section-number">4.2.4</span> Caso 4</a></li>
+<li><a href="#caso-5-1"><span class="toc-section-number">4.2.5</span> Caso 5</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+
+<h1 id="grupo-127-integrantes"><span class="header-section-number">1</span> Grupo 127, integrantes</h1>
+<ul>
+<li>Nicolás Cossío Miravalles - <a href="mailto:n.cossio@alumnos.upm.es">n.cossio@alumnos.upm.es</a> - b190082</li>
+<li>Bárbara Rodríguez Ruiz - <a href="mailto:barbara.rodriguez.ruiz@alumnos.upm.es">barbara.rodriguez.ruiz@alumnos.upm.es</a> - b190110</li>
+<li>Huangjue He - <a href="mailto:h.he@alumnos.upm.es">h.he@alumnos.upm.es-</a> a180022</li>
+</ul>
+<h1 id="código-fuente-e-instrucciones-de-instalación"><span class="header-section-number">2</span> Código fuente e instrucciones de instalación</h1>
+<p>Disponible en <a href="https://github.com/nicocossiom/PdL">Github</a>, en el repositorio encontrará las instrucciones para instalarlo de forma local.</p>
+<p>Formato ejecutable disponible en <a href="https://github.com/nicocossiom/PdL/releases/">releases</a>.</p>
+<h1 id="carácterísticas-específicas-del-lenguaje"><span class="header-section-number">3</span> Carácterísticas específicas del lenguaje</h1>
+<p>Se listan la parte asignada, opcional y las elecciones que hemos hecho. El resto del lenguaje sigue las <a href="https://dlsiis.fi.upm.es/procesadores/IntroJavaScript.html">reglas generales del lenguage</a>.</p>
+<p>Asignadas :</p>
+<ul>
+<li><strong>Sentencias</strong>: do-while</li>
+<li><strong>Operadores especiales:</strong> Post-auto-incremento ( ++ como sufijo)</li>
+<li><strong>Comentarios:</strong> de bloque ( /<em>coment</em>/ )</li>
+<li><strong>Cadenas</strong>: con comillas dobles ( “cadenas” )</li>
+<li><strong>Técnicas de Análisis Sintáctico</strong>: Descendente recursivo</li>
+</ul>
+<p>Opcionales:</p>
+<ul>
+<li>No aceptamos carácteres de escape en cadenas</li>
+<li>No aceptamos declaración e inicialización en la misma sentencia</li>
+<li>Sí se aceptan las constantes lógicas true y false</li>
+<li>No aceptamos operadores unarios</li>
+</ul>
+<p>Elecciones de operadores:</p>
+<ul>
+<li>Operadores lógicos: and ( &amp;&amp; ) y or ( || )</li>
+<li>Operadores aritméticos: más ( + ) y por ( * )</li>
+<li>Operadores relacionales: comparación ( == ) y mayor qué ( &gt; )</li>
+</ul>
+<h2 id="analizador-léxico"><span class="header-section-number">3.1</span> Analizador Léxico</h2>
+<h3 id="tokens"><span class="header-section-number">3.1.1</span> Tokens</h3>
+<hr />
+<h4 id="palabras-reservadas"><span class="header-section-number">3.1.1.1</span> Palabras reservadas</h4>
+<pre class="text"><code>let :      &lt; let, - &gt;
+function : &lt; function, - &gt;
+return:    &lt; return, - &gt;
+if:        &lt; if, - &gt;
+else :     &lt; else, - &gt;
+input :    &lt; input, - &gt;
+print :    &lt; print, - &gt;
+while :    &lt; while, - &gt;
+do:        &lt; do, - &gt;
+true :     &lt; boolT, - &gt;
+false :    &lt; boolF, - &gt;
+int :      &lt; int, - &gt;
+boolean :  &lt; boolean, - &gt;
+string :   &lt; string, - &gt;</code></pre>
+<h4 id="operadores"><span class="header-section-number">3.1.1.2</span> Operadores</h4>
+<pre class="text"><code>Operadores Aritméticos:
+ + : &lt; mas, - &gt;
+ * : &lt; por, - &gt;
+ 
+Operadores Lógicos:
+ &amp;&amp; : &lt; and, - &gt;
+ || : &lt; or, - &gt;
+ 
+Operadores relacionales:
+  == : &lt; equals, - &gt;
+  &gt;  : &lt; mayor, - &gt;</code></pre>
+<h4 id="resto-de-tokens"><span class="header-section-number">3.1.1.3</span> Resto de tokens</h4>
+<pre class="text"><code>Identificador : &lt; id, ptroTS &gt;
+Asignacion =  : &lt; asig, - &gt;
+Cadena        : &lt; cadena, laCadena &gt;
+Entero        : &lt; cteEnt, valor &gt;
+++            : &lt; postIncrem, - &gt;
+,             : &lt; coma, - &gt;
+;             : &lt; puntoComa, - &gt;
+(             : &lt; parAbierto, - &gt;
+)             : &lt; parCerrado, - &gt;
+{             : &lt; llaveAbierto, - &gt;
+}             : &lt; llaveCerrado, - &gt;
+eof           : &lt; eof, - &gt;</code></pre>
+<h3 id="gramática-regular"><span class="header-section-number">3.1.2</span> Gramática Regular</h3>
+<hr />
+<pre class="text"><code>S -&gt; lA | dC | (  | ) | { | } | delS | =E | &amp;D | &gt; | +G | * | , | ; | eof | /B | &quot;J
+A -&gt; lA | dA | _A |  lambda 
+B -&gt; *H
+C -&gt; dC |  lambda 
+D -&gt; &amp; 
+E -&gt; = |  lambda 
+G -&gt; + |  lambda 
+H -&gt;  lambda H | *I
+I -&gt; /S 
+J -&gt;  lambda J | ”K
+K -&gt;  lambda 
+otro indica cualquier otro carácter distinto de *</code></pre>
+<h3 id="automata-finito-determinista"><span class="header-section-number">3.1.3</span> Automata Finito Determinista</h3>
+<hr />
+<figure>
+<img src="images/afd.jpeg" alt="Afd" /><figcaption>Afd</figcaption>
+</figure>
+<ul>
+<li>OC: cualquier carácter distinto de los ya especificados para ese estado</li>
+</ul>
+<h3 id="acciones-semánticas"><span class="header-section-number">3.1.4</span> Acciones Semánticas</h3>
+<hr />
+<pre class="text"><code>- LEER: lee el siguiente carácter del fichero fuente. car := leer()
+    En todas las transiciones menos en las transiciones etiquetadas con O.C, excepto en 25-&gt;25
+- CONC: forma una cadena (lexema). Siempre después de leer(), lex:=lex + car 
+    En las transiciones: 13-&gt;14, 14-&gt;15 | 0-&gt;1, 1-&gt;1, x-&gt;x //por hacer, cadenas
+- VALOR: convierte un carácter a su entero correspondiente, entero:=valor(carácter)
+- GENTOKEN: genera un token que el A.Léxico pasa al sintáctico
+0-&gt;2: num = valor(car)
+2-&gt;2: num = num*10+valor(car)
+2-&gt;4: if (num &lt; 32768) genToken(cteEnt, num)
+   else error()
+
+25-&gt;26: 
+if (length(lex) &lt; 65) genToken(cadena, lex) 
+else error()
+
+TEstadosFinales []:=lista de códigos de los tokens de operacion y otros menos los no identificadores, cadena o constante que se generan en los estados finales del autómata, permiten crear un token al usarse como argumento de genToken( )
+
+if transicion is not 1-&gt;3, 2-&gt;4 { 
+ a:=TEstadosFinales[numEstadoFinal] 
+ if a is not null genToken( a , ) 
+}
+
+buscarTPR(lex): devuelve el código del token que coincide con un lexema dado, codigo:=buscarTPR(lex) 
+TPR []:=lista de códigos de tokens de palabras reservadas que permiten crear un token al usarse como argumento de genToken( )
+1-&gt;3: 
+zona_decl := boolean que indica si se trata de una declaracion, global = true y local = false
+p:= buscarTPR(lex)
+if ( p is not null ) genToken( p , - ) //genera token de palabra reservada
+else { //identificador
+    p:= buscarTS(lex)
+    if ( p is not null ) //ya está declarada 
+      genToken(id, p)
+    else { //no está declarada
+      p:=añadirTS_activa(lexema) //AñadirTS devuelve un ptro. al id
+      genToken(id, p)
+    }
+}</code></pre>
+<h3 id="errores-que-recoge-el-autómata"><span class="header-section-number">3.1.5</span> Errores que recoge el autómata</h3>
+<hr />
+<pre class="text"><code>ERROR: cualquier transición no recogida en el autómata corresponde a un caso de error. 
+También son errores todos los lanzados desde las acciones semánticas, que son los siguientes: 
+ - Entero sobrepasa valor máximo permitido
+ - String sobrepasa longitud máxima permitida</code></pre>
+<h3 id="tabla-de-símbolos---diseño-general"><span class="header-section-number">3.1.6</span> Tabla de símbolos - Diseño general</h3>
+<hr />
+<pre class="text"><code>Todas las tablas tendrán lexema y tipo, pero el resto de los Tributos de la tabla dependeran del tipo.
+
+Para enteros, reales, cadenas, lógicos... tendremos una tabla con el siguiente formato:
+
+TS 1##:
+
+* LEXEMA : &#39;a&#39;
+Atributos:
++ tipo: &#39;entero&#39;
++ despl : 0
+
+Para un array:
+
+TS 2##:
+
+* LEXEMA : &#39;a&#39;
+Atributos:
++ tipo: &#39;entero&#39;
++ despl : 0
+? núm de dimensiones, límite inf y límte sup de cada dimensión,...
+
+Para funciones la tabla seguirá el formato:
+
+TABLA FUNCION SUMA ##3:
+
+*LEXEMA : &#39;suma&#39;
+Atributos:
++ tipo: &#39;funcion&#39;
++ numParam: 2
++ TipoParam01: &#39;ent&#39; 
++ TipoParam2: &#39;real&#39; 
++ TipoRetorno: &#39;ent&#39;
++ EtiqFuncion: &#39;Etsuma01’</code></pre>
+<h2 id="analizador-sintáctico"><span class="header-section-number">3.2</span> Analizador Sintáctico</h2>
+<h3 id="gcl-del-lenguaje"><span class="header-section-number">3.2.1</span> GCL del lenguaje</h3>
+<hr />
+<blockquote>
+<p><strong>ACLARACIÓN:</strong> usamos los símbolos en vez de los nombres propios de los tokens en las gramáticas debido a la mejor legibilidad que dan. Somos conscientes que el símbolo es la representación del token en el lenguaje y el viceversa en la gramática. En el apartado <em><a href="https://www.notion.so/Memoria-5755ae10d6334950bd41137bea137221">“Gramática para el árbol sintáctico”</a></em> se encuentra la gramática final propiamente dada.</p>
+</blockquote>
+<h3 id="grámatica-incial-dada"><span class="header-section-number">3.2.2</span> Grámatica incial dada</h3>
+<pre class="text"><code>P -&gt; B P | F P | eof
+B -&gt; let T id ; | if ( E ) S | S | while ( E ) { C }
+T -&gt; int | boolean | string
+S -&gt; id = E ; | return X ; | id ( L ) | print ( E ) ; | input ( id ) ; 
+X -&gt; E |  lambda 
+C -&gt; B C |  lambda 
+L -&gt; E Q |  lambda 
+Q -&gt; , E Q |  lambda 
+F -&gt; function id H ( A ) { C } 
+H -&gt; T |  lambda 
+A -&gt; T id K  |  lambda 
+K -&gt; , T id K |  lambda 
+E -&gt; E &amp;&amp; R | R
+R -&gt; R &gt; U | U 
+U -&gt; U + V | V 
+V -&gt; id | ( E ) | id (L) | entero | cadena</code></pre>
+<h3 id="gramática-transformada"><span class="header-section-number">3.2.3</span> Gramática transformada</h3>
+<pre class="text"><code>## indica comentario dentro de la definición de la gramática 
+P  -&gt;  B P | F P | eof
+B  -&gt;  let T id ; | if ( E ) S | S | do { C } while ( E ) ;
+T  -&gt;  int   | boolean    | string
+S  -&gt;  id S&#39; | return X ; | print ( E ) ; | input ( id ) ;
+S&#39; -&gt;  = E   | ( L )    | ++
+X  -&gt;  E     |  lambda 
+C  -&gt;  B C   |  lambda 
+L  -&gt;  E Q   |  lambda 
+Q  -&gt;  , E Q |  lambda 
+F  -&gt;  function id H ( A ) { C } 
+H  -&gt;  T |  lambda 
+A  -&gt;  T id K |  lambda 
+K  -&gt;  , T id K |  lambda 
+## precedencia menos a más:  {||} -&gt; {&amp;&amp;} -&gt; {==} -&gt; {&gt;} -&gt; {+} -&gt; {*} -&gt; {++}
+E  -&gt;  N O1  ##operadores aritméticos 
+N  -&gt;  Z O2  ##operadores relacionales
+Z  -&gt;  R O3  ##operadores lógicos
+O1 -&gt;  || N O1 | &amp;&amp; N O1 |  lambda 
+O2 -&gt;  == N O2 | &gt; N O2  |  lambda 
+O3 -&gt;  + R O3  | * R O3  |  lambda 
+R  -&gt;  id R&#39;   |  ( E )  | entero | cadena | true | false 
+R&#39; -&gt;  ( L )   |   ++    |  lambda </code></pre>
+<p>Justificación de que es gramática LL(1):</p>
+<p>Como la gramática está factorizada no existe ninguna producción: <em>A → a | B | …</em> donde First(a) interseccion First(B) != <strong>Ø</strong></p>
+<p>Para los consecuentes que pueden derivar a lambda :</p>
+<ul>
+<li>O1 → First( O1 ) interseccion Follow( O1 ) = <strong>Ø</strong>
+<ul>
+<li>First( O1 ) = { +, *, lambda }</li>
+<li>Follow( O1 ) = Follow( E ) = First( Q ) + Follow( X ) + { ;, ) } = { ;, ), coma}</li>
+</ul></li>
+<li>O2 → First( O2 ) interseccion Follow( O2 ) = <strong>Ø</strong>
+<ul>
+<li>First( O2 ) = { ==, &gt;, lambda }</li>
+<li>Follow( O2 ) = Follow( N ) = First( O1 ) + First(O2) + Follow( E )= { +, *, ==, &gt;, ; , ), coma }</li>
+</ul></li>
+<li>O3 → First( O3 ) interseccion Follow( O3 ) = <strong>Ø</strong>
+<ul>
+<li>First( O3 ) = { &amp;&amp;, ||, lambda }</li>
+<li>Follow( O3 ) = Follow( Z ) = First( O2 ) + Follow( N )= { ==, &gt;, +, *, ; , ), coma }</li>
+</ul></li>
+<li>X → E |  lambda —&gt; First(X) interseccion Follow(X) = <strong>Ø</strong>
+<ul>
+<li>First( X ) = { id, (, cteEnt, cadena, boolT, boolF, lambda }</li>
+<li><p>Follow( X ) = { ; }</p>
+<p>First(V)contenido en First(U)contenido en First(R)contenido en First(E)contenido en First(X)</p></li>
+</ul></li>
+<li>C → B C | lambda —&gt; First(B C ) interseccion Follow(C) = <strong>Ø</strong>
+<ul>
+<li>First( C ) = First(B) = { let, if, id, return, print, input, do }</li>
+<li>Follow( C ) = { llaveAbierto }</li>
+</ul></li>
+<li>L → E Q | lambda —&gt; First(EQ) interseccion Follow(L) = <strong>Ø</strong>
+<ul>
+<li>First( L ) = First(E) = { id, (, cteEnt, cadena, boolT, boolF}</li>
+<li><p>Follow( L ) = { ) }</p>
+<p>First(V)contenido en First(U)contenido en First(R)contenido en First(E)contenido en First(EQ)</p></li>
+</ul></li>
+<li>Q → , E Q |  lambda —&gt; First(, E Q) interseccion Follow(Q) = <strong>Ø</strong>
+<ul>
+<li>First( Q ) = { , }</li>
+<li>Follow( Q ) = Follow( L ) = { ) }</li>
+</ul></li>
+<li>H → T |  lambda —&gt; First(T) interseccion Follow(H) = <strong>Ø</strong>
+<ul>
+<li>Follow(H) = { ( }</li>
+</ul></li>
+<li>A → T id K | lambda —&gt; First(T id K) interseccion Follow(A) = <strong>Ø</strong>
+<ul>
+<li>First( A ) = First( T ) = { int, boolean, string }</li>
+<li><p>Follow( A ) = { ) }</p>
+<p>First(T)contenido en First(T id K)</p></li>
+</ul></li>
+<li>K → , T id K | lambda —&gt; First(, T id K ) interseccion Follow(K) = <strong>Ø</strong>
+<ul>
+<li>First( K ) = { , }</li>
+<li>Follow( K ) = Follow (A ) = { ) }</li>
+</ul></li>
+<li>R’ -&gt; First ( R ) interseccion Follow( R’ ) = <strong>Ø</strong>
+<ul>
+<li>First( R’ ) = { (, ++, lambda }</li>
+<li>Follow( R ’) = Follow( R ) = First( O ) + Follow( E ) = { &amp;&amp;, +, *, ==, &gt;, lambda } + { coma, puntoComa, ) } = {  ) }</li>
+</ul></li>
+</ul>
+<p>function hola int (){</p>
+<p>return “cadena”;</p>
+<p>}</p>
+<h3 id="reglas"><span class="header-section-number">3.2.4</span> Reglas</h3>
+<pre class="text"><code>1  - P  -&gt; B P
+2  - P  -&gt; F P
+3  - P  -&gt; eof
+4  - B  -&gt; let T id ;
+5  - B  -&gt; if ( E ) S
+6  - B  -&gt; S
+7  - B  -&gt; do { C } while ( E );
+8  - T  -&gt; int
+9  - T  -&gt; boolean
+10 - T  -&gt; string
+11 - S  -&gt; id S&#39; ; 
+12 - S  -&gt; return X ;
+13 - S  -&gt; print ( E ) ;
+14 - S  -&gt; input ( id ) ;
+15 - S&#39; -&gt; asig E 
+16 - S&#39; -&gt; ( L ) 
+17 - S&#39; -&gt; ++
+18 - X  -&gt; E
+19 - X  -&gt;  lambda 
+20 - C  -&gt; B C
+21 - C  -&gt;  lambda 
+22 - L  -&gt; E Q
+23 - L  -&gt;  lambda 
+24 - Q  -&gt; , E Q
+25 - Q  -&gt;  lambda 
+26 - F  -&gt; function id H ( A ) { C }
+27 - H  -&gt; T
+28 - H  -&gt;  lambda 
+29 - A  -&gt; T id K
+30 - A  -&gt;  lambda 
+31 - K  -&gt; , T id K
+32 - K  -&gt;  lambda 
+33 - E  -&gt; N O1  
+34 - N  -&gt; Z O2  
+35 - Z  -&gt; R O3  
+36 - O1 -&gt; || N O1
+37 - O1 -&gt; &amp;&amp; N O1
+38 - O1 -&gt;  lambda  
+39 - O2 -&gt; == Z O2
+40 - O2 -&gt; &gt; Z O2
+41 - O2 -&gt;  lambda 
+42 - O3 -&gt; + R O3
+43 - O3 -&gt; * R O3
+44 - O3 -&gt;  lambda 
+45 - R  -&gt; id R&#39;
+46 - R  -&gt; ( E )
+47 - R  -&gt; entero 
+48 - R  -&gt; cadena 
+49 - R  -&gt; true
+50 - R  -&gt; false 
+51 - R&#39; -&gt; ( L ) 
+52 - R&#39; -&gt; ++ 
+53 - R&#39; -&gt;  lambda </code></pre>
+<h3 id="gramática-para-el-árbol-sintáctico"><span class="header-section-number">3.2.5</span> Gramática para el árbol sintáctico</h3>
+<pre class="text"><code>Terminales = { eof let id puntoComa if parAbierto parCerrado llaveAbierto llaveCerrado while do else function return input print true false int boolean string mas por and equals mayor asig cadena cteEnt postIncrem coma or cteEnt }
+NoTerminales = { A  B  C  E  F  H  K  L  N  O1  O2  O3  P  Q   R  Rp  S  Sp  T  X  Z }
+Axioma = P
+
+Producciones = {
+P  -&gt; B P
+P  -&gt; F P
+P  -&gt; eof
+B  -&gt; let T id puntoComa
+B  -&gt; if parAbierto E parCerrado S
+B  -&gt; S
+B  -&gt; do llaveAbierto C llaveCerrado while parAbierto E parCerrado puntoComa
+T  -&gt; int
+T  -&gt; boolean
+T  -&gt; string
+S  -&gt; id Sp puntoComa 
+S  -&gt; return X puntoComa
+S  -&gt; print parAbierto E parCerrado puntoComa
+S  -&gt; input parAbierto id parCerrado puntoComa
+Sp -&gt; asig E 
+Sp -&gt; parAbierto L parCerrado 
+Sp -&gt; postIncrem
+X  -&gt; E
+X  -&gt; lambda
+C  -&gt; B C
+C  -&gt; lambda
+L  -&gt; E Q
+L  -&gt; lambda
+Q  -&gt; coma E Q
+Q  -&gt; lambda
+F  -&gt; function id H parAbierto A parCerrado llaveAbierto C llaveCerrado 
+H  -&gt; T
+H  -&gt; lambda
+A  -&gt; T id K
+A  -&gt; lambda
+K  -&gt; coma T id K
+K  -&gt; lambda
+E  -&gt; N O1  
+N  -&gt; Z O2  
+Z  -&gt; R O3  
+O1 -&gt; or N O1
+O1 -&gt; and N O1
+O1 -&gt; lambda 
+O2 -&gt; equals Z O2
+O2 -&gt; mayor Z O2
+O2 -&gt; lambda
+O3 -&gt; mas R O3
+O3 -&gt; por R O3
+O3 -&gt; lambda
+R  -&gt; id Rp
+R  -&gt; parAbierto E parCerrado
+R  -&gt; cteEnt 
+R  -&gt; cadena 
+R  -&gt; true
+R  -&gt; false 
+Rp -&gt; parAbierto L parCerrado 
+Rp -&gt; postIncrem 
+Rp -&gt; lambda
+}</code></pre>
+<h2 id="analizador-semántico"><span class="header-section-number">3.3</span> Analizador Semántico</h2>
+<h4 id="tipos-de-datos"><span class="header-section-number">3.3.0.1</span> <strong>Tipos de Datos</strong></h4>
+<p>El lenguaje dispone de los siguientes tipos de datos básicos:</p>
+<ul>
+<li>El tipo <strong>entero</strong> se refiere a un número entero que debe representarse con un tamaño de 1 palabra (16 bits). Se representa con la palabra <code>int</code>.</li>
+<li>El tipo <strong>lógico</strong> permite representar valores lógicos. Se representa también con un tamaño de 1 palabra (16 bits). Las expresiones relacionales y lógicas devuelven un valor lógico. Se representa con la palabra <code>boolean</code>.</li>
+<li>El tipo <strong>cadena</strong> permite representar secuencias de caracteres. Se representa con la palabra <code>string</code> y una variable de tipo cadena ocupa 64 palabras (128 bytes).</li>
+</ul>
+<p>No hay conversión de tipos automática en el lenguaje.</p>
+<h3 id="funciones-semánticas"><span class="header-section-number">3.3.1</span> Funciones semánticas</h3>
+<pre class="text"><code>tipo TS:
+  .crear() -&gt; crea una tabla de símbolos vacía
+  .destruir( tabla ) -&gt; destruye la tabla de símbolos &quot;tabla&quot;
+  .desp = desplazamiento actual de la tabla, última posición libre  
+  .insertatId(id) -&gt; se inserta en la última posición el identificador, creando una nueva entrada y poniendo el desplazamiento 
+    de la entrada como el valor actual de TS.desp
+  .insertarTipoId ( pos, tipo ) -&gt; inserta el tipo de la variable (id.pos) en la TS
+  
+  .insertarTipoParam ( tipo1 x tipo2 x ... ) -&gt; inserta un producto cartesiano de los tipos de los 
+    parámetros de los argumentos de una función
+  .insertarTipoDev ( tipo ) -&gt; inserta el tipo que devuelve una función en la tabla general
+  
+  .buscarId( id.pos ) -&gt; busca un identificador en la tabla, devuelve true si existe, false si no
+  .getTipoParam( id.pos ) -&gt; devuelve el valor (producto cartesiano de tipos) que identifica los tipos 
+    de los argumentos de la función id
+tipo id:
+  .pos = posición en la TS que corresponda, adquiere el valor de TS.pos al insertarse con 
+    TS.insertarId(id)
+
+tipo reglas: son todas las reglas que contiene la gramática
+  .tipo = tipo que devuelve la regla (boolean, string, entero o int, vacio, function)
+    puede ser una producto cartesiano de tipos o solo uno 
+  .tipoDev= devolución de una regla </code></pre>
+<h3 id="esquema-de-traducción"><span class="header-section-number">3.3.2</span> Esquema de Traducción</h3>
+<pre class="text"><code>P&#39; -&gt; { TSG = TS.crear() TSactual = TSG } P  { TS.destruir(TSG) } 
+P  -&gt; B P
+P  -&gt; F P 
+P  -&gt; eof 
+B  -&gt; let T id  puntoComa
+   { if TSactual.buscarId(id) == false ) 
+     then 
+      id.pos = TSActual.insertarId( id )
+      TSActual.insertarTipoId( id.pos, T.tipo )
+      TS.despl = despl + T.ancho
+   } 
+B  -&gt; if parAbierto E parCerrado S 
+  { if (E.tipo != boolean) 
+   then error(&quot;El tipo de E tiene que ser boolean ya que nos encontramos en la condición de if&quot;)
+  }
+B  -&gt; S 
+B  -&gt; do llaveAbierto C llaveCerrado while parAbierto E parCerrado puntoComa
+  { if (E.tipo != boolean) 
+   then error(&quot;La condición del while debe ser de tipo booleano&quot;)
+  }
+T  -&gt; int { T.tipo:= int, T.ancho:= 1 }
+T  -&gt; boolean { T.tipo:= boolean, T.ancho:= 1 }
+T  -&gt; string { T.tipo:= string, T.ancho:= 64}
+S  -&gt; id S&#39; puntoComa 
+ { if ( TSActual.buscarId( id ) == false ) ## no está en tabla local
+   then if (TSG.buscarId( id ) == true ) ## sí está en global-&gt; llamada a función o asignación a variable
+       then if (S&#39;.tipo != TSG.getTipoParam(id) )  ## argumentos no coinciden con los de la función
+           then if (id.tipo != S&#39;.tipo ) ## asignación
+               then error( &quot;Tipos en la asignación no coinciden&quot;)
+              ## funcion
+              else error(&quot;Argumentos no coinciden con los de la función&quot;) 
+  else if ( S&#39;.tipo == postIncrem and id.tipo != cteE )  
+     then error(&quot;El operador post incremento solo es aplicable a variables del tipo entero&quot;)
+  else  ## es una declaracion e inicialización de una variable global i.e (a = 5)
+    id.pos = TSG.insertarId( id ) 
+    TSG.insertarTipo ( id.pos, S&#39;.tipo )
+    ancho = if (S&#39;tipo == string ) else 1
+    TSG.pos = TSG.pos + ancho
+ }
+S  -&gt; return X puntoComa 
+ { 
+  S.tipo = tipo_ok
+  S.tipoRet = X.tipo 
+ }
+S  -&gt; print parAbierto E
+  { 
+  S.tipoRet = vacio
+  S.tipo = tipo_ok if (E.tipo == string ) else error(&quot;La función print solo acepta parámetros de tipo string&quot;)   
+  }  
+  parCerrado puntoComa
+S  -&gt; input parAbierto id 
+  { if (TSactual.buscarId(id) == true )
+    then if TSactual.buscarTipo(id) not in (string, cteEnt)
+       then error(&quot;La función input debe recibir una variable de tipo string o entero&quot;) 
+   else if (TSG.buscarId(id) == true )
+    then if TSG.buscarTipo(id) not in (string, cteEnt)
+       then error(&quot;La función input debe recibir una variable de tipo string o entero&quot;) 
+   else error(&quot;Variable no ha sido previamente declarada&quot;)
+  } parCerrado puntoComa
+S&#39; -&gt; asig E puntoComa { S&#39;.tipo = E.tipo } 
+S&#39; -&gt; parAbierto L parCerrado { S&#39;.tipo = L.tipo }  
+S&#39; -&gt; postIncrem { S&#39;.tipo = postIncrem } 
+X  -&gt; E { X.tipo = E.tdefipo } 
+X  -&gt; lambda { X.tipo = vacio }
+C  -&gt; B C 
+C  -&gt; lambda { C.tipo = vacio } 
+L  -&gt; E Q { L.tipo = L.tipo x Q.tipo }   ## tipo1 x tipo2 x tipo3 o vacio 
+L  -&gt; lambda { L.tipo = vacio }  
+Q  -&gt; coma E {if E.tipo != vacio) 
+    then Q.tipo = Q.tipo x E.tipo } 
+   Q      
+Q  -&gt; lambda { Q.tipo = vacio } 
+F  -&gt; function id 
+  { tabla = crearTS() 
+   TSactual = tabla  
+   Desp_tabla1 = 0 
+   TSG.insertarId( id ) }
+  H 
+   { TSactual.insertartipoTS (H.tipo); 
+    TSG.insertarTipoDev( id, H.tipo )}
+ parAbierto A parCerrado 
+ { TSG.insertarTipoParam( id.pos, A.tipo )} ## sintáctico solo acepta boolean string o int, si no es ninguno dará error
+ llaveAbierto C llaveCerrado 
+ { tabla.destruir()
+  TSActual = TSG }
+H  -&gt; T { H.tipo = T.tipo }
+H  -&gt; lambda { H.tipo = vacio }
+A  -&gt; T id K { if ( K.tipo != vacio) then A.tipo = T.tipo x K.tipo} ## concatenamiento de ids (tipo1 x tipo2 x tipo3 x ... )
+A  -&gt; lambda { A.tipo = vacio }
+K  -&gt; coma T  { K.tipo = T.tipo x K.tipo } id K
+K  -&gt; lambda { K.tipo = vacio }
+E  -&gt; N O1 { E.tipo =  &quot;cteEnt&quot; }
+N  -&gt; Z O2 { N.tipo = &quot;cteEnt&quot; }
+Z  -&gt; R O3 { Z.tipo = &quot;boolean&quot; } 
+O1 -&gt; mas N { if R.tipo != cteEnt  
+        then error(&quot;Operador + solo acepta datos enteros&quot;) 
+      } O1
+O1 -&gt; por N { if R.tipo != cteEnt 
+        then error(&quot;Operador * solo acepta datos enteros&quot;) 
+      } O1
+O1 -&gt; lambda { O1.tipo = tipo_ok}
+O2 -&gt; equals Z { if Z.tipo != cteEnt 
+         then error(&quot;Operador &gt; solo acepta datos enteros&quot;) 
+          } O2
+O2 -&gt; mayor Z { if Z.tipo != cteEnt 
+         then error(&quot;Operador &gt; solo acepta datos enteros&quot;) 
+       } O2 
+O2 -&gt; lambda { O1.tipo = &quot;boolean&quot;}
+O3 -&gt; or R { if R.tipo != boolean 
+       then error(&quot;Operador || solo acepta datos lógicos&quot;) 
+      } O3
+O3 -&gt; and R { if R.tipo != boolean 
+        then error(&quot;Operador || solo acepta datos lógicos&quot;) 
+      else if O1.tipo == vacio then O3.tipo = tipo_ok } O3 
+O3 -&gt; lambda { O3.tipo = tipo_ok } 
+R  -&gt; id R&#39; { if (R&#39;.tipo == postIncrem and id.tipo != cteEnt ) 
+        then error(&quot;El operador post incremento solo es aplicable a variables del tipo entero&quot;) 
+       else if (R&#39;.tipo =! vacio ) ## se trata de una llamada a una función 
+          then if ( TSG.buscarId( id ) == false )
+             then error(&quot;Errror la función no ha sido declarada previamente&quot;)
+          else if (R&#39;.tipo != TSG.getParam( id ) ) 
+            then error(&quot;Tipos de los atributos incorrectos en llamada a función&quot;)
+          else R.tipo = TSG.getTipoDev( id )
+      else:
+        R.tipo = id.tipo ## habria que buscarlo en ambas tablas para ver en 
+                 ## en cual esta y coger el tipo de la tabla 
+      }
+R  -&gt; parAbierto E parCerrado { R.tipo:= E.tipo }
+R  -&gt; cteEnt { R.tipo:= int, R.ancho:= 1 }
+R  -&gt; cadena { R.tipo:= string R.ancho:= 64 }
+R  -&gt; boolT { R.tipo:= boolean R.ancho:= 1 }
+R  -&gt; boolF { R.tipo:= boolean R.ancho:= 1 }
+R&#39; -&gt; lambda { R&#39;.tipo = vacio }
+R&#39; -&gt; parAbierto L parCerrado 
+   { R&#39;.tipo = L.tipo } 
+R&#39; -&gt; postIncrem { R&#39;.tipo = postIncrem }  </code></pre>
+<h2 id="tabla-de-símbolos"><span class="header-section-number">3.4</span> Tabla de Símbolos</h2>
+<p>Para las tablas de simbolos hemos seguido un formato como el que se muestra a continuación:</p>
+<pre class="text"><code>---------------------------------------------------------------------------
+  TABLA PRINCIPAL #0
+
+*  LEXEMA : &quot;demo&quot;
+  ATRIBUTOS : 
+ + Tipo: funcion
+ +numParam: 0
+  +TipoRetorno: string
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+  TABLA de funcion &quot;demo&quot; #1
+
+*  LEXEMA : &quot;v1&quot;
+  ATRIBUTOS : 
+ + Tipo: int
+ + Despl: 0
+
+*  LEXEMA : &quot;v2&quot;
+  ATRIBUTOS : 
+ + Tipo: int
+ + Despl: 1
+
+*  LEXEMA : &quot;v3&quot;
+  ATRIBUTOS : 
+ + Tipo: int
+ + Despl: 2
+---------------------------------------------------------------------------</code></pre>
+<h2 id="gestor-de-errores"><span class="header-section-number">3.5</span> Gestor de Errores</h2>
+<p>Este apartado lo hemos manejado según de dónde provenía el error. Para los errores léxicos hemos hecho que en vez de parar la ejecución siga produciendo tokens y buscando errores léxicos, para sí poder dar la mayor información posible pese a que no se pueda hacer un análisis sintáctico o gramátical.<br />
+Hemos añadido la funcionalidad de que se autocorrigan los comentarios que no estén puestos con el formato pedido de " " en vez del de ’’.</p>
+<p>Sobre los errores sintácticos o semánticos, detenemos completamente el análisis, ya que al no recibir el token que esperamos se rompe el árbol sintáctico y es imposible continuar.</p>
+<p>Para los mensajes de error hemos creado una clase que implementan todas las partes del analizador con su propio método para crear una instancia de este tipo error. Al crearse un error este automáticamente crea un string del error diciendo el tipo de error, la línea donde ha ocurrido, además obteniendo dicha línea y mostrándola, para ser más visual.<br />
+Debajo de la línea usamos un indicador para mostrar en qué columna está el error, por lo que así el usuario puede saber exactamente dónde está el error, no solo a nivel de línea sino de carácter dentro de esta. Estos son algunos ejemplos:</p>
+<pre class="text"><code>***************************************************************************
+NonDeclaredError at line 2: 
+ estafuncionnoexiste();
+                       ^```````````````~~~
+Error la función estafuncionnoexiste no ha sido declarada previamente
+***************************************************************************
+
+***************************************************************************
+Lexical error at line 34:
+        print (&#39;Es bisiesto?&#39;);
+        ^```~~~
+Cadena se debe especificar entre &quot; &quot;, no con &#39; &#39;. Corregido
+***************************************************************************
+
+***************************************************************************
+TypeError at line 7: 
+ input (v1);
+            ^`````````
+Variable a es de tipo boolean, input() debe recibir una variable de tipo string o entero
+***************************************************************************
+
+
+Error fatal, saliendo ...</code></pre>
+<h1 id="anexo---casos-de-prueba"><span class="header-section-number">4</span> Anexo - Casos de prueba</h1>
+<h2 id="correctos"><span class="header-section-number">4.1</span> Correctos</h2>
+<p>Formato:</p>
+<ul>
+<li>Breve explicación del código y los elementos del lenguaje que queremos demostrar que se funcionan</li>
+<li>Código del caso escrito en Javascript PdL</li>
+</ul>
+<p>Para el perimer caso además se mostrará la siguiente información:</p>
+<ul>
+<li>Listado de tokens</li>
+<li>Imágen del árbol de análisis sintáctico generado mediante VAST</li>
+<li>Volcado de la Tabla de Símbolos</li>
+</ul>
+<h3 id="caso-1"><span class="header-section-number">4.1.1</span> Caso 1</h3>
+<p>Esto es una demostración de todo lo que se podría hacer con el lenguaje</p>
+<ul>
+<li>Declaraciones con todos los tipos posibles.</li>
+<li>Declaraciones de funciones con varios parámetros, algunas de ellas en sus códigos de bloque son recursivas. Se llaman a las funciones con los parámetros esperados.</li>
+<li>Se utilizan todas las operaciones posibles</li>
+<li>Se hacen returns con valores directamente o de otros resultados de funciones.</li>
+<li>Se utiliza el bucle do while, junto con condiciones if simples</li>
+<li>Asignaciones</li>
+<li>Se utilizan funciones predeterminadas como input o print</li>
+</ul>
+<p>Código:</p>
+<pre class="jsx"><code>let string cadena;
+input(cadena);
+let boolean logico1;
+let boolean logico2;
+let int  int2;
+int1 = 000000378;
+
+int2 = int1++;
+cadena = &quot;string&quot;;
+logico1 = true;
+logico1 = false;
+function ff string(string ss)
+{
+ logico2 =  logico1;
+ if (logico2) cadena = ff (ss);
+ varglobal = 78;
+ return cadena;
+}
+  
+function funcion string (string logico2)
+{
+ let int var;
+ do {
+ logico1 = int1 == int2;print(0);logico2=&quot;&quot;;
+   } while (logico1);
+  return logico2;
+}
+
+cadena = (ff(funcion(cadena)));
+print(cadena);
+let boolean booleano;
+function bisiesto boolean (int a) 
+{ let string bis;
+ print (&quot;Es bisiesto?&quot;);
+ input(bis);
+ return ((a + 4 == 0)); 
+}
+function dias int (int m, int a)
+{
+ let int dd;
+ print (&quot;di cuantos dias tiene el mes &quot;);
+ print (m);
+ input(dd);
+ if (bisiesto(a)) dd = dd + 1;
+ return dd;
+}
+function esFechaCorrecta boolean (int d, int m, int a) 
+{
+ return (d == dias (m, a));
+}</code></pre>
+<pre class="text"><code>Listado de tokens:
+&lt; let , None &gt;
+&lt; string , None &gt;
+&lt; id , cadena &gt;
+&lt; puntoComa , None &gt;
+&lt; input , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , cadena &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; let , None &gt;
+&lt; boolean , None &gt;
+&lt; id , logico1 &gt;
+&lt; puntoComa , None &gt;
+&lt; let , None &gt;
+&lt; boolean , None &gt;
+&lt; id , logico2 &gt;
+&lt; puntoComa , None &gt;
+&lt; let , None &gt;
+&lt; int , None &gt;
+&lt; id , int2 &gt;
+&lt; puntoComa , None &gt;
+&lt; id , int1 &gt;
+&lt; asig , None &gt;
+&lt; cteEnt , 0 &gt;
+&lt; puntoComa , None &gt;
+&lt; id , int2 &gt;
+&lt; asig , None &gt;
+&lt; id , int1 &gt;
+&lt; postIncrem , None &gt;
+&lt; puntoComa , None &gt;
+&lt; id , cadena &gt;
+&lt; asig , None &gt;
+&lt; cadena , string &gt;
+&lt; puntoComa , None &gt;
+&lt; id , logico1 &gt;
+&lt; asig , None &gt;
+&lt; true , None &gt;
+&lt; puntoComa , None &gt;
+&lt; id , logico1 &gt;
+&lt; asig , None &gt;
+&lt; false , None &gt;
+&lt; puntoComa , None &gt;
+&lt; if , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , int2 &gt;
+&lt; mas , None &gt;
+&lt; id , int2 &gt;
+&lt; equals , None &gt;
+&lt; id , int1 &gt;
+&lt; or , None &gt;
+&lt; id , logico1 &gt;
+&lt; and , None &gt;
+&lt; id , logico2 &gt;
+&lt; parCerrado , None &gt;
+&lt; print , None &gt;
+&lt; parAbierto , None &gt;
+&lt; cadena , Como narices se ha evaluado esto a true &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; function , None &gt;
+&lt; id , ff &gt;
+&lt; string , None &gt;
+&lt; parAbierto , None &gt;
+&lt; string , None &gt;
+&lt; id , ss &gt;
+&lt; parCerrado , None &gt;
+&lt; llaveAbierto , None &gt;
+&lt; id , logico2 &gt;
+&lt; asig , None &gt;
+&lt; id , logico1 &gt;
+&lt; puntoComa , None &gt;
+&lt; if , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , logico2 &gt;
+&lt; parCerrado , None &gt;
+&lt; id , cadena &gt;
+&lt; asig , None &gt;
+&lt; id , ff &gt;
+&lt; parAbierto , None &gt;
+&lt; id , ss &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; id , varglobal &gt;
+&lt; asig , None &gt;
+&lt; cteEnt , 0 &gt;
+&lt; puntoComa , None &gt;
+&lt; return , None &gt;
+&lt; id , cadena &gt;
+&lt; puntoComa , None &gt;
+&lt; llaveCerrado , None &gt;
+&lt; function , None &gt;
+&lt; id , funcion &gt;
+&lt; string , None &gt;
+&lt; parAbierto , None &gt;
+&lt; string , None &gt;
+&lt; id , logico2 &gt;
+&lt; parCerrado , None &gt;
+&lt; llaveAbierto , None &gt;
+&lt; let , None &gt;
+&lt; int , None &gt;
+&lt; id , var &gt;
+&lt; puntoComa , None &gt;
+&lt; do , None &gt;
+&lt; llaveAbierto , None &gt;
+&lt; id , logico1 &gt;
+&lt; asig , None &gt;
+&lt; id , int1 &gt;
+&lt; equals , None &gt;
+&lt; id , int2 &gt;
+&lt; puntoComa , None &gt;
+&lt; print , None &gt;
+&lt; parAbierto , None &gt;
+&lt; cteEnt , 0 &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; id , logico2 &gt;
+&lt; asig , None &gt;
+&lt; cadena ,  &gt;
+&lt; puntoComa , None &gt;
+&lt; llaveCerrado , None &gt;
+&lt; while , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , logico1 &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; return , None &gt;
+&lt; id , logico2 &gt;
+&lt; puntoComa , None &gt;
+&lt; llaveCerrado , None &gt;
+&lt; id , cadena &gt;
+&lt; asig , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , ff &gt;
+&lt; parAbierto , None &gt;
+&lt; id , funcion &gt;
+&lt; parAbierto , None &gt;
+&lt; id , cadena &gt;
+&lt; parCerrado , None &gt;
+&lt; parCerrado , None &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; print , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , cadena &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; let , None &gt;
+&lt; boolean , None &gt;
+&lt; id , booleano &gt;
+&lt; puntoComa , None &gt;
+&lt; function , None &gt;
+&lt; id , bisiesto &gt;
+&lt; boolean , None &gt;
+&lt; parAbierto , None &gt;
+&lt; int , None &gt;
+&lt; id , a &gt;
+&lt; parCerrado , None &gt;
+&lt; llaveAbierto , None &gt;
+&lt; let , None &gt;
+&lt; string , None &gt;
+&lt; id , bis &gt;
+&lt; puntoComa , None &gt;
+&lt; print , None &gt;
+&lt; parAbierto , None &gt;
+&lt; cadena , Es bisiesto? &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; input , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , bis &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; return , None &gt;
+&lt; parAbierto , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , a &gt;
+&lt; mas , None &gt;
+&lt; cteEnt , 0 &gt;
+&lt; equals , None &gt;
+&lt; cteEnt , 0 &gt;
+&lt; parCerrado , None &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; llaveCerrado , None &gt;
+&lt; function , None &gt;
+&lt; id , dias &gt;
+&lt; int , None &gt;
+&lt; parAbierto , None &gt;
+&lt; int , None &gt;
+&lt; id , m &gt;
+&lt; coma , None &gt;
+&lt; int , None &gt;
+&lt; id , a &gt;
+&lt; parCerrado , None &gt;
+&lt; llaveAbierto , None &gt;
+&lt; let , None &gt;
+&lt; int , None &gt;
+&lt; id , dd &gt;
+&lt; puntoComa , None &gt;
+&lt; print , None &gt;
+&lt; parAbierto , None &gt;
+&lt; cadena , di cuantos dias tiene el mes  &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; print , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , m &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; input , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , dd &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; if , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , bisiesto &gt;
+&lt; parAbierto , None &gt;
+&lt; id , a &gt;
+&lt; parCerrado , None &gt;
+&lt; parCerrado , None &gt;
+&lt; id , dd &gt;
+&lt; asig , None &gt;
+&lt; id , dd &gt;
+&lt; mas , None &gt;
+&lt; cteEnt , 0 &gt;
+&lt; puntoComa , None &gt;
+&lt; return , None &gt;
+&lt; id , dd &gt;
+&lt; puntoComa , None &gt;
+&lt; llaveCerrado , None &gt;
+&lt; function , None &gt;
+&lt; id , esFechaCorrecta &gt;
+&lt; boolean , None &gt;
+&lt; parAbierto , None &gt;
+&lt; int , None &gt;
+&lt; id , d &gt;
+&lt; coma , None &gt;
+&lt; int , None &gt;
+&lt; id , m &gt;
+&lt; coma , None &gt;
+&lt; int , None &gt;
+&lt; id , a &gt;
+&lt; parCerrado , None &gt;
+&lt; llaveAbierto , None &gt;
+&lt; return , None &gt;
+&lt; parAbierto , None &gt;
+&lt; id , d &gt;
+&lt; equals , None &gt;
+&lt; id , dias &gt;
+&lt; parAbierto , None &gt;
+&lt; id , m &gt;
+&lt; coma , None &gt;
+&lt; id , a &gt;
+&lt; parCerrado , None &gt;
+&lt; parCerrado , None &gt;
+&lt; puntoComa , None &gt;
+&lt; llaveCerrado , None &gt;
+&lt; eof , None &gt;</code></pre>
+<p>Árbol de análisis sintáctico generado mediante VAST</p>
+<figure>
+<img src="images/arbol.png" alt="Arbol" /><figcaption>Arbol</figcaption>
+</figure>
+<p>Volcado de la Tabla de Símbolos</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb18-1" title="1"><span class="er">TS</span> <span class="er">GLOBAL</span> <span class="er">#1</span></a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="er">*Lexema:</span> <span class="er">&#39;contador&#39;</span></a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="er">*Lexema:</span> <span class="er">&#39;x&#39;</span></a></code></pre></div>
+<h3 id="caso-2"><span class="header-section-number">4.1.2</span> Caso 2</h3>
+<blockquote>
+<p>Función potencia que devuelve un número a la potencia deseada, este caso correcto demuestra que crea una variable de la manera correcta con let para la inicialización y luego la asignación. Admitimos el do {S} while (E) con los comentarios de bloque /**/.</p>
+</blockquote>
+<p>Código:</p>
+<pre class="jsx"><code>function potencia int (int z, int dim) {
+ let int s;
+ s = 0;
+ do{
+  z = z*z;
+  print(z);
+  s++;
+ } while(dim&gt;s);
+ return z;
+} /* fin de potencia*/</code></pre>
+<h3 id="caso-3"><span class="header-section-number">4.1.3</span> Caso 3</h3>
+<blockquote>
+<p>En este caso se comprueba con una simple función que devuelve string llamado demo, los operadores relaciones con el ==, y la palabra reservada input para obtener variables del usuario desde el I/O. También podemos ver que con el return, podemos devolver no solo variables o enteros, si no que también cadenas de caracteres.</p>
+</blockquote>
+<p>Código:</p>
+<pre class="jsx"><code>function demo string() { /* definición de la función demo, sin argumentos y devuelve un string */
+ let int v1;
+ let int v2;
+ let int v3;
+ print (&quot;Escriba tres números: &quot;);
+ input (v1);
+ input (v2);
+ input (v3);
+ if(v1==v2) return &quot;Primer y segundo valor son idénticos&quot;;
+ if(v2==v3) return &quot;Segundo y tercer valor son idénticos&quot;;
+ if(v1==v3) return &quot;Primer y tercer valor son idénticos&quot;;
+}</code></pre>
+<h3 id="caso-4"><span class="header-section-number">4.1.4</span> Caso 4</h3>
+<blockquote>
+<p>Función básica de calcular el factorial de un número. Comprobamos que sean todos los operadores relacionales y aritméticos aceptados, como son el equals (==), el por (*). La última sentencia hacemos comprobación sobre funciones anidadas, demostrando que el procesador lo admite.</p>
+</blockquote>
+<p>Código:</p>
+<pre class="jsx"><code>function factorial int (int n){ /* n: parámetro formal de la función entera */
+    let int result;
+    let int aux;
+    result = 1;
+    aux = 2;
+    
+    if(n == 0) return 1;
+    do {
+        result = result * aux;
+        aux++;
+    }while(n&gt;aux);
+
+    return result;
+} /* funcion representativa */
+
+print(factorial(factorial(2)));</code></pre>
+<h3 id="caso-5"><span class="header-section-number">4.1.5</span> Caso 5</h3>
+<blockquote>
+<p>Este último caso correcto, tenemos una comparación de dos inputs tipo string y comprobamos los tipos booleanos, los cuales son admitidos por el lenguaje y que los “if” solo admiten una sola sentencia despues de su ejecución.</p>
+</blockquote>
+<p>Código:</p>
+<pre class="jsx"><code>function compara boolean (string input1, string input2, string input3){
+    let boolean result;
+    result = false;
+    
+    if(input1 == input2 &amp;&amp; input2 == input3) result = true;
+    if(input1 == input2 &amp;&amp; input2 == input3) print(&quot;Los 3 inputs recibidos son iguales&quot;);
+
+    return result;
+} /* funcion representativa */</code></pre>
+<h2 id="incorrectos"><span class="header-section-number">4.2</span> Incorrectos:</h2>
+<p>Formato:</p>
+<ul>
+<li>Breve explicación del código y los errores que se encuentran en el código que el procesador debería reconocer</li>
+<li>Código del caso escrito en Javascript PdL</li>
+<li>Listado de errores generados (para todos los casos)</li>
+</ul>
+<h3 id="caso-1-1"><span class="header-section-number">4.2.1</span> Caso 1</h3>
+<blockquote>
+<p>Función básica que calcula si un año es bisiesto o no con tipos booleanos. Es un caso incorrecto por un error léxico ya que no se admiten en el lenguaje algunos tokens como son %, !=, al igual que los comentarios con //.</p>
+</blockquote>
+<blockquote>
+
+</blockquote>
+<p>Código:</p>
+<pre class="jsx"><code>function bisiesto boolean (int a, int b, c) {  
+ return (a % 4 == 0 &amp;&amp; a % 100 != 0 || a % 400 == 0);
+} // fin de bisiesto: función lógica</code></pre>
+<p>Mensajes de error:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb24-1" title="1"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">2:</span> </a>
+<a class="sourceLine" id="cb24-3" title="3"> <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
+<a class="sourceLine" id="cb24-4" title="4">           <span class="er">^`````````</span></a>
+<a class="sourceLine" id="cb24-5" title="5"><span class="er">Simbolo:</span> <span class="er">&quot;%&quot;</span> <span class="er">no</span> <span class="er">permitido.</span> </a>
+<a class="sourceLine" id="cb24-6" title="6"><span class="er">No</span> <span class="er">pertence</span> <span class="er">al</span> <span class="er">lenguaje,</span> <span class="er">consulte</span> <span class="er">la</span> <span class="er">documentacion</span> <span class="er">para</span> <span class="er">ver</span> <span class="er">carácteres</span> <span class="er">aceptados</span></a>
+<a class="sourceLine" id="cb24-7" title="7"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-8" title="8"></a>
+<a class="sourceLine" id="cb24-9" title="9"></a>
+<a class="sourceLine" id="cb24-10" title="10"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-11" title="11"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">2:</span> </a>
+<a class="sourceLine" id="cb24-12" title="12"> <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
+<a class="sourceLine" id="cb24-13" title="13">                         <span class="er">^``````````````````~~</span></a>
+<a class="sourceLine" id="cb24-14" title="14"><span class="er">Simbolo:</span> <span class="er">&quot;%&quot;</span> <span class="er">no</span> <span class="er">permitido.</span> </a>
+<a class="sourceLine" id="cb24-15" title="15"><span class="er">No</span> <span class="er">pertence</span> <span class="er">al</span> <span class="er">lenguaje,</span> <span class="er">consulte</span> <span class="er">la</span> <span class="er">documentacion</span> <span class="er">para</span> <span class="er">ver</span> <span class="er">carácteres</span> <span class="er">aceptados</span></a>
+<a class="sourceLine" id="cb24-16" title="16"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-17" title="17"></a>
+<a class="sourceLine" id="cb24-18" title="18"></a>
+<a class="sourceLine" id="cb24-19" title="19"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-20" title="20"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">2:</span> </a>
+<a class="sourceLine" id="cb24-21" title="21"> <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
+<a class="sourceLine" id="cb24-22" title="22">                               <span class="er">^````````````````````````</span></a>
+<a class="sourceLine" id="cb24-23" title="23"><span class="er">Simbolo:</span> <span class="er">&quot;!&quot;</span> <span class="er">no</span> <span class="er">permitido.</span> </a>
+<a class="sourceLine" id="cb24-24" title="24"><span class="er">No</span> <span class="er">pertence</span> <span class="er">al</span> <span class="er">lenguaje,</span> <span class="er">consulte</span> <span class="er">la</span> <span class="er">documentacion</span> <span class="er">para</span> <span class="er">ver</span> <span class="er">carácteres</span> <span class="er">aceptados</span></a>
+<a class="sourceLine" id="cb24-25" title="25"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-26" title="26"></a>
+<a class="sourceLine" id="cb24-27" title="27"></a>
+<a class="sourceLine" id="cb24-28" title="28"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-29" title="29"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">2:</span> </a>
+<a class="sourceLine" id="cb24-30" title="30"> <span class="er">return</span> <span class="er">(a</span> <span class="er">%</span> <span class="er">4</span> <span class="er">==</span> <span class="er">0</span> <span class="er">&amp;&amp;</span> <span class="er">a</span> <span class="er">%</span> <span class="er">100</span> <span class="er">!=</span> <span class="er">0</span> <span class="er">||</span> <span class="er">a</span> <span class="er">%</span> <span class="er">400</span> <span class="er">==</span> <span class="er">0);</span></a>
+<a class="sourceLine" id="cb24-31" title="31">                                         <span class="er">^``````````````````````````````~~</span></a>
+<a class="sourceLine" id="cb24-32" title="32"><span class="er">Simbolo:</span> <span class="er">&quot;%&quot;</span> <span class="er">no</span> <span class="er">permitido.</span> </a>
+<a class="sourceLine" id="cb24-33" title="33"><span class="er">No</span> <span class="er">pertence</span> <span class="er">al</span> <span class="er">lenguaje,</span> <span class="er">consulte</span> <span class="er">la</span> <span class="er">documentacion</span> <span class="er">para</span> <span class="er">ver</span> <span class="er">carácteres</span> <span class="er">aceptados</span></a>
+<a class="sourceLine" id="cb24-34" title="34"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-35" title="35"></a>
+<a class="sourceLine" id="cb24-36" title="36"></a>
+<a class="sourceLine" id="cb24-37" title="37"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-38" title="38"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">3:</span> </a>
+<a class="sourceLine" id="cb24-39" title="39"><span class="er">}</span> <span class="er">//</span> <span class="er">fin</span> <span class="er">de</span> <span class="er">bisiesto:</span> <span class="er">funciÃ³n</span> <span class="er">lÃ³gica</span></a>
+<a class="sourceLine" id="cb24-40" title="40">  <span class="er">^~</span></a>
+<a class="sourceLine" id="cb24-41" title="41"><span class="er">Comentarios</span> <span class="er">de</span> <span class="er">tipo</span> <span class="er">&#39;//comentario&#39;</span> <span class="er">no</span> <span class="er">estan</span> <span class="er">permitidos</span></a>
+<a class="sourceLine" id="cb24-42" title="42"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-43" title="43"></a>
+<a class="sourceLine" id="cb24-44" title="44"></a>
+<a class="sourceLine" id="cb24-45" title="45"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-46" title="46"><span class="er">NonSupportedOperationError</span> <span class="er">at</span> <span class="er">line</span> <span class="er">3:</span> </a>
+<a class="sourceLine" id="cb24-47" title="47"><span class="er">}</span> <span class="er">//</span> <span class="er">fin</span> <span class="er">de</span> <span class="er">bisiesto:</span> <span class="er">funciÃ³n</span> <span class="er">lÃ³gica</span></a>
+<a class="sourceLine" id="cb24-48" title="48"><span class="er">^~</span></a>
+<a class="sourceLine" id="cb24-49" title="49"><span class="er">Esperaba</span> <span class="er">uno</span> <span class="er">de</span> <span class="er">los</span> <span class="er">siguientes</span> <span class="er">símbolos</span><span class="ot">[</span><span class="er">&#39;mayor&#39;</span><span class="ot">,</span> <span class="er">&#39;equals&#39;</span><span class="ot">,</span> <span class="er">&#39;parCerrado&#39;</span><span class="ot">,</span> <span class="er">&#39;coma&#39;</span><span class="ot">,</span> <span class="er">&#39;and&#39;</span><span class="ot">,</span> <span class="er">&#39;or&#39;</span><span class="ot">,</span> <span class="er">&#39;puntoComa&#39;</span><span class="ot">,</span> <span class="er">&#39;lambda&#39;</span><span class="ot">]</span></a>
+<a class="sourceLine" id="cb24-50" title="50"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb24-51" title="51"></a>
+<a class="sourceLine" id="cb24-52" title="52"></a>
+<a class="sourceLine" id="cb24-53" title="53"><span class="er">Error</span> <span class="er">fatal,</span> <span class="er">saliendo</span> <span class="er">...</span></a>
+<a class="sourceLine" id="cb24-54" title="54"></a>
+<a class="sourceLine" id="cb24-55" title="55"><span class="er">Process</span> <span class="er">finished</span> <span class="er">with</span> <span class="er">exit</span> <span class="er">code</span> <span class="er">1</span></a></code></pre></div>
+<h3 id="caso-2-1"><span class="header-section-number">4.2.2</span> Caso 2</h3>
+<blockquote>
+<p>Bloque de código de factoriales y booleanos de sumas con un error sintáctico en la primera línea para la asignación conjunta con la inicialización de variables, en los comentarios estilo ‘//’ y el uso no aceptado de la resta con el menos ‘-’.</p>
+</blockquote>
+<p>Código:</p>
+<pre class="jsx"><code>let int num = 1;
+
+function factorial int (int x) {
+  if (x &gt; 1)
+    return x * factorial (x - 1);
+  return 1;
+}
+
+function Suma boolean (int aux, int fin){
+  /* se define la función Suma que recibe dos enteros por valor */
+  /* usa la variable global x */
+    do{
+      aux = aux + factorial(aux-1)
+      x = x + 2
+    }while(fin&gt;x)
+    
+    return aux &gt; 10000;
+} // la función devuelve un lógico
+
+function imprime (int a){
+    print (a);
+}
+
+imprime (factorial (Suma (5, 6)));</code></pre>
+<p>Mensajes de error:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb26-1" title="1"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb26-2" title="2"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">5:</span> </a>
+<a class="sourceLine" id="cb26-3" title="3">    <span class="er">return</span> <span class="er">x</span> <span class="er">*</span> <span class="er">factorial</span> <span class="er">(x</span> <span class="er">-</span> <span class="er">1);</span></a>
+<a class="sourceLine" id="cb26-4" title="4">                            <span class="er">^`````````````````````~</span></a>
+<a class="sourceLine" id="cb26-5" title="5"><span class="er">Simbolo:</span> <span class="er">&quot;-&quot;</span> <span class="er">no</span> <span class="er">permitido.</span> </a>
+<a class="sourceLine" id="cb26-6" title="6"><span class="er">No</span> <span class="er">pertence</span> <span class="er">al</span> <span class="er">lenguaje,</span> <span class="er">consulte</span> <span class="er">la</span> <span class="er">documentacion</span> <span class="er">para</span> <span class="er">ver</span> <span class="er">carácteres</span> <span class="er">aceptados</span></a>
+<a class="sourceLine" id="cb26-7" title="7"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb26-8" title="8"></a>
+<a class="sourceLine" id="cb26-9" title="9"></a>
+<a class="sourceLine" id="cb26-10" title="10"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb26-11" title="11"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">13:</span> </a>
+<a class="sourceLine" id="cb26-12" title="12">      <span class="er">aux</span> <span class="er">=</span> <span class="er">aux</span> <span class="er">+</span> <span class="er">factorial(aux-1)</span></a>
+<a class="sourceLine" id="cb26-13" title="13">                                <span class="er">^````````````````````````</span></a>
+<a class="sourceLine" id="cb26-14" title="14"><span class="er">Simbolo:</span> <span class="er">&quot;-&quot;</span> <span class="er">no</span> <span class="er">permitido.</span> </a>
+<a class="sourceLine" id="cb26-15" title="15"><span class="er">No</span> <span class="er">pertence</span> <span class="er">al</span> <span class="er">lenguaje,</span> <span class="er">consulte</span> <span class="er">la</span> <span class="er">documentacion</span> <span class="er">para</span> <span class="er">ver</span> <span class="er">carácteres</span> <span class="er">aceptados</span></a>
+<a class="sourceLine" id="cb26-16" title="16"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb26-17" title="17"></a>
+<a class="sourceLine" id="cb26-18" title="18"></a>
+<a class="sourceLine" id="cb26-19" title="19"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb26-20" title="20"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">18:</span> </a>
+<a class="sourceLine" id="cb26-21" title="21"><span class="er">}</span> <span class="er">//</span> <span class="er">la</span> <span class="er">funciÃ³n</span> <span class="er">devuelve</span> <span class="er">un</span> <span class="er">lÃ³gico</span></a>
+<a class="sourceLine" id="cb26-22" title="22">  <span class="er">^~</span></a>
+<a class="sourceLine" id="cb26-23" title="23"><span class="er">Comentarios</span> <span class="er">de</span> <span class="er">tipo</span> <span class="er">&#39;//comentario&#39;</span> <span class="er">no</span> <span class="er">estan</span> <span class="er">permitidos</span></a>
+<a class="sourceLine" id="cb26-24" title="24"><span class="er">***************************************************************************</span></a></code></pre></div>
+<h3 id="caso-3-1"><span class="header-section-number">4.2.3</span> Caso 3</h3>
+<blockquote>
+<p>Bloque de código que tiene un error léxico por usar una cadena que excede el tamaño máximo permitido además de asignar variables junto a la inicialización de variables.</p>
+</blockquote>
+<p>Código:</p>
+<pre class="jsx"><code>/*
+Imprimir en salida estándar con formateo de variables entre la cadena de caracteres
+*/
+
+let int number; number = 32768;
+let int ten = 10;
+print(&#39;Fifteen is &#39; + five &#39;+&#39; ten &#39;and not &#39; + 2 * five &#39;+&#39; ten&#39;.&#39;);
+print(&quot;An int variable is lower than &quot; + number);
+let string test = &quot;abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz&quot;;
+print(test);</code></pre>
+<p>Mensajes de error:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb28-1" title="1"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb28-2" title="2"><span class="er">Lexical</span> <span class="er">error</span> <span class="er">at</span> <span class="er">line</span> <span class="er">3:</span> </a>
+<a class="sourceLine" id="cb28-3" title="3"><span class="er">let</span> <span class="er">int</span> <span class="er">number;</span> <span class="er">number</span> <span class="er">=</span> <span class="er">32768;</span></a>
+<a class="sourceLine" id="cb28-4" title="4">                         <span class="er">^`````````````````````~~</span></a>
+<a class="sourceLine" id="cb28-5" title="5"><span class="er">Digito</span> <span class="er">con</span> <span class="er">valor</span> <span class="er">mayor</span> <span class="er">al</span> <span class="er">permitido</span> <span class="er">(32768)</span> <span class="er">en</span> <span class="er">el</span> <span class="er">sistema</span></a>
+<a class="sourceLine" id="cb28-6" title="6"><span class="er">***************************************************************************</span></a></code></pre></div>
+<h3 id="caso-4-1"><span class="header-section-number">4.2.4</span> Caso 4</h3>
+<blockquote>
+<p>Este código del caso 4 comprueba el tipo de la función (void, que no está reconocida) además del tipo obligatorio dentro del paréntesis de los inputs. Esto provoca un error sintáctico al no usar o poner los tipos de variable adecuados.</p>
+</blockquote>
+<p>Código:</p>
+<pre class="jsx"><code>function comparacion void (*) { 
+    do{
+        print(&quot;ERROR&quot;)
+    }while(input&gt;1)
+}</code></pre>
+<p>Mensajes de error:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb30-1" title="1"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb30-2" title="2"><span class="er">TypeError</span> <span class="er">at</span> <span class="er">line</span> <span class="er">1:</span> </a>
+<a class="sourceLine" id="cb30-3" title="3"><span class="er">function</span> <span class="er">comparacion</span> <span class="er">void</span> <span class="er">(*)</span> <span class="fu">{</span> </a>
+<a class="sourceLine" id="cb30-4" title="4">         <span class="er">^```````````````</span></a>
+<a class="sourceLine" id="cb30-5" title="5"><span class="er">Tipo</span> <span class="er">de</span> <span class="er">función no</span> <span class="er">aceptado.</span> <span class="er">Debe</span> <span class="er">usar</span> <span class="er">[&#39;int&#39;</span><span class="fu">,</span> <span class="er">&#39;boolean&#39;</span><span class="fu">,</span> <span class="er">&#39;string&#39;]</span> <span class="er">o</span> <span class="dt">&quot;&quot;</span> <span class="er">(no</span> <span class="er">poner</span> <span class="er">nada</span> <span class="er">para</span> <span class="er">void)</span></a>
+<a class="sourceLine" id="cb30-6" title="6"><span class="er">***************************************************************************</span></a></code></pre></div>
+<h3 id="caso-5-1"><span class="header-section-number">4.2.5</span> Caso 5</h3>
+<blockquote>
+<p>Función de factorial de un número pero con bucle for, la cual no es reconocida en el lenguaje. Error sintáctico en la función con paréntesis faltante.</p>
+</blockquote>
+<p>Código:</p>
+<pre class="jsx"><code>function FactorialFor int ( int n){
+ let int i;
+ let int factorial; factorial = 1;
+ for (i = 1; i &lt;= n; i++)
+ {
+  factorial *= i;
+ }
+ return factorial;
+}</code></pre>
+<p>Mensajes de error:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb32-1" title="1"><span class="er">***************************************************************************</span></a>
+<a class="sourceLine" id="cb32-2" title="2"><span class="er">NonSupportedOperationError</span> <span class="er">at</span> <span class="er">line</span> <span class="er">4:</span> </a>
+<a class="sourceLine" id="cb32-3" title="3"> <span class="er">for</span> <span class="er">(i</span> <span class="er">=</span> <span class="er">1;</span> <span class="er">i</span> <span class="er">&lt;=</span> <span class="er">n;</span> <span class="er">i++)</span></a>
+<a class="sourceLine" id="cb32-4" title="4">       <span class="er">^```~~~</span></a>
+<a class="sourceLine" id="cb32-5" title="5"><span class="er">Esperaba</span> <span class="er">uno</span> <span class="er">de</span> <span class="er">los</span> <span class="er">siguientes</span> <span class="er">símbolos</span><span class="ot">[</span><span class="er">&#39;mayor&#39;</span><span class="ot">,</span> <span class="er">&#39;equals&#39;</span><span class="ot">,</span> <span class="er">&#39;parCerrado&#39;</span><span class="ot">,</span> <span class="er">&#39;coma&#39;</span><span class="ot">,</span> <span class="er">&#39;and&#39;</span><span class="ot">,</span> <span class="er">&#39;or&#39;</span><span class="ot">,</span> <span class="er">&#39;puntoComa&#39;</span><span class="ot">,</span> <span class="er">&#39;lambda&#39;</span><span class="ot">]</span></a>
+<a class="sourceLine" id="cb32-6" title="6"><span class="er">***************************************************************************</span></a></code></pre></div>
+</body>
+</html>

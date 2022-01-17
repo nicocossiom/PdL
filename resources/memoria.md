@@ -1,14 +1,18 @@
 ---
 title: "Javascript PdL"
 author: Nicolás Cossío Miravalles, Bárbara Rodríguez Ruiz, Huangjue He 
-date: January 20220
-geometry: margin=1cm
+date: Enero 2022
+geometry: margin=2cm
 output: pdf_document
 fontsize: 10pt
+fontfamily: helvet
+
 header-includes:
   - \hypersetup{
             allbordercolors={0 0 0},
             pdfborderstyle={/S/U/W 1}}
+   - \renewcommand{\familydefault}{\sfdefault}
+
 ---
 \newpage{}
 
@@ -113,16 +117,16 @@ eof           : < eof, - >
 
 ```text
 S -> lA | dC | (  | ) | { | } | delS | =E | &D | > | +G | * | , | ; | eof | /B | "J
-A -> lA | dA | _A | λ
+A -> lA | dA | _A |  lambda 
 B -> *H
-C -> dC | λ
+C -> dC |  lambda 
 D -> & 
-E -> = | λ
-G -> + | λ
-H -> λH | *I
+E -> = |  lambda 
+G -> + |  lambda 
+H ->  lambda H | *I
 I -> /S 
-J -> λJ | ”K
-K -> λ
+J ->  lambda J | ”K
+K ->  lambda 
 otro indica cualquier otro carácter distinto de *
 ```
 
@@ -130,7 +134,7 @@ otro indica cualquier otro carácter distinto de *
 
 ---
 
-<img src="images/afd.jpeg" alt="Automata Finito Determinista" style="width:60%">
+![Afd](images/afd.jpeg)
 
 - OC: cualquier carácter distinto de los ya especificados para ese estado
 
@@ -141,7 +145,7 @@ otro indica cualquier otro carácter distinto de *
 ```text
 - LEER: lee el siguiente carácter del fichero fuente. car := leer()
     En todas las transiciones menos en las transiciones etiquetadas con O.C, excepto en 25->25
-- CONC: forma una cadena (lexema). Siempre después de leer(), lex:=lex⨁car 
+- CONC: forma una cadena (lexema). Siempre después de leer(), lex:=lex + car 
     En las transiciones: 13->14, 14->15 | 0->1, 1->1, x->x //por hacer, cadenas
 - VALOR: convierte un carácter a su entero correspondiente, entero:=valor(carácter)
 - GENTOKEN: genera un token que el A.Léxico pasa al sintáctico
@@ -245,14 +249,14 @@ P -> B P | F P | eof
 B -> let T id ; | if ( E ) S | S | while ( E ) { C }
 T -> int | boolean | string
 S -> id = E ; | return X ; | id ( L ) | print ( E ) ; | input ( id ) ; 
-X -> E | λ
-C -> B C | λ
-L -> E Q | λ
-Q -> , E Q | λ
+X -> E |  lambda 
+C -> B C |  lambda 
+L -> E Q |  lambda 
+Q -> , E Q |  lambda 
 F -> function id H ( A ) { C } 
-H -> T | λ
-A -> T id K  | λ
-K -> , T id K | λ
+H -> T |  lambda 
+A -> T id K  |  lambda 
+K -> , T id K |  lambda 
 E -> E && R | R
 R -> R > U | U 
 U -> U + V | V 
@@ -268,72 +272,72 @@ B  ->  let T id ; | if ( E ) S | S | do { C } while ( E ) ;
 T  ->  int   | boolean    | string
 S  ->  id S' | return X ; | print ( E ) ; | input ( id ) ;
 S' ->  = E   | ( L )    | ++
-X  ->  E     | λ
-C  ->  B C   | λ
-L  ->  E Q   | λ
-Q  ->  , E Q | λ
+X  ->  E     |  lambda 
+C  ->  B C   |  lambda 
+L  ->  E Q   |  lambda 
+Q  ->  , E Q |  lambda 
 F  ->  function id H ( A ) { C } 
-H  ->  T | λ
-A  ->  T id K | λ
-K  ->  , T id K | λ
+H  ->  T |  lambda 
+A  ->  T id K |  lambda 
+K  ->  , T id K |  lambda 
 ## precedencia menos a más:  {||} -> {&&} -> {==} -> {>} -> {+} -> {*} -> {++}
 E  ->  N O1  ##operadores aritméticos 
 N  ->  Z O2  ##operadores relacionales
 Z  ->  R O3  ##operadores lógicos
-O1 ->  || N O1 | && N O1 | λ
-O2 ->  == N O2 | > N O2  | λ
-O3 ->  + R O3  | * R O3  | λ
+O1 ->  || N O1 | && N O1 |  lambda 
+O2 ->  == N O2 | > N O2  |  lambda 
+O3 ->  + R O3  | * R O3  |  lambda 
 R  ->  id R'   |  ( E )  | entero | cadena | true | false 
-R' ->  ( L )   |   ++    | λ
+R' ->  ( L )   |   ++    |  lambda 
 ```
 
 Justificación de que es gramática LL(1):
 
-Como la gramática está factorizada no existe ninguna producción: *A → α | β | ...* donde First(α) ∩ First(β) ≠ **Ø**
+Como la gramática está factorizada no existe ninguna producción: *A → a | B | ...* donde First(a) interseccion First(B) != **Ø**
 
-Para los consecuentes que pueden derivar a λ :
+Para los consecuentes que pueden derivar a  lambda  :
 
-- O1 → First( O1 ) ∩ Follow( O1 ) = **Ø**
-  - First( O1 ) = { +, *,  λ }
+- O1 → First( O1 ) interseccion Follow( O1 ) = **Ø**
+  - First( O1 ) = { +, *,   lambda  }
   - Follow( O1 ) = Follow( E ) = First( Q ) + Follow( X ) + { ;, ) } = { ;, ), coma}
-- O2 → First( O2 ) ∩ Follow( O2 ) = **Ø**
-  - First( O2 ) = { ==, >,  λ }
+- O2 → First( O2 ) interseccion Follow( O2 ) = **Ø**
+  - First( O2 ) = { ==, >,   lambda  }
   - Follow( O2 ) = Follow( N ) = First( O1 ) + First(O2) + Follow( E )= { +, *, ==, >, ; , ), coma }
-- O3 → First( O3 ) ∩ Follow( O3 ) = **Ø**
-  - First( O3 ) = { &&, ||,  λ }
+- O3 → First( O3 ) interseccion Follow( O3 ) = **Ø**
+  - First( O3 ) = { &&, ||,   lambda  }
   - Follow( O3 ) = Follow( Z ) = First( O2 ) + Follow( N )= { ==, >, +, *, ; , ), coma }
-- X → E | λ  —> First(X) ∩ Follow(X) = **Ø**
-  - First( X ) = { id, (, cteEnt, cadena, boolT, boolF, λ }
+- X → E |  lambda   —> First(X) interseccion Follow(X) = **Ø**
+  - First( X ) = { id, (, cteEnt, cadena, boolT, boolF,  lambda  }
   - Follow( X ) = { ; }
 
-    First(V) ⊆ First(U) ⊆ First(R) ⊆ First(E) ⊆ First(X)
+    First(V)contenido en  First(U)contenido en  First(R)contenido en  First(E)contenido en  First(X)
 
-- C → B C | λ —> First(B C ) ∩ Follow(C) = **Ø**
+- C → B C |  lambda  —> First(B C ) interseccion Follow(C) = **Ø**
   - First( C ) = First(B) = { let, if, id, return, print, input,  do }
   - Follow( C ) =  { llaveAbierto }
-- L → E Q | λ —> First(EQ) ∩ Follow(L) = **Ø**
+- L → E Q |  lambda  —> First(EQ) interseccion Follow(L) = **Ø**
   - First( L ) = First(E) = { id, (, cteEnt, cadena, boolT, boolF}
   - Follow( L ) = { ) }
 
-    First(V) ⊆ First(U) ⊆ First(R) ⊆ First(E) ⊆ First(EQ)
+    First(V)contenido en  First(U)contenido en  First(R)contenido en  First(E)contenido en  First(EQ)
 
-- Q → , E Q | λ —> First(, E Q) ∩ Follow(Q) = **Ø**
+- Q → , E Q |  lambda  —> First(, E Q) interseccion Follow(Q) = **Ø**
   - First( Q ) = { , }
   - Follow( Q ) = Follow( L ) = {  ) }
-- H → T | λ —>  First(T) ∩ Follow(H) = **Ø**
+- H → T |  lambda  —>  First(T) interseccion Follow(H) = **Ø**
   - Follow(H) = { (  }
-- A → T id K | λ —>  First(T id K) ∩ Follow(A) = **Ø**
+- A → T id K |  lambda  —>  First(T id K) interseccion Follow(A) = **Ø**
   - First( A ) = First( T ) = { int, boolean, string }
   - Follow( A ) = { ) }
 
-    First(T) ⊆ First(T id K)
+    First(T)contenido en  First(T id K)
 
-- K → , T id K | λ —> First(, T id K ) ∩ Follow(K) = **Ø**
+- K → , T id K |  lambda  —> First(, T id K ) interseccion Follow(K) = **Ø**
   - First( K ) = { , }
   - Follow( K ) = Follow (A ) = { ) }
-- R' -> First ( R ) ∩ Follow( R’ ) = **Ø**
-  - First( R’ ) = { (, ++, λ }
-  - Follow( R ’) = Follow( R ) = First( O ) + Follow( E ) = {  &&,  +, *, ==, >, λ  } + { coma, puntoComa, )  }  = {   )  }
+- R' -> First ( R ) interseccion Follow( R’ ) = **Ø**
+  - First( R’ ) = { (, ++,  lambda  }
+  - Follow( R ’) = Follow( R ) = First( O ) + Follow( E ) = {  &&,  +, *, ==, >,  lambda   } + { coma, puntoComa, )  }  = {   )  }
 
 function hola int (){
 
@@ -362,32 +366,32 @@ return “cadena”;
 16 - S' -> ( L ) 
 17 - S' -> ++
 18 - X  -> E
-19 - X  -> λ
+19 - X  ->  lambda 
 20 - C  -> B C
-21 - C  -> λ
+21 - C  ->  lambda 
 22 - L  -> E Q
-23 - L  -> λ
+23 - L  ->  lambda 
 24 - Q  -> , E Q
-25 - Q  -> λ
+25 - Q  ->  lambda 
 26 - F  -> function id H ( A ) { C }
 27 - H  -> T
-28 - H  -> λ
+28 - H  ->  lambda 
 29 - A  -> T id K
-30 - A  -> λ
+30 - A  ->  lambda 
 31 - K  -> , T id K
-32 - K  -> λ
+32 - K  ->  lambda 
 33 - E  -> N O1  
 34 - N  -> Z O2  
 35 - Z  -> R O3  
 36 - O1 -> || N O1
 37 - O1 -> && N O1
-38 - O1 -> λ 
+38 - O1 ->  lambda  
 39 - O2 -> == Z O2
 40 - O2 -> > Z O2
-41 - O2 -> λ
+41 - O2 ->  lambda 
 42 - O3 -> + R O3
 43 - O3 -> * R O3
-44 - O3 -> λ
+44 - O3 ->  lambda 
 45 - R  -> id R'
 46 - R  -> ( E )
 47 - R  -> entero 
@@ -396,7 +400,7 @@ return “cadena”;
 50 - R  -> false 
 51 - R' -> ( L ) 
 52 - R' -> ++ 
-53 - R' -> λ
+53 - R' ->  lambda 
 ```
 
 ### Gramática para el árbol sintáctico
@@ -1062,7 +1066,7 @@ Listado de tokens:
 
 Árbol de análisis sintáctico generado mediante VAST
 
-<img src="./images/arbol.png" title="Ärbol Sintáctico generado por VAST" alt="Ärbol Sintáctico"style="width:30%">
+![Arbol](images/arbol.png)
 
 Volcado de la Tabla de Símbolos
 

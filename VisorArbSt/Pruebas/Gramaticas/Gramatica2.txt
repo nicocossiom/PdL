@@ -1,0 +1,30 @@
+//// Prueba 2
+//// Prueba clásica para la factorización
+//// Gramática factorizada LL(1)
+NoTerminales = { A A2 B B2 C C2 }
+//// Se han añadido los símbolos A2 B2 y C2 para lograr la correcta factorizacion
+
+Axioma = A
+
+Terminales = { a b c }
+
+//// El lenguaje que se genera el a+ b+ c+
+Producciones = {
+	A -> a A2
+	
+	A2 -> A
+	A2 -> B
+
+	B -> b B2
+	
+	B2 -> B
+	B2 -> C
+
+	C -> c C2
+	
+	C2 -> C
+	C2 -> lambda	//// Única producción anulable de la gramática
+}
+
+//// El lenguaje que genera esta gramática es el miso que el de el ejemplo 1,
+//// pero ésta sí cumple las condiciones LL(1)

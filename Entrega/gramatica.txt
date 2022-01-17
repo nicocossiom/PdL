@@ -1,0 +1,60 @@
+Terminales = { eof let id puntoComa if parAbierto parCerrado llaveAbierto
+llaveCerrado while do else function return input print true false int boolean
+string mas por and equals mayor asig cadena cteEnt postIncrem coma or cteEnt }
+
+NoTerminales = { A B C E F H K L N O1 O2 O3 P Q R Rp S Sp T X Z }
+
+Axioma = P
+
+Producciones = {
+P -> B P
+P -> F P
+P -> eof
+B -> let T id puntoComa
+B -> if parAbierto E parCerrado S
+B -> S
+B -> do llaveAbierto C llaveCerrado while parAbierto E parCerrado puntoComa
+T -> int
+T -> boolean
+T -> string
+S -> id Sp puntoComa
+S -> return X puntoComa
+S -> print parAbierto E parCerrado puntoComa
+S -> input parAbierto id parCerrado puntoComa
+Sp -> asig E
+Sp -> parAbierto L parCerrado
+Sp -> postIncrem
+X -> E
+X -> lambda
+C -> B C
+C -> lambda
+L -> E Q
+L -> lambda
+Q -> coma E Q
+Q -> lambda
+F -> function id H parAbierto A parCerrado llaveAbierto C llaveCerrado 
+H -> T
+H -> lambda
+A -> T id K
+A -> lambda
+K -> coma T id K
+K -> lambda
+E -> N O1
+N -> Z O2
+Z -> R O3
+O1 -> or N O1
+O1 -> and N O1
+O1 -> lambda
+O2 -> equals Z O2
+O2 -> mayor Z O2
+O2 -> lambda
+O3 -> mas R O3
+O3 -> por R O3
+O3 -> lambda
+R -> id Rp
+R -> parAbierto E parCerrado
+R -> cteEnt
+R -> cadena
+R -> true
+R -> false
+Rp -> parAbierto L parCerrado

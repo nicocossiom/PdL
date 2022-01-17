@@ -1,0 +1,1 @@
+1 3 9 16 6 12 descendente 18

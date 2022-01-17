@@ -1,3 +1,0 @@
-function bisiesto boolean (int a)	{		
-	return (a % 4 == 0 && a % 100 != 0 || a % 400 == 0);	//se tienen en cuenta la precedencia de operadores
-} // fin de bisiesto: función lógica

@@ -742,6 +742,8 @@ class Syntactic:
                     return
         elif self.equipara("if", 5) and self.equipara("parAbierto"):
             E = self.E()
+            if not E:
+                self.error("EmptyConditionError", "La condición está vacía")
             if self.equipara("parCerrado"):
                 if self.token == "llaveAbierto":
                     self.error("IfBlockError", "Solo estan soportados los ifs simples")
@@ -757,6 +759,8 @@ class Syntactic:
                 self.C()
                 if self.equipara("llaveCerrado") and self.equipara("while") and self.equipara("parAbierto"):
                     E = self.E()
+                    if not E:
+                        self.error("EmptyConditionError", "La condición está vacía")
                     if self.equipara("parCerrado") and self.equipara("puntoComa"):
                         if E.tipo != "boolean":
                             self.error("WrongDataTypeError", "La condición del while debe ser de tipo booleano")
@@ -816,6 +820,8 @@ class Syntactic:
         elif self.equipara("print", 13):
             if self.equipara("parAbierto"):
                 E = self.E()
+                if not E:
+                    self.error("EmptyConditionError", "La condición está vacía")
                 if self.equipara("parCerrado") and self.equipara("puntoComa"):
                     if E.tipo in {"string", "int"}:
                         return ProductionObject(tipo=True)
@@ -844,6 +850,8 @@ class Syntactic:
     def Sp(self) -> ProductionObject:
         if self.equipara("asig", 15):
             E = self.E()
+            if not E:
+                self.error("EmptyConditionError", "La condición está vacía")
             if self.equipara("puntoComa"):
                 return E
         elif self.equipara("parAbierto", 16):
@@ -1061,7 +1069,7 @@ class Syntactic:
                                "El operador post incremento solo es aplicable a variables del tipo entero")
                 elif not self.TSG.buscarId(id):
                     self.error("NonDeclaredError", f"Error la función {id} no ha sido declarada previamente")
-                elif Rp.tipo != self.TSG.map[id].tipo_params:
+                elif Rp.tipo != "true" and Rp.tipo != self.TSG.map[id].tipo_params:
                     self.error("WrongArguemensError", f"Tipos de los atributos incorrectos en llamada a función \"{id}\" ")
                 else:
                     return ProductionObject(tipo=self.TSG.map[id].tipo_dev)
@@ -1089,7 +1097,10 @@ class Syntactic:
         if self.equipara("parAbierto", 51):
             L = self.L()
             if self.equipara("parCerrado"):
-                return ProductionObject(tipo=L.tipo)
+                if L:
+                    return ProductionObject(tipo=L.tipo)
+                else:
+                     return ProductionObject(tipo="true")
         elif self.equipara("postIncrem", 52):
             return ProductionObject(tipo="postIncrem")
         elif self.token in Follow["Rp"]:

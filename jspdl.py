@@ -956,7 +956,6 @@ class Syntactic:
             Syntactic.addParseElement(30)
         else:
             self.error("FunctionCallError", f"No ha cerrado paréntesis en la llamada a la función")
-            self.error("FunctionCallError", f"No ha cerrado paréntesis en la llamada a la función")
 
     def K(self, lista=None) -> List[str]:
         if self.equipara("coma", 31):

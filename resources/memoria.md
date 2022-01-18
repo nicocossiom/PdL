@@ -483,28 +483,32 @@ No hay conversión de tipos automática en el lenguaje.
 
 ```text
 tipo TS:
-  .crear() -> crea una tabla de símbolos vacía
-  .destruir( tabla ) -> destruye la tabla de símbolos "tabla"
-  .desp = desplazamiento actual de la tabla, última posición libre  
-  .insertatId(id) -> se inserta en la última posición el identificador, creando una nueva entrada y poniendo el desplazamiento 
-    de la entrada como el valor actual de TS.desp
-  .insertarTipoId ( pos, tipo ) -> inserta el tipo de la variable (id.pos) en la TS
-  
-  .insertarTipoParam ( tipo1 x tipo2 x ... ) -> inserta un producto cartesiano de los tipos de los 
-    parámetros de los argumentos de una función
-  .insertarTipoDev ( tipo ) -> inserta el tipo que devuelve una función en la tabla general
-  
-  .buscarId( id.pos ) -> busca un identificador en la tabla, devuelve true si existe, false si no
-  .getTipoParam( id.pos ) -> devuelve el valor (producto cartesiano de tipos) que identifica los tipos 
-    de los argumentos de la función id
+		.crear() -> crea una tabla de símbolos vacía
+		.destruir( tabla ) -> destruye la tabla de símbolos "tabla"
+		.desp = desplazamiento actual de la tabla, última posición libre		
+		.insertarId(id) -> se inserta en la última posición el identificador, creando una nueva entrada y poniendo el desplazamiento 
+				de la entrada como el valor actual de TS.desp
+		.insertarTipoId ( pos, tipo ) -> inserta el tipo de la variable (id.pos) en la TS
+		
+		.insertarTipoParam ( tipo1 x tipo2 x ... ) -> inserta un vector de los tipos de los 
+				parámetros de los argumentos de una función
+		.insertarTipoDev ( tipo ) -> inserta el tipo que devuelve una función en la tabla general
+		
+		.buscarId( id.pos ) -> busca un identificador en la tabla, devuelve true si existe, false si no
+		.getTipoParam( id.pos ) -> devuelve el valor (vecto de tipos) que identifica los tipos 
+				de los argumentos de la función id
+		.getTipo (id.pos ) -> devuelve el tipo del valor  
 tipo id:
-  .pos = posición en la TS que corresponda, adquiere el valor de TS.pos al insertarse con 
-    TS.insertarId(id)
+		.pos = posición en la TS que corresponda, adquiere el valor de TS.pos al insertarse con 
+				TS.insertarId(id)
 
 tipo reglas: son todas las reglas que contiene la gramática
-  .tipo = tipo que devuelve la regla (boolean, string, entero o int, vacio, function)
-    puede ser una producto cartesiano de tipos o solo uno 
-  .tipoDev= devolución de una regla 
+		.tipo = tipo que devuelve la regla (boolean, string, entero o int, vacio, function)
+				puede ser una vector de tipos o solo uno 
+		.tipoDev= devolución de una regla
+
+isinstance(id.tipo, claseObjeto) -> devuelve un valor booleano en función de si id.tipo es el mismo tipo de objeto que claseObjeto.
+		por ejemplo isinstance(id.tipo, vector) para saber si un resultado es un vector
 ```
 
 ### Esquema de Traducción
@@ -514,129 +518,153 @@ P' -> { TSG = TS.crear() TSactual = TSG } P  { TS.destruir(TSG) }
 P  -> B P
 P  -> F P 
 P  -> eof 
-B  -> let T id  puntoComa
-   { if TSactual.buscarId(id) == false ) 
-     then 
-      id.pos = TSActual.insertarId( id )
-      TSActual.insertarTipoId( id.pos, T.tipo )
-      TS.despl = despl + T.ancho
-   } 
+B  -> let T id 	puntoComa
+			{ if (TSactual.buscarId(id) == false ) 
+					then 
+						id.pos = TSActual.insertarId( id )
+						TSActual.insertarTipoId( id.pos, T.tipo )
+						TS.despl = despl + T.ancho
+			}	
 B  -> if parAbierto E parCerrado S 
-  { if (E.tipo != boolean) 
-   then error("El tipo de E tiene que ser boolean ya que nos encontramos en la condición de if")
-  }
+		{ if (E.tipo == vacio ) 
+			then error ("La condición está vacía")
+			if (E.tipo != boolean) 
+			then error("El tipo de E tiene que ser boolean ya que nos encontramos en la condición de if")
+		}
 B  -> S 
 B  -> do llaveAbierto C llaveCerrado while parAbierto E parCerrado puntoComa
-  { if (E.tipo != boolean) 
-   then error("La condición del while debe ser de tipo booleano")
-  }
+		{ if (E.tipo == vacio ) 
+			then error ("La condición está vacía")
+
+
+			if (E.tipo != boolean) 
+			then error("La condición del while debe ser de tipo booleano")
+		}
 T  -> int { T.tipo:= int, T.ancho:= 1 }
 T  -> boolean { T.tipo:= boolean, T.ancho:= 1 }
 T  -> string { T.tipo:= string, T.ancho:= 64}
 S  -> id S' puntoComa 
- { if ( TSActual.buscarId( id ) == false ) ## no está en tabla local
-   then if (TSG.buscarId( id ) == true ) ## sí está en global-> llamada a función o asignación a variable
-       then if (S'.tipo != TSG.getTipoParam(id) )  ## argumentos no coinciden con los de la función
-           then if (id.tipo != S'.tipo ) ## asignación
-               then error( "Tipos en la asignación no coinciden")
-              ## funcion
-              else error("Argumentos no coinciden con los de la función") 
-  else if ( S'.tipo == postIncrem and id.tipo != cteE )  
-     then error("El operador post incremento solo es aplicable a variables del tipo entero")
-  else  ## es una declaracion e inicialización de una variable global i.e (a = 5)
-    id.pos = TSG.insertarId( id ) 
-    TSG.insertarTipo ( id.pos, S'.tipo )
-    ancho = if (S'tipo == string ) else 1
-    TSG.pos = TSG.pos + ancho
- }
+if Sp.tipo == vacio || isinstance(Sp.tipo, vector):  # es una llamada a funcion
+    then if (TSG.buscarId(id))
+        then if (Sp.tipo != vacio)
+              then if id.tipo == "function" && Sp.tipo != TSG.getTipoParams:  # funcion con parametros incorrectos
+                  error("Argumentos incorrectos")
+    else error("Error la función no ha sido declarada previamente")
+else  # es una asignacion
+    if !(self.TSActual.buscarId(id) || TSG.buscar(id) ) 
+        then  # declaracion e inicialización de una variable global i.e (a = 5)
+        if Sp.tipo == int
+            then 
+            TSG.insertarId(id, Sp.tipo)
+            if (Sp.tipo != "postIncrem" && id.tipo != Sp.tipo) 
+                then error("Tipo de la variable no coincide con tipo tipo de la asignación")
+            S.tipo = tipo_ok
+        else error("Solo se pueden hacer asignaciones sin inicializacion cuando la asignacion es de tipo int")
+    else if (Sp.tipo == "postIncrem" && id.tipo != "int")
+        then error("El operador post incremento solo es aplicable a variables del tipo entero")
+    else if (Sp.tipo != "postIncrem" && id.tipo != Sp.tipo):  # es una asignacion normal
+        then error("Tipo de la variable no coincide con el tipo de la asignación")
 S  -> return X puntoComa 
- { 
-  S.tipo = tipo_ok
-  S.tipoRet = X.tipo 
- }
+	{ 
+		S.tipo = tipo_ok
+		S.tipoRet = X.tipo	
+	}
 S  -> print parAbierto E
-  { 
-  S.tipoRet = vacio
-  S.tipo = tipo_ok if (E.tipo == string ) else error("La función print solo acepta parámetros de tipo string")   
-  }  
-  parCerrado puntoComa
+		{ if (E.tipo == vacio)
+			then error ("La condición está vacía")
+			S.tipoRet = vacio	}		
+		parCerrado puntoComa
+		{	S.tipo = tipo_ok if (E.tipo == string || E.tipo == int) else error("La función print solo acepta parámetros de tipo string e int") }
 S  -> input parAbierto id 
-  { if (TSactual.buscarId(id) == true )
-    then if TSactual.buscarTipo(id) not in (string, cteEnt)
-       then error("La función input debe recibir una variable de tipo string o entero") 
-   else if (TSG.buscarId(id) == true )
-    then if TSG.buscarTipo(id) not in (string, cteEnt)
-       then error("La función input debe recibir una variable de tipo string o entero") 
-   else error("Variable no ha sido previamente declarada")
-  } parCerrado puntoComa
-S' -> asig E puntoComa { S'.tipo = E.tipo } 
+		{ if (TSactual.buscarId(id) == true )
+				then if TSactual.buscarTipo(id) not in (string, cteEnt)
+							then error("La función input debe recibir una variable de tipo string o entero") 
+			else if (TSG.buscarId(id) == true )
+				then if TSG.buscarTipo(id) not in (string, cteEnt)
+							then error("La función input debe recibir una variable de tipo string o entero") 
+			else error("Variable no ha sido previamente declarada")
+		} parCerrado puntoComa
+S' -> asig E puntoComa 
+			{if (E.tipo == vacio)
+			 then error ("La condición está vacía")
+			 S'.tipo = E.tipo } 
 S' -> parAbierto L parCerrado { S'.tipo = L.tipo }  
 S' -> postIncrem { S'.tipo = postIncrem } 
 X  -> E { X.tipo = E.tdefipo } 
 X  -> lambda { X.tipo = vacio }
 C  -> B C 
 C  -> lambda { C.tipo = vacio } 
-L  -> E Q { L.tipo = L.tipo x Q.tipo }   ## tipo1 x tipo2 x tipo3 o vacio 
+L  -> E Q { L.tipo = L.tipo x Q.tipo }   # tipo1 x tipo2 x tipo3 o vacio 
 L  -> lambda { L.tipo = vacio }  
 Q  -> coma E {if E.tipo != vacio) 
-    then Q.tipo = Q.tipo x E.tipo } 
-   Q      
+				then Q.tipo = Q.tipo x E.tipo } 
+			Q      
 Q  -> lambda { Q.tipo = vacio } 
 F  -> function id 
-  { tabla = crearTS() 
-   TSactual = tabla  
-   Desp_tabla1 = 0 
-   TSG.insertarId( id ) }
-  H 
-   { TSactual.insertartipoTS (H.tipo); 
-    TSG.insertarTipoDev( id, H.tipo )}
- parAbierto A parCerrado 
- { TSG.insertarTipoParam( id.pos, A.tipo )} ## sintáctico solo acepta boolean string o int, si no es ninguno dará error
- llaveAbierto C llaveCerrado 
- { tabla.destruir()
-  TSActual = TSG }
+		{	tabla = crearTS() 
+			TSactual = tabla  
+			Desp_tabla1 = 0 
+			TSG.insertarId( id ) }
+		H 
+			{ TSactual.insertartipoTS (H.tipo); 
+				TSG.insertarTipoDev( id, H.tipo )}
+	parAbierto A parCerrado 
+	{ TSG.insertarTipoParam( id.pos, A.tipo )} # sintáctico solo acepta boolean string o int, si no es ninguno dará error
+	llaveAbierto C llaveCerrado 
+	{ tabla.destruir()
+		TSActual = TSG }
 H  -> T { H.tipo = T.tipo }
 H  -> lambda { H.tipo = vacio }
-A  -> T id K { if ( K.tipo != vacio) then A.tipo = T.tipo x K.tipo} ## concatenamiento de ids (tipo1 x tipo2 x tipo3 x ... )
+A  -> T id K { if ( K.tipo != vacio) then A.tipo = T.tipo x K.tipo} # concatenamiento de ids (tipo1 x tipo2 x tipo3 x ... )
 A  -> lambda { A.tipo = vacio }
 K  -> coma T  { K.tipo = T.tipo x K.tipo } id K
 K  -> lambda { K.tipo = vacio }
-E  -> N O1 { E.tipo =  "cteEnt" }
-N  -> Z O2 { N.tipo = "cteEnt" }
-Z  -> R O3 { Z.tipo = "boolean" } 
-O1 -> mas N { if R.tipo != cteEnt  
-        then error("Operador + solo acepta datos enteros") 
-      } O1
-O1 -> por N { if R.tipo != cteEnt 
-        then error("Operador * solo acepta datos enteros") 
-      } O1
-O1 -> lambda { O1.tipo = tipo_ok}
-O2 -> equals Z { if Z.tipo != cteEnt 
-         then error("Operador > solo acepta datos enteros") 
-          } O2
-O2 -> mayor Z { if Z.tipo != cteEnt 
-         then error("Operador > solo acepta datos enteros") 
-       } O2 
-O2 -> lambda { O1.tipo = "boolean"}
-O3 -> or R { if R.tipo != boolean 
-       then error("Operador || solo acepta datos lógicos") 
-      } O3
-O3 -> and R { if R.tipo != boolean 
-        then error("Operador || solo acepta datos lógicos") 
-      else if O1.tipo == vacio then O3.tipo = tipo_ok } O3 
+E  -> N {O1.tipo = N.tipo} O1 { E.tipo = O1.tipo}
+N  -> Z {O2.tipo = Z.tipo} O2 { N.tipo = O2.tipo }
+Z  -> R {O3.tipo = R.tipo} O3 { Z.tipo = O3.tipo } 
+O1 ->and N { if N.tipo != boolean 
+								then error("Operador || solo acepta datos lógicos") 
+						} O1-2  { if O1-2.tipo == tipo_ok then O1.tipo = boolean }
+O1 -> or N { if N.tipo != boolean 
+							then error("Operador || solo acepta datos lógicos") 
+			} O1-2 { if O1-2.tipo == tipo_ok then O1.tipo = boolean } 
+O1 -> lambda { if O1.tipo == vacio
+									then O1.tipo = boolean }
+O2 -> equals Z { if Z.tipo != int 
+									then error("Operador > solo acepta datos enteros") 
+			} O2-2 { if O2-2.tipo == tipo_ok then O2.tipo = boolean } 
+O2 -> mayor Z { if Z.tipo != int 
+									then error("Operador > solo acepta datos enteros") 
+							} O2-2 {if O2-2.tipo == tipo_ok then O2.tipo = boolean  } 
+O2 -> lambda { if O2.tipo == vacio
+									then O2.tipo = boolean }
+O3 -> por R { if R.tipo != cteEnt 
+								then error("Operador * solo acepta datos enteros") 
+						} O3-2 { if O3-2.tipo == tipo_ok then O3.tipo = int }
+
+O3 -> mas R { if R.tipo != cteEnt  
+								then error("Operador + solo acepta datos enteros") 
+						} O3-2 { if O3-2.tipo == tipo_ok then O3.tipo = int }
 O3 -> lambda { O3.tipo = tipo_ok } 
-R  -> id R' { if (R'.tipo == postIncrem and id.tipo != cteEnt ) 
-        then error("El operador post incremento solo es aplicable a variables del tipo entero") 
-       else if (R'.tipo =! vacio ) ## se trata de una llamada a una función 
-          then if ( TSG.buscarId( id ) == false )
-             then error("Errror la función no ha sido declarada previamente")
-          else if (R'.tipo != TSG.getParam( id ) ) 
-            then error("Tipos de los atributos incorrectos en llamada a función")
-          else R.tipo = TSG.getTipoDev( id )
-      else:
-        R.tipo = id.tipo ## habria que buscarlo en ambas tablas para ver en 
-                 ## en cual esta y coger el tipo de la tabla 
-      }
+R  -> id R' { 
+						if (Rp.tipo != vacio)
+							then if Rp.tipo = postIncrem
+											then if (!TSG.buscarId(id) && TSActual.buscarId(id))
+													then error("Variable no declarada")
+											else
+												if (id.tipo != int) then error("Postincremento solo es aplicable a variables del tipo entero")
+							else 
+								if (!TSG.buscarId(id)) then error("Funcion no declarada")
+								else if (R.tipo != true && TSG.getTipoParams(id.pos)!=R.tipo)
+												then error("Tipos de los atributos incorrectos en la llamada a la función")
+								else 
+										R.tipo = TSG.getTipoDev(id.pos)
+							else 
+								if (TSActual.buscarId(id)) then R.tipo = TSActual.getTipo(id.pos)
+								else if (TSG.buscarId(id)) then R.tipo = TSG.getTipo(id.pos)
+							else 
+								error("Variable no ha sido declarada previamente")
+						}
 R  -> parAbierto E parCerrado { R.tipo:= E.tipo }
 R  -> cteEnt { R.tipo:= int, R.ancho:= 1 }
 R  -> cadena { R.tipo:= string R.ancho:= 64 }
@@ -644,7 +672,9 @@ R  -> boolT { R.tipo:= boolean R.ancho:= 1 }
 R  -> boolF { R.tipo:= boolean R.ancho:= 1 }
 R' -> lambda { R'.tipo = vacio }
 R' -> parAbierto L parCerrado 
-   { R'.tipo = L.tipo } 
+			{ if L.tipo != vacio 
+					then R'.tipo = L.tipo
+				else R.tipo = tipo_ok } 
 R' -> postIncrem { R'.tipo = postIncrem }  
 ```
 

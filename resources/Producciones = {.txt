@@ -1,9 +1,3 @@
-Terminales = { eof let id puntoComa if parAbierto parCerrado llaveAbierto llaveCerrado while do else function return input print true false int boolean string mas por and equals mayor asig cadena postIncrem coma or cteEnt }
-
-NoTerminales = { A B C E F H K L N O1 O2 O3 P Q R Rp S Sp T X Z  }
-
-Axioma = P
-
 Producciones = {
 P -> B P
 P -> F P
@@ -55,7 +49,4 @@ R -> cteEnt
 R -> cadena
 R -> true
 R -> false
-Rp -> parAbierto L parCerrado 
-Rp -> postIncrem 
-Rp -> lambda
-}
+Rp -> parAbierto L parCerrado

@@ -1066,7 +1066,2644 @@ Listado de tokens:
 
 Árbol de análisis sintáctico generado mediante VAST
 
-![Arbol](images/arbol.png)
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+<title>Arbol</title>
+<link rel="stylesheet" type="text/css" href="CSS.css"> 
+<style type="text/css"> 
+.filetree span.Noterminales { color: Brown;}
+.filetree span.terminales { color: Red;}
+</style>
+<script>
+$(document).ready(function(){
+$("#browser").treeview();
+});
+</script>
+</head>
+<body>
+<ul id="browser" class="filetree">
+
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (4)</span>
+<ul>
+<li><span class="terminales">let</span>
+</li>
+<li><span class="Noterminales">T (10)</span>
+<ul>
+<li><span class="terminales">string</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (14)</span>
+<ul>
+<li><span class="terminales">input</span>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (4)</span>
+<ul>
+<li><span class="terminales">let</span>
+</li>
+<li><span class="Noterminales">T (9)</span>
+<ul>
+<li><span class="terminales">boolean</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (4)</span>
+<ul>
+<li><span class="terminales">let</span>
+</li>
+<li><span class="Noterminales">T (9)</span>
+<ul>
+<li><span class="terminales">boolean</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (4)</span>
+<ul>
+<li><span class="terminales">let</span>
+</li>
+<li><span class="Noterminales">T (8)</span>
+<ul>
+<li><span class="terminales">int</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (47)</span>
+<ul>
+<li><span class="terminales">cteEnt</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (52)</span>
+<ul>
+<li><span class="terminales">postIncrem</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (48)</span>
+<ul>
+<li><span class="terminales">cadena</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (49)</span>
+<ul>
+<li><span class="terminales">true</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (50)</span>
+<ul>
+<li><span class="terminales">false</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (2)</span>
+<ul>
+<li><span class="Noterminales">F (26)</span>
+<ul>
+<li><span class="terminales">function</span>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">H (27)</span>
+<ul>
+<li><span class="Noterminales">T (10)</span>
+<ul>
+<li><span class="terminales">string</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">A (29)</span>
+<ul>
+<li><span class="Noterminales">T (10)</span>
+<ul>
+<li><span class="terminales">string</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">K (32)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">llaveAbierto</span>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (5)</span>
+<ul>
+<li><span class="terminales">if</span>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (51)</span>
+<ul>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">L (22)</span>
+<ul>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">Q (25)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (47)</span>
+<ul>
+<li><span class="terminales">cteEnt</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (12)</span>
+<ul>
+<li><span class="terminales">return</span>
+</li>
+<li><span class="Noterminales">X (18)</span>
+<ul>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (21)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">llaveCerrado</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (2)</span>
+<ul>
+<li><span class="Noterminales">F (26)</span>
+<ul>
+<li><span class="terminales">function</span>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">H (27)</span>
+<ul>
+<li><span class="Noterminales">T (10)</span>
+<ul>
+<li><span class="terminales">string</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">A (29)</span>
+<ul>
+<li><span class="Noterminales">T (10)</span>
+<ul>
+<li><span class="terminales">string</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">K (32)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">llaveAbierto</span>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (4)</span>
+<ul>
+<li><span class="terminales">let</span>
+</li>
+<li><span class="Noterminales">T (8)</span>
+<ul>
+<li><span class="terminales">int</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (7)</span>
+<ul>
+<li><span class="terminales">do</span>
+</li>
+<li><span class="terminales">llaveAbierto</span>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (39)</span>
+<ul>
+<li><span class="terminales">equals</span>
+</li>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (13)</span>
+<ul>
+<li><span class="terminales">print</span>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (47)</span>
+<ul>
+<li><span class="terminales">cteEnt</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (48)</span>
+<ul>
+<li><span class="terminales">cadena</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (21)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">llaveCerrado</span>
+</li>
+<li><span class="terminales">while</span>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (12)</span>
+<ul>
+<li><span class="terminales">return</span>
+</li>
+<li><span class="Noterminales">X (18)</span>
+<ul>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (21)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">llaveCerrado</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (46)</span>
+<ul>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (51)</span>
+<ul>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">L (22)</span>
+<ul>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (51)</span>
+<ul>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">L (22)</span>
+<ul>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">Q (25)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">Q (25)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (13)</span>
+<ul>
+<li><span class="terminales">print</span>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (1)</span>
+<ul>
+<li><span class="Noterminales">B (4)</span>
+<ul>
+<li><span class="terminales">let</span>
+</li>
+<li><span class="Noterminales">T (9)</span>
+<ul>
+<li><span class="terminales">boolean</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (2)</span>
+<ul>
+<li><span class="Noterminales">F (26)</span>
+<ul>
+<li><span class="terminales">function</span>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">H (27)</span>
+<ul>
+<li><span class="Noterminales">T (9)</span>
+<ul>
+<li><span class="terminales">boolean</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">A (29)</span>
+<ul>
+<li><span class="Noterminales">T (8)</span>
+<ul>
+<li><span class="terminales">int</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">K (32)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">llaveAbierto</span>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (4)</span>
+<ul>
+<li><span class="terminales">let</span>
+</li>
+<li><span class="Noterminales">T (10)</span>
+<ul>
+<li><span class="terminales">string</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (13)</span>
+<ul>
+<li><span class="terminales">print</span>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (48)</span>
+<ul>
+<li><span class="terminales">cadena</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (14)</span>
+<ul>
+<li><span class="terminales">input</span>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (12)</span>
+<ul>
+<li><span class="terminales">return</span>
+</li>
+<li><span class="Noterminales">X (18)</span>
+<ul>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (46)</span>
+<ul>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (46)</span>
+<ul>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (42)</span>
+<ul>
+<li><span class="terminales">mas</span>
+</li>
+<li><span class="Noterminales">R (47)</span>
+<ul>
+<li><span class="terminales">cteEnt</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (39)</span>
+<ul>
+<li><span class="terminales">equals</span>
+</li>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (47)</span>
+<ul>
+<li><span class="terminales">cteEnt</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (21)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">llaveCerrado</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (2)</span>
+<ul>
+<li><span class="Noterminales">F (26)</span>
+<ul>
+<li><span class="terminales">function</span>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">H (27)</span>
+<ul>
+<li><span class="Noterminales">T (8)</span>
+<ul>
+<li><span class="terminales">int</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">A (29)</span>
+<ul>
+<li><span class="Noterminales">T (8)</span>
+<ul>
+<li><span class="terminales">int</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">K (31)</span>
+<ul>
+<li><span class="terminales">coma</span>
+</li>
+<li><span class="Noterminales">T (8)</span>
+<ul>
+<li><span class="terminales">int</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">K (32)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">llaveAbierto</span>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (4)</span>
+<ul>
+<li><span class="terminales">let</span>
+</li>
+<li><span class="Noterminales">T (8)</span>
+<ul>
+<li><span class="terminales">int</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (13)</span>
+<ul>
+<li><span class="terminales">print</span>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (48)</span>
+<ul>
+<li><span class="terminales">cadena</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (13)</span>
+<ul>
+<li><span class="terminales">print</span>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (14)</span>
+<ul>
+<li><span class="terminales">input</span>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (5)</span>
+<ul>
+<li><span class="terminales">if</span>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (51)</span>
+<ul>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">L (22)</span>
+<ul>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">Q (25)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="Noterminales">S (11)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Sp (15)</span>
+<ul>
+<li><span class="terminales">asig</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (42)</span>
+<ul>
+<li><span class="terminales">mas</span>
+</li>
+<li><span class="Noterminales">R (47)</span>
+<ul>
+<li><span class="terminales">cteEnt</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (12)</span>
+<ul>
+<li><span class="terminales">return</span>
+</li>
+<li><span class="Noterminales">X (18)</span>
+<ul>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (21)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">llaveCerrado</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (2)</span>
+<ul>
+<li><span class="Noterminales">F (26)</span>
+<ul>
+<li><span class="terminales">function</span>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">H (27)</span>
+<ul>
+<li><span class="Noterminales">T (9)</span>
+<ul>
+<li><span class="terminales">boolean</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">A (29)</span>
+<ul>
+<li><span class="Noterminales">T (8)</span>
+<ul>
+<li><span class="terminales">int</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">K (31)</span>
+<ul>
+<li><span class="terminales">coma</span>
+</li>
+<li><span class="Noterminales">T (8)</span>
+<ul>
+<li><span class="terminales">int</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">K (31)</span>
+<ul>
+<li><span class="terminales">coma</span>
+</li>
+<li><span class="Noterminales">T (8)</span>
+<ul>
+<li><span class="terminales">int</span>
+</li>
+</ul>
+</li>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">K (32)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+<li><span class="terminales">llaveAbierto</span>
+</li>
+<li><span class="Noterminales">C (20)</span>
+<ul>
+<li><span class="Noterminales">B (6)</span>
+<ul>
+<li><span class="Noterminales">S (12)</span>
+<ul>
+<li><span class="terminales">return</span>
+</li>
+<li><span class="Noterminales">X (18)</span>
+<ul>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (46)</span>
+<ul>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (39)</span>
+<ul>
+<li><span class="terminales">equals</span>
+</li>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (51)</span>
+<ul>
+<li><span class="terminales">parAbierto</span>
+</li>
+<li><span class="Noterminales">L (22)</span>
+<ul>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">Q (24)</span>
+<ul>
+<li><span class="terminales">coma</span>
+</li>
+<li><span class="Noterminales">E (33)</span>
+<ul>
+<li><span class="Noterminales">N (34)</span>
+<ul>
+<li><span class="Noterminales">Z (35)</span>
+<ul>
+<li><span class="Noterminales">R (45)</span>
+<ul>
+<li><span class="terminales">id</span>
+</li>
+<li><span class="Noterminales">Rp (53)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">Q (25)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">parCerrado</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O3 (44)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O2 (41)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">O1 (38)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">puntoComa</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">C (21)</span>
+<ul>
+<li><span class="terminales">lambda</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="terminales">llaveCerrado</span>
+</li>
+</ul>
+</li>
+<li><span class="Noterminales">P (3)</span>
+<ul>
+<li><span class="terminales">eof</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
+
 
 Volcado de la Tabla de Símbolos
 
